@@ -9,8 +9,13 @@ Status: Starting early design prototype(s)
     - If you'd like to understand the setup, inspect the `docker-compose.yml` for details.
     - You'll get a shell in the container where you may run `npm run` commands documented in `package.json`.
     - Code/text editing can be done from the outside as usual.
-2. Go to http://localhost:3000
-    - Port can be modified in `docker-compose.yml`.
+2. Go to http://localhost:8080
+    - Port can be modified in `docker-compose.yml`, but the webpack dev server may need to be adjusted in order to make it work completely.
+
+### Useful documentation
+
+- Blockly
+    - [A full list of pre-defined blocks can be found in the source code.](https://github.com/google/blockly/tree/develop/blocks)
 
 ## Origin
 
