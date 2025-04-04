@@ -1,6 +1,6 @@
 services:
   dev:
-    container_name: dev
+    container_name: fairdo-designer-dev
     image: node:23
     ports:
       - 127.0.0.1:8080:8080
