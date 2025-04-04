@@ -17,6 +17,10 @@ Status: Starting early design prototype(s)
 - Blockly
     - [A full list of pre-defined blocks can be found in the source code.](https://github.com/google/blockly/tree/develop/blocks)
 
+## Findings
+
+- Having the Profile on the right and the values on the left may be interesting to keep the left-to-right data flow. To do so, we can (ironically) set rtl to true for the workspace and then align all inputs to `"RIGHT"`. I will not do this now because it is additional work and not my current focus.
+
 ## Origin
 
 This has been started using the [command from the Blockly documentation for a typescript setup](https://developers.google.com/blockly/guides/get-started/get-the-code): `npx @blockly/create-package app hello-world --typescript`
