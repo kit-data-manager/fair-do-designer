@@ -37,15 +37,6 @@ forBlock["hmc_profile"] = function (
   block: Blockly.Block,
   generator: Blockly.CodeGenerator,
 ) {
-  // TODO: change Order.ATOMIC to the correct operator precedence strength
-  const value_mandatory = generator.valueToCode(
-    block,
-    "mandatory",
-    Order.ATOMIC,
-  );
-
-  const statement_optional = generator.statementToCode(block, "optional");
-
   // TODO: Assemble javascript into the code variable.
   const code = "1";
   // TODO: Change Order.NONE to the correct operator precedence strength

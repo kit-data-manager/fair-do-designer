@@ -631,7 +631,7 @@ export const toolbox = {
     {
       kind: "category",
       name: "Profile",
-      categorystyle: "profile_category",
+      categorystyle: "procedure_category",
       contents: [
         {
           kind: "block",
