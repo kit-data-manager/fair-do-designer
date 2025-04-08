@@ -7,8 +7,8 @@
 import * as Blockly from "blockly";
 import { blocks } from "./blocks/text";
 import { blocks as profile_blocks } from "./blocks/profiles";
-import { forBlock } from "./generators/javascript";
-import { javascriptGenerator } from "blockly/javascript";
+import { forBlock } from "./generators/python";
+import { pythonGenerator as codeGenerator } from "blockly/python";
 import { save, load } from "./serialization";
 import { toolbox } from "./toolbox";
 import "./index.css";
@@ -16,7 +16,7 @@ import "./index.css";
 // Register the blocks and generator with Blockly
 Blockly.common.defineBlocks(blocks);
 Blockly.common.defineBlocks(profile_blocks);
-Object.assign(javascriptGenerator.forBlock, forBlock);
+Object.assign(codeGenerator.forBlock, forBlock);
 
 // Set up UI elements and inject Blockly
 const codeDiv = document.getElementById("generatedCode")?.firstChild;
@@ -32,7 +32,7 @@ const ws = Blockly.inject(blocklyDiv, { rtl: false, toolbox });
 // generated code from the workspace, and evals the code.
 // In a real application, you probably shouldn't use `eval`.
 const runCode = () => {
-  const code = javascriptGenerator.workspaceToCode(ws as Blockly.Workspace);
+  const code = codeGenerator.workspaceToCode(ws as Blockly.Workspace);
   if (codeDiv) codeDiv.textContent = code;
 
   if (outputDiv) outputDiv.innerHTML = "";

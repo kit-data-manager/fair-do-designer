@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Order } from "blockly/javascript";
+import { Order, PythonGenerator } from "blockly/python";
 import * as Blockly from "blockly/core";
 
 // Export all the code generators for our custom blocks,
@@ -14,7 +14,7 @@ export const forBlock = Object.create(null);
 
 forBlock["add_text"] = function (
   block: Blockly.Block,
-  generator: Blockly.CodeGenerator,
+  generator: PythonGenerator,
 ) {
   const text = generator.valueToCode(block, "TEXT", Order.NONE) || "''";
   const addText = generator.provideFunction_(
@@ -35,28 +35,34 @@ forBlock["add_text"] = function (
 
 forBlock["hmc_profile"] = function (
   block: Blockly.Block,
-  generator: Blockly.CodeGenerator,
-) {
+  generator: PythonGenerator,
+): String {
+  // TODO: change Order.ATOMIC to the correct operator precedence strength
+  const value_dot = generator.valueToCode(block, "dot", Order.ATOMIC);
+
+  // TODO: change Order.ATOMIC to the correct operator precedence strength
+  const value_name2 = generator.valueToCode(block, "NAME", Order.ATOMIC);
+
+  // TODO: change Order.ATOMIC to the correct operator precedence strength
+  const value_loc1 = generator.valueToCode(block, "loc1", Order.ATOMIC);
+
+  const dropdown_opt_selector = block.getFieldValue("opt_selector");
+
+  // TODO: change Order.ATOMIC to the correct operator precedence strength
+  const value_name = generator.valueToCode(block, "NAME", Order.ATOMIC);
+
+  // TODO: change Order.ATOMIC to the correct operator precedence strength
+  const value_loc2 = generator.valueToCode(block, "loc1", Order.ATOMIC);
+
   // TODO: Assemble javascript into the code variable.
-  const code = "1";
-  // TODO: Change Order.NONE to the correct operator precedence strength
-  return [code, Order.NONE];
+  const code = "var profile = 1\n";
+  return code;
 };
 
 forBlock["attribute_key"] = function (
   block: Blockly.Block,
   generator: Blockly.CodeGenerator,
-) {
-  // TODO: change Order.ATOMIC to the correct operator precedence strength
-  const value_attr_value = generator.valueToCode(
-    block,
-    "attr_value",
-    Order.ATOMIC,
-  );
-
-  const dropdown_on_fail = block.getFieldValue("on_fail");
-
-  // TODO: Assemble javascript into the code variable.
-  const code = "1";
+): String {
+  const code = "var attr = 1\n";
   return code;
 };

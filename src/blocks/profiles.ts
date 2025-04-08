@@ -9,105 +9,61 @@ const profile = {
   tooltip: "",
   helpUrl: "",
   message0:
-    "%1 %2 ⭐ Mandatory Attributes %3 %4 %5 %6 %7 %8 %9 %10 %11 %12 %13 %14 %15 %16 %17 %18 %19",
+    "Profile %1 %2 Digital Object Type %3 Digital Object Location [+] %4 [-] %5 Add %6 %7 hasMetadata [+] %8 [-] %9",
   args0: [
     {
       type: "field_label_serializable",
-      text: "Helmholtz KIP",
-      name: "profile_title",
+      text: '"Helmholtz KIP"',
+      name: "name_label",
     },
     {
       type: "input_dummy",
-      name: "profile_header",
+      name: "name",
+    },
+    {
+      type: "input_value",
+      name: "dot",
+      check: "String",
+    },
+    {
+      type: "input_value",
+      name: "NAME",
+      check: "String",
+    },
+    {
+      type: "input_value",
+      name: "loc1",
+      align: "RIGHT",
+      check: "attribute_array",
+    },
+    {
+      type: "field_dropdown",
+      name: "opt_selector",
+      options: [
+        ["--some optional attribute--", "empty"],
+        ["hasMetadata (repeatable)", "hasmd"],
+        ["isMetadataFor", "ismd"],
+        ["Contact (repeatable)", "contact"],
+      ],
     },
     {
       type: "input_dummy",
+      name: "opt",
+    },
+    {
+      type: "input_value",
       name: "NAME",
     },
     {
-      type: "field_label_serializable",
-      text: "Digital Object Location",
-      name: "dolocations_label",
-    },
-    {
       type: "input_value",
-      name: "dolocations",
-      check: "String",
-    },
-    {
-      type: "field_label_serializable",
-      text: "Topic",
-      name: "topic_label",
-    },
-    {
-      type: "input_value",
-      name: "topic",
-      check: "String",
-    },
-    {
-      type: "field_label_serializable",
-      text: "dateCreated",
-      name: "date_label",
-    },
-    {
-      type: "input_value",
-      name: "date",
-      check: "String",
-    },
-    {
-      type: "field_label_serializable",
-      text: "Contact",
-      name: "contact_label",
-    },
-    {
-      type: "input_value",
-      name: "contact",
-      check: "String",
-    },
-    {
-      type: "field_label_serializable",
-      text: "Contact_important",
-      name: "contact2_label",
-    },
-    {
-      type: "input_value",
-      name: "contact2",
-      check: "String",
-    },
-    {
-      type: "field_label_serializable",
-      text: "Contact_special",
-      name: "contact3_label",
-    },
-    {
-      type: "input_value",
-      name: "contact3",
-      check: "String",
-    },
-    {
-      type: "field_label_serializable",
-      text: "Has Metadata",
-      name: "hasmd_label",
-    },
-    {
-      type: "input_value",
-      name: "hasmd",
-      check: "String",
-    },
-    {
-      type: "field_label_serializable",
-      text: "⭐Recommended Attributes",
-      name: "opt_label",
-    },
-    {
-      type: "input_value",
-      name: "optionals",
+      name: "loc1",
+      align: "RIGHT",
       check: "attribute_array",
     },
   ],
-  previousStatement: ["profile", "attribute_key"],
-  nextStatement: ["profile", "attribute_key"],
-  colour: 330,
+  previousStatement: "hmc_profile",
+  nextStatement: ["hmc_profile", "attribute_key"],
+  colour: 195,
   inputsInline: false,
 };
 
