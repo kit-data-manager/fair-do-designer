@@ -37,13 +37,13 @@ const runCode = () => {
 
   if (outputDiv) outputDiv.innerHTML = "";
 
-  eval(code);
+  //eval(code);
 };
 
 if (ws) {
   // Load the initial state from storage and run the code.
   load(ws);
-  //runCode();
+  runCode();
 
   // Every time the workspace changes state, save the changes to storage.
   ws.addChangeListener((e: Blockly.Events.Abstract) => {
@@ -65,6 +65,6 @@ if (ws) {
     ) {
       return;
     }
-    //runCode();
+    runCode();
   });
 }
