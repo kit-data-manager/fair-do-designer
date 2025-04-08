@@ -635,6 +635,10 @@ export const toolbox = {
       contents: [
         {
           kind: "block",
+          type: "pidrecord",
+        },
+        {
+          kind: "block",
           type: "hmc_profile",
         },
         {

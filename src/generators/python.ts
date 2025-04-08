@@ -4,38 +4,49 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Order, PythonGenerator } from "blockly/python";
+import { Order, PythonGenerator, pythonGenerator } from "blockly/python";
 import * as Blockly from "blockly/core";
+
+export class RecordMappingGenerator extends PythonGenerator {
+  constructor(name: string) {
+    super(name);
+    this.definitions_["record-bucket-class"] = `
+class PidRecord:
+    def __init__(self):
+        self._tuples = set()
+
+    def add(self, a, b):
+        try:
+            self._tuples.add((a, b))
+            return True
+        except:
+            return False
+`;
+  }
+}
 
 // Export all the code generators for our custom blocks,
 // but don't register them with Blockly yet.
 // This file has no side effects!
 export const forBlock = Object.create(null);
 
-forBlock["add_text"] = function (
+forBlock["pidrecord"] = function (
   block: Blockly.Block,
-  generator: PythonGenerator,
-) {
-  const text = generator.valueToCode(block, "TEXT", Order.NONE) || "''";
-  const addText = generator.provideFunction_(
-    "addText",
-    `function ${generator.FUNCTION_NAME_PLACEHOLDER_}(text) {
+  generator: Blockly.Generator,
+): String {
+  // TODO: change Order.ATOMIC to the correct operator precedence strength
+  const value_localid = generator.valueToCode(block, "local-id", Order.ATOMIC);
 
-  // Add text to the output area.
-  const outputDiv = document.getElementById('output');
-  const textEl = document.createElement('p');
-  textEl.innerText = text;
-  outputDiv.appendChild(textEl);
-}`,
-  );
-  // Generate the function call for this block.
-  const code = `${addText}(${text});\n`;
+  const statement_record = generator.statementToCode(block, "record");
+
+  // TODO: Assemble python into the code variable.
+  const code = "...";
   return code;
 };
 
 forBlock["hmc_profile"] = function (
   block: Blockly.Block,
-  generator: PythonGenerator,
+  generator: Blockly.Generator,
 ): String {
   // TODO: change Order.ATOMIC to the correct operator precedence strength
   const value_dot = generator.valueToCode(block, "dot", Order.ATOMIC);

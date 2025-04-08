@@ -7,8 +7,10 @@
 import * as Blockly from "blockly";
 import { blocks } from "./blocks/text";
 import { blocks as profile_blocks } from "./blocks/profiles";
-import { forBlock } from "./generators/python";
-import { pythonGenerator as codeGenerator } from "blockly/python";
+import {
+  forBlock,
+  RecordMappingGenerator as codeGenerator,
+} from "./generators/python";
 import { save, load } from "./serialization";
 import { toolbox } from "./toolbox";
 import "./index.css";

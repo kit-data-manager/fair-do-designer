@@ -1,9 +1,34 @@
 import * as Blockly from "blockly/core";
 
-// Create a custom block called 'add_text' that adds
-// text to the output div on the sample app.
-// This is just an example and you should replace this with your
-// own custom blocks.
+const pidrecord = {
+  type: "pidrecord",
+  tooltip: "",
+  helpUrl: "",
+  message0: "PID Record %1 %2 Local ID (pseudo-pid) %3 %4",
+  args0: [
+    {
+      type: "field_label_serializable",
+      text: "(no PID yet)",
+      name: "pid",
+    },
+    {
+      type: "input_dummy",
+      name: "label",
+    },
+    {
+      type: "input_value",
+      name: "local-id",
+    },
+    {
+      type: "input_statement",
+      name: "record",
+      check: ["profile", "attribute_key"],
+    },
+  ],
+  colour: 330,
+  inputsInline: false,
+};
+
 const profile = {
   type: "hmc_profile",
   tooltip: "",
@@ -61,8 +86,8 @@ const profile = {
       check: "attribute_array",
     },
   ],
-  previousStatement: "hmc_profile",
-  nextStatement: ["hmc_profile", "attribute_key"],
+  previousStatement: "profile",
+  nextStatement: ["profile", "attribute_key"],
   colour: 195,
   inputsInline: false,
 };
@@ -112,6 +137,7 @@ const attribute = {
 // This does not register their definitions with Blockly.
 // This file has no side effects!
 export const blocks = Blockly.common.createBlockDefinitionsFromJsonArray([
+  pidrecord,
   profile,
   attribute,
 ]);
