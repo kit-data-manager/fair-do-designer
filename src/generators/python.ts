@@ -11,7 +11,7 @@ export class RecordMappingGenerator extends PythonGenerator {
   init(workspace: Blockly.Workspace) {
     super.init(workspace);
     this.addReservedWords("math,random,Number");
-    this.forBlock = pythonGenerator.forBlock;
+    Object.assign(this.forBlock, pythonGenerator.forBlock);
     Object.assign(this.forBlock, forBlock);
     this.definitions_["record-bucket-class"] = `
 class PidRecord:
