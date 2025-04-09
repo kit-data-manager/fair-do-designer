@@ -8,27 +8,38 @@ import { Order, PythonGenerator, pythonGenerator } from "blockly/python";
 import * as Blockly from "blockly/core";
 
 export class RecordMappingGenerator extends PythonGenerator {
-  constructor(name: string) {
-    super(name);
+  init(workspace: Blockly.Workspace) {
+    super.init(workspace);
+    this.addReservedWords("math,random,Number");
+    this.forBlock = pythonGenerator.forBlock;
+    Object.assign(this.forBlock, forBlock);
     this.definitions_["record-bucket-class"] = `
 class PidRecord:
     def __init__(self):
+        self._id = ""
+        self._pid = ""
         self._tuples = set()
 
+    def setPid(self, pid):
+        self._pid = pid
+        return self
+
+    def setId(self, id):
+        self._id = id
+        return self
+
     def add(self, a, b):
-        try:
-            self._tuples.add((a, b))
-            return True
-        except:
-            return False
+        self._tuples.add((a, b))
+        return self
 `;
   }
 }
 
-// Export all the code generators for our custom blocks,
-// but don't register them with Blockly yet.
-// This file has no side effects!
-export const forBlock = Object.create(null);
+/**
+ * The generator will import all the definitions
+ * assigned to this object.
+ */
+const forBlock = Object.create(null);
 
 forBlock["pidrecord"] = function (
   block: Blockly.Block,
@@ -39,8 +50,10 @@ forBlock["pidrecord"] = function (
 
   const statement_record = generator.statementToCode(block, "record");
 
-  // TODO: Assemble python into the code variable.
-  const code = "...";
+  var code = "result = (PIDRecord()\n";
+  code += ".setId(" + value_localid + ")\n";
+  code += statement_record + "\n";
+  code += ")\n";
   return code;
 };
 
@@ -66,7 +79,7 @@ forBlock["hmc_profile"] = function (
   const value_loc2 = generator.valueToCode(block, "loc1", Order.ATOMIC);
 
   // TODO: Assemble javascript into the code variable.
-  const code = "var profile = 1\n";
+  const code = "";
   return code;
 };
 
@@ -74,6 +87,13 @@ forBlock["attribute_key"] = function (
   block: Blockly.Block,
   generator: Blockly.CodeGenerator,
 ): String {
-  const code = "var attr = 1\n";
+  const dropdown_on_fail = block.getFieldValue("on_fail");
+  // TODO: change Order.ATOMIC to the correct operator precedence strength
+  const value_slot = generator.valueToCode(block, "slot", Order.ATOMIC);
+
+  const text_pid = block.getFieldValue("pid");
+
+  // TODO: Assemble python into the code variable.
+  const code = `.add(${text_pid},${value_slot})\n`;
   return code;
 };

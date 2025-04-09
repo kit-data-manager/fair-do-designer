@@ -6,17 +6,14 @@
 
 import * as Blockly from "blockly";
 import { blocks as profile_blocks } from "./blocks/profiles";
-import {
-  forBlock,
-  RecordMappingGenerator as codeGenerator,
-} from "./generators/python";
+import { RecordMappingGenerator } from "./generators/python";
 import { save, load } from "./serialization";
 import { toolbox } from "./toolbox";
 import "./index.css";
 
 // Register the blocks and generator with Blockly
 Blockly.common.defineBlocks(profile_blocks);
-Object.assign(codeGenerator.forBlock, forBlock);
+var codeGenerator = new RecordMappingGenerator("PidRecordMappingPython");
 
 // Set up UI elements and inject Blockly
 const codeDiv = document.getElementById("generatedCode")?.firstChild;
