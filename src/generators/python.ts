@@ -31,6 +31,23 @@ class PidRecord:
     def add(self, a, b):
         self._tuples.add((a, b))
         return self
+
+    def toSimpleJSON(self):
+        result = {"entries": list(self._tuples)}
+        if self._pid and self._pid != "":
+            result["pid"] = self._pid
+        return result
+
+records_graph = []
+`;
+    this.definitions_["typped-pid-maker-connections"] = `
+def createSingleRecord(pidrecord):
+    # TODO implement request to a typed PID Maker instance
+    # pseudocode:
+    # if pidrecord.hasPid: update(pidrecord)
+    # else: create(pidrecord)
+    # onError: to be decided
+    return "pid-of-pidrecord"
 `;
   }
 }
@@ -50,7 +67,7 @@ forBlock["pidrecord"] = function (
 
   const statement_record = generator.statementToCode(block, "record");
 
-  var code = `result = ( PidRecord()\n`;
+  var code = `records_graph.append( PidRecord()\n`;
   code += generator.INDENT + ".setId(" + value_localid + ")\n";
   code += statement_record + "\n";
   code += ")\n";
