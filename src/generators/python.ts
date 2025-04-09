@@ -43,15 +43,15 @@ const forBlock = Object.create(null);
 
 forBlock["pidrecord"] = function (
   block: Blockly.Block,
-  generator: Blockly.Generator,
+  generator: RecordMappingGenerator,
 ): String {
   // TODO: change Order.ATOMIC to the correct operator precedence strength
   const value_localid = generator.valueToCode(block, "local-id", Order.ATOMIC);
 
   const statement_record = generator.statementToCode(block, "record");
 
-  var code = "result = (PidRecord()\n";
-  code += ".setId(" + value_localid + ")\n";
+  var code = `result = ( PidRecord()\n`;
+  code += generator.INDENT + ".setId(" + value_localid + ")\n";
   code += statement_record + "\n";
   code += ")\n";
   return code;
@@ -59,7 +59,7 @@ forBlock["pidrecord"] = function (
 
 forBlock["hmc_profile"] = function (
   block: Blockly.Block,
-  generator: Blockly.Generator,
+  generator: RecordMappingGenerator,
 ): String {
   // TODO: change Order.ATOMIC to the correct operator precedence strength
   const value_dot = generator.valueToCode(block, "dot", Order.ATOMIC);
@@ -85,7 +85,7 @@ forBlock["hmc_profile"] = function (
 
 forBlock["attribute_key"] = function (
   block: Blockly.Block,
-  generator: Blockly.CodeGenerator,
+  generator: RecordMappingGenerator,
 ): String {
   const dropdown_on_fail = block.getFieldValue("on_fail");
   // TODO: change Order.ATOMIC to the correct operator precedence strength
