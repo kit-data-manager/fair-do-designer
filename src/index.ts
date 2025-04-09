@@ -5,7 +5,6 @@
  */
 
 import * as Blockly from "blockly";
-import { blocks } from "./blocks/text";
 import { blocks as profile_blocks } from "./blocks/profiles";
 import {
   forBlock,
@@ -16,7 +15,6 @@ import { toolbox } from "./toolbox";
 import "./index.css";
 
 // Register the blocks and generator with Blockly
-Blockly.common.defineBlocks(blocks);
 Blockly.common.defineBlocks(profile_blocks);
 Object.assign(codeGenerator.forBlock, forBlock);
 
