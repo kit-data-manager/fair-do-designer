@@ -5,6 +5,8 @@
  */
 
 import { Order, PythonGenerator, pythonGenerator } from "blockly/python";
+// importing this triggers registration of inputs withcustom data
+import * as DataInputs from "../inputs/data_inputs";
 import * as Blockly from "blockly/core";
 
 /**
@@ -56,6 +58,31 @@ def createSingleRecord(pidrecord):
     return "pid-of-pidrecord"
 `;
   }
+
+  getAttributeInput(
+    block: Blockly.Block,
+    name: string,
+  ): DataInputs.AttributeValueInput | null {
+    // TODO this function is a candidate for a parent class in-between for reuse in other generators (or a utility class)
+    const input = block.getInput(name);
+    if (input && input instanceof DataInputs.AttributeValueInput) {
+      return input as DataInputs.AttributeValueInput;
+    }
+    return null;
+  }
+
+  addPairChainCall(block: Blockly.Block, input_name: string): string {
+    // TODO this function is a candidate for a parent class in-between for reuse in other generators (or a utility class)
+    var code = "";
+    const dotInput = this.getAttributeInput(block, input_name);
+    if (dotInput) {
+      // TODO: change Order.ATOMIC to the correct operator precedence strength
+      const value_dot = this.valueToCode(block, input_name, Order.ATOMIC);
+      const pid_dot = dotInput.pid;
+      code += `.add(${pid_dot}, ${value_dot})\n`;
+    }
+    return code;
+  }
 }
 
 /**
@@ -84,8 +111,9 @@ forBlock["hmc_profile"] = function (
   block: Blockly.Block,
   generator: RecordMappingGenerator,
 ): String {
-  // TODO: change Order.ATOMIC to the correct operator precedence strength
-  const value_dot = generator.valueToCode(block, "dot", Order.ATOMIC);
+  var code = `# Block: ${block.type}\n`;
+
+  code = generator.addPairChainCall(block, "dot");
 
   // TODO: change Order.ATOMIC to the correct operator precedence strength
   const value_name2 = generator.valueToCode(block, "NAME", Order.ATOMIC);
@@ -102,7 +130,7 @@ forBlock["hmc_profile"] = function (
   const value_loc2 = generator.valueToCode(block, "loc1", Order.ATOMIC);
 
   // TODO: Assemble javascript into the code variable.
-  const code = "";
+  //const code = "";
   return code;
 };
 

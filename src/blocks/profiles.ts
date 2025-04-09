@@ -46,7 +46,7 @@ const profile = {
       name: "name",
     },
     {
-      type: "input_value",
+      type: "attribute_value",
       name: "dot",
       check: "String",
     },
