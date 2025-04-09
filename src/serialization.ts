@@ -22,11 +22,20 @@ export const save = function (workspace: Blockly.Workspace) {
  * @param workspace Blockly workspace to load into.
  */
 export const load = function (workspace: Blockly.Workspace) {
-  const data = window.localStorage?.getItem(storageKey);
-  if (!data) return;
+  try {
+    const data = window.localStorage?.getItem(storageKey);
+    if (!data) return;
 
-  // Don't emit events during loading.
-  Blockly.Events.disable();
-  Blockly.serialization.workspaces.load(JSON.parse(data), workspace, undefined);
-  Blockly.Events.enable();
+    // Don't emit events during loading.
+    Blockly.Events.disable();
+    Blockly.serialization.workspaces.load(
+      JSON.parse(data),
+      workspace,
+      undefined,
+    );
+    Blockly.Events.enable();
+  } catch (error) {
+    console.error("Clean local storage! Error loading workspace:", error);
+    window.localStorage?.clear();
+  }
 };
