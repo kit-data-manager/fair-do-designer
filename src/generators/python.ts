@@ -7,6 +7,12 @@
 import { Order, PythonGenerator, pythonGenerator } from "blockly/python";
 import * as Blockly from "blockly/core";
 
+/**
+ * Specialized generator for our code.
+ * In order to make the basic blocks reusable and generate proper code,
+ * we should not override the existing methods but write new ones
+ * (possibly reusing the existing functionality).
+ */
 export class RecordMappingGenerator extends PythonGenerator {
   init(workspace: Blockly.Workspace) {
     super.init(workspace);
