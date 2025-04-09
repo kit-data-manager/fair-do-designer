@@ -50,7 +50,7 @@ forBlock["pidrecord"] = function (
 
   const statement_record = generator.statementToCode(block, "record");
 
-  var code = "result = (PIDRecord()\n";
+  var code = "result = (PidRecord()\n";
   code += ".setId(" + value_localid + ")\n";
   code += statement_record + "\n";
   code += ")\n";
