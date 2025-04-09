@@ -94,6 +94,6 @@ forBlock["attribute_key"] = function (
   const text_pid = block.getFieldValue("pid");
 
   // TODO: Assemble python into the code variable.
-  const code = `.add(${text_pid},${value_slot})\n`;
+  const code = `.add("${text_pid}",${value_slot})\n`;
   return code;
 };
