@@ -1,5 +1,5 @@
 {
-  "name": "FAIR-DO-Designer",
+  "name": "fair-do-designer",
   "version": "0.1.0",
   "description": "Generate code to create FAIR Digital Objects with puzzle pieces",
   "main": "dist/bundle.js",
