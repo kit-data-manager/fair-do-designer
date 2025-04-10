@@ -23,13 +23,18 @@ const blocklyDiv = document.getElementById("blocklyDiv");
 if (!blocklyDiv) {
   throw new Error(`div with id 'blocklyDiv' not found`);
 }
-const ws = Blockly.inject(blocklyDiv, { rtl: false, toolbox });
+const workspace = Blockly.inject(blocklyDiv, {
+  rtl: false,
+  toolbox,
+  grid: { spacing: 20, length: 3, colour: "#ccc", snap: true },
+});
+workspace.addChangeListener(Blockly.Events.disableOrphans);
 
 // This function resets the code and output divs, shows the
 // generated code from the workspace, and evals the code.
 // In a real application, you probably shouldn't use `eval`.
 const runCode = () => {
-  const code = codeGenerator.workspaceToCode(ws as Blockly.Workspace);
+  const code = codeGenerator.workspaceToCode(workspace as Blockly.Workspace);
   if (codeDiv) codeDiv.textContent = code;
 
   //if (outputDiv) outputDiv.innerHTML = "";
@@ -37,28 +42,28 @@ const runCode = () => {
   //eval(code);
 };
 
-if (ws) {
+if (workspace) {
   // Load the initial state from storage and run the code.
-  load(ws);
+  load(workspace);
   runCode();
 
   // Every time the workspace changes state, save the changes to storage.
-  ws.addChangeListener((e: Blockly.Events.Abstract) => {
+  workspace.addChangeListener((e: Blockly.Events.Abstract) => {
     // UI events are things like scrolling, zooming, etc.
     // No need to save after one of these.
     if (e.isUiEvent) return;
-    save(ws);
+    save(workspace);
   });
 
   // Whenever the workspace changes meaningfully, run the code again.
-  ws.addChangeListener((e: Blockly.Events.Abstract) => {
+  workspace.addChangeListener((e: Blockly.Events.Abstract) => {
     // Don't run the code when the workspace finishes loading; we're
     // already running it once when the application starts.
     // Don't run the code during drags; we might have invalid state.
     if (
       e.isUiEvent ||
       e.type == Blockly.Events.FINISHED_LOADING ||
-      ws.isDragging()
+      workspace.isDragging()
     ) {
       return;
     }
