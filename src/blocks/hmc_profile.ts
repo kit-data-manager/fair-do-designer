@@ -76,6 +76,10 @@ export const profile = {
  * Possible improvements:
  * - serialize data using the data string attribute or a mutator
  * - handle serialized, old data ... somehow, in case of updates
+ * - use for each input a serializable field, for example a
+ *   serializable label. See more on this here:
+ *     - https://developers.google.com/blockly/guides/create-custom-blocks/fields/anatomy-of-a-field#serialization
+ *     - Serializable Label docs: https://developers.google.com/blockly/guides/create-custom-blocks/fields/built-in-fields/label-serializable
  *
  * Why this is designed this way:
  * - The mixins and extensions are quite hard / unsound to use from
