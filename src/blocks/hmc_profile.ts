@@ -46,13 +46,13 @@ export const profile = {
     },
     {
       type: "input_value",
-      name: "NAME",
+      name: "hasMetadata",
     },
     {
       type: "input_value",
-      name: "loc1",
+      name: "hasMetadata1",
       align: "RIGHT",
-      check: "attribute_array",
+      check: "String",
     },
   ],
   previousStatement: "profile",
