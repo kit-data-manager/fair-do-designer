@@ -119,10 +119,11 @@ forBlock["attribute_key"] = function <T extends Util.FairDoCodeGenerator>(
   const dropdown_on_fail = block.getFieldValue("on_fail");
   // TODO: change Order.ATOMIC to the correct operator precedence strength
   const value_slot = generator.valueToCode(block, "slot", Order.ATOMIC);
-
   const text_pid = block.getFieldValue("pid");
 
-  // TODO: Assemble python into the code variable.
-  const code = `.add("${text_pid}",${value_slot})\n`;
+  var code = "";
+  if (value_slot) {
+    code += generator.makeAddAttributeChainCall(text_pid, value_slot);
+  }
   return code;
 };
