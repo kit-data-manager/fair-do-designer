@@ -4,11 +4,12 @@ Status: Starting early design prototype(s)
 
 ## Development
 
-1. Get a shell into the dev container: `bash dev.sh`
+1. Start the dev container: `docker compose up -d`
     - The container will be created if required.
     - If you'd like to understand the setup, inspect the `docker-compose.yml` for details.
     - You'll get a shell in the container where you may run `npm run` commands documented in `package.json`.
     - Code/text editing can be done from the outside as usual.
+    - Optional for advanced use cases: Get a shell into the dev container: `bash dev.sh` (will start the container, if required)
 2. Go to http://localhost:8080
     - Port can be modified in `docker-compose.yml`, but the webpack dev server may need to be adjusted in order to make it work completely.
 
