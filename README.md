@@ -21,6 +21,7 @@ Status: Starting early design prototype(s)
 ## Findings
 
 - Having the Profile on the right and the values on the left may be interesting to keep the left-to-right data flow. To do so, we can (ironically) set rtl to true for the workspace and then align all inputs to `"RIGHT"`. I will not do this now because it is additional work and not my current focus.
+- Assigning complex data to the blocks is a bit hard/unsound from typescript. Therefore I currently split data from blocks to some degree and do not use one of the Blockly-given methods (extensions, mixins, mutators) with some pros and cons described in detail at `src/blocks/hmc_profile.ts`.
 
 ## Origin
 
