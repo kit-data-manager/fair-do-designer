@@ -31,8 +31,8 @@ code {
 }
 
 #generatedCode {
-  height: 50%;
-  background-color: rgb(247, 240, 228);
+    height: 100vh;
+    background-color: rgb(247, 240, 228);
 }
 
 #output {

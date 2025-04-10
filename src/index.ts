@@ -17,7 +17,7 @@ var codeGenerator = new RecordMappingGenerator("PidRecordMappingPython");
 
 // Set up UI elements and inject Blockly
 const codeDiv = document.getElementById("generatedCode")?.firstChild;
-const outputDiv = document.getElementById("output");
+//const outputDiv = document.getElementById("output");
 const blocklyDiv = document.getElementById("blocklyDiv");
 
 if (!blocklyDiv) {
@@ -32,7 +32,7 @@ const runCode = () => {
   const code = codeGenerator.workspaceToCode(ws as Blockly.Workspace);
   if (codeDiv) codeDiv.textContent = code;
 
-  if (outputDiv) outputDiv.innerHTML = "";
+  //if (outputDiv) outputDiv.innerHTML = "";
 
   //eval(code);
 };
