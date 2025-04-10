@@ -5,7 +5,7 @@
  */
 
 import * as Blockly from "blockly";
-import { blocks as profile_blocks } from "./blocks/profiles";
+import { blocks as profile_blocks } from "./blocks/all";
 import { RecordMappingGenerator } from "./generators/python";
 import { save, load } from "./serialization";
 import { toolbox } from "./toolbox";

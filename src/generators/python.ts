@@ -5,9 +5,9 @@
  */
 
 import { Order, PythonGenerator, pythonGenerator } from "blockly/python";
-// importing this triggers registration of inputs withcustom data
-import * as DataInputs from "../inputs/data_inputs";
 import * as Blockly from "blockly/core";
+import * as HmcProfile from "../blocks/hmc_profile";
+import * as Util from "./util";
 
 /**
  * Specialized generator for our code.
@@ -15,7 +15,10 @@ import * as Blockly from "blockly/core";
  * we should not override the existing methods but write new ones
  * (possibly reusing the existing functionality).
  */
-export class RecordMappingGenerator extends PythonGenerator {
+export class RecordMappingGenerator
+  extends PythonGenerator
+  implements Util.RecordMappingGenerator
+{
   init(workspace: Blockly.Workspace) {
     super.init(workspace);
     this.addReservedWords("math,random,Number");
@@ -59,29 +62,8 @@ def createSingleRecord(pidrecord):
 `;
   }
 
-  getAttributeInput(
-    block: Blockly.Block,
-    name: string,
-  ): DataInputs.AttributeValueInput | null {
-    // TODO this function is a candidate for a parent class in-between for reuse in other generators (or a utility class)
-    const input = block.getInput(name);
-    if (input && input instanceof DataInputs.AttributeValueInput) {
-      return input as DataInputs.AttributeValueInput;
-    }
-    return null;
-  }
-
-  addPairChainCall(block: Blockly.Block, input_name: string): string {
-    // TODO this function is a candidate for a parent class in-between for reuse in other generators (or a utility class)
-    var code = "";
-    const dotInput = this.getAttributeInput(block, input_name);
-    if (dotInput) {
-      // TODO: change Order.ATOMIC to the correct operator precedence strength
-      const value_dot = this.valueToCode(block, input_name, Order.ATOMIC);
-      const pid_dot = dotInput.pid;
-      code += `.add(${pid_dot}, ${value_dot})\n`;
-    }
-    return code;
+  makeAddAttributeChainCall(key: string, value: string): string {
+    return `.add(${key}, ${value})\n`;
   }
 }
 
@@ -91,9 +73,9 @@ def createSingleRecord(pidrecord):
  */
 const forBlock = Object.create(null);
 
-forBlock["pidrecord"] = function (
+forBlock["pidrecord"] = function <T extends Util.FairDoCodeGenerator>(
   block: Blockly.Block,
-  generator: RecordMappingGenerator,
+  generator: T,
 ): String {
   // TODO: change Order.ATOMIC to the correct operator precedence strength
   const value_localid = generator.valueToCode(block, "local-id", Order.ATOMIC);
@@ -107,36 +89,32 @@ forBlock["pidrecord"] = function (
   return code;
 };
 
-forBlock["hmc_profile"] = function (
+forBlock["hmc_profile"] = function <T extends Util.FairDoCodeGenerator>(
   block: Blockly.Block,
-  generator: RecordMappingGenerator,
+  generator: T,
 ): String {
   var code = `# Block: ${block.type}\n`;
 
-  code = generator.addPairChainCall(block, "dot");
+  code += generator.makeAddAttributeChainCall(
+    HmcProfile.data.self_attribute_key,
+    HmcProfile.data.self_pid,
+  );
 
-  // TODO: change Order.ATOMIC to the correct operator precedence strength
-  const value_name2 = generator.valueToCode(block, "NAME", Order.ATOMIC);
-
-  // TODO: change Order.ATOMIC to the correct operator precedence strength
-  const value_loc1 = generator.valueToCode(block, "loc1", Order.ATOMIC);
-
-  const dropdown_opt_selector = block.getFieldValue("opt_selector");
-
-  // TODO: change Order.ATOMIC to the correct operator precedence strength
-  const value_name = generator.valueToCode(block, "NAME", Order.ATOMIC);
-
-  // TODO: change Order.ATOMIC to the correct operator precedence strength
-  const value_loc2 = generator.valueToCode(block, "loc1", Order.ATOMIC);
-
-  // TODO: Assemble javascript into the code variable.
-  //const code = "";
+  for (const input of block.inputList) {
+    const name = input.name;
+    const pid = Util.getPidByPrefixMap(name, HmcProfile.data.pidMap);
+    // TODO: change Order.ATOMIC to the correct operator precedence strength
+    const value = generator.valueToCode(block, name, Order.ATOMIC);
+    if (pid !== undefined && value && value != "") {
+      code += generator.makeAddAttributeChainCall(pid, value);
+    }
+  }
   return code;
 };
 
-forBlock["attribute_key"] = function (
+forBlock["attribute_key"] = function <T extends Util.FairDoCodeGenerator>(
   block: Blockly.Block,
-  generator: RecordMappingGenerator,
+  generator: T,
 ): String {
   const dropdown_on_fail = block.getFieldValue("on_fail");
   // TODO: change Order.ATOMIC to the correct operator precedence strength

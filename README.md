@@ -2,12 +2,6 @@
 
 Status: Starting early design prototype(s)
 
-Current research: How to assign a PID properly to an input?
-
-- I created a custom input, but the property isn't read from the json.
-- A mixin could work (can be added to block definition)
-- I could try to reuse the name property... unsure about limitations, though.
-
 ## Development
 
 1. Get a shell into the dev container: `bash dev.sh`

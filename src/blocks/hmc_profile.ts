@@ -1,0 +1,96 @@
+export const profile = {
+  type: "hmc_profile",
+  tooltip: "",
+  helpUrl: "",
+  message0:
+    "Profile %1 %2 Digital Object Type %3 Digital Object Location [+] %4 [-] %5 Add %6 %7 hasMetadata [+] %8 [-] %9",
+  args0: [
+    {
+      type: "field_label_serializable",
+      text: '"Helmholtz KIP"',
+      name: "name_label",
+    },
+    {
+      type: "input_dummy",
+      name: "name",
+    },
+    {
+      type: "input_value",
+      name: "digitalObjectType",
+      check: "String",
+    },
+    {
+      type: "input_value",
+      name: "digitalObjectLocation",
+      check: "String",
+    },
+    {
+      type: "input_value",
+      name: "digitalObjectLocation1",
+      align: "RIGHT",
+      check: "String",
+    },
+    {
+      type: "field_dropdown",
+      name: "opt_selector",
+      options: [
+        ["--some optional attribute--", "empty"],
+        ["hasMetadata (repeatable)", "hasmd"],
+        ["isMetadataFor", "ismd"],
+        ["Contact (repeatable)", "contact"],
+      ],
+    },
+    {
+      type: "input_dummy",
+      name: "opt",
+    },
+    {
+      type: "input_value",
+      name: "NAME",
+    },
+    {
+      type: "input_value",
+      name: "loc1",
+      align: "RIGHT",
+      check: "attribute_array",
+    },
+  ],
+  previousStatement: "profile",
+  nextStatement: ["profile", "attribute_key"],
+  colour: 195,
+  inputsInline: false,
+};
+
+/**
+ * Contains data associated with the profile.
+ *
+ * NOTE: This means that the data will be associated at runtime
+ * and is not being serialized! Implications:
+ *
+ * - assuming we load a design with a newer version of the designer,
+ *   and updated data will be considered
+ * - the old data will be forgotten
+ * - good to keep things up to date, somehow
+ * - bad for documentation, reproduction, and understandability
+ *
+ * Possible improvements:
+ * - serialize data using the data string attribute or a mutator
+ * - handle serialized, old data ... somehow, in case of updates
+ *
+ * Why this is designed this way:
+ * - The mixins and extensions are quite hard / unsound to use from
+ *   typescript. Probably caused by the transition of blockly to typescript
+ *   still somehow being in progress.
+ * - We need to assign a PID and the reference attribute of a profile
+ * - We need to assign a PID to each attribute (=input) of a profile
+ * - For repeatable attribute, the amount of inputs may be dynamic (at runtime)
+ */
+export const data = {
+  self_pid: "21.T11148/b9b76f887845e32d29f7",
+  self_attribute_key: "21.T11148/076759916209e5d62bd5",
+  pidMap: {
+    digitalObjectType: "21.T11148/1c699a5d1b4ad3ba4956",
+    digitalObjectLocation: "21.T11148/b8457812905b83046284",
+    hasMetadata: "21.T11148/d0773859091aeb451528",
+  },
+};
