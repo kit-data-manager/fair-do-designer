@@ -21,11 +21,24 @@ export function getPidByPrefixMap(
 
 export interface RecordMappingGenerator {
   /**
-   * Should generate something like ".add(key, value)", depending on language.
-   * @param key
-   * @param value
+   * Generates a chain call to set the ID for a record or entity.
+   * @param id The identifier to be set
+   * @returns A string representing the chain call, e.g., ".setId('myId')"
+   */
+  makeSetIDChainCall(id: string): string;
+  /**
+   * Generates a chain call to add an attribute key-value pair to a record or entity.
+   * @param key The attribute name or identifier
+   * @param value The value to be associated with the key
+   * @returns A string representing the chain call, e.g., ".add('name', 'value')"
    */
   makeAddAttributeChainCall(key: string, value: string): string;
+  /**
+   * Generates a line comment in the target programming language.
+   * @param text The comment text to be included
+   * @returns A formatted comment string according to the language syntax
+   */
+  makeLineComment(text: string): string;
 }
 export type FairDoCodeGenerator = RecordMappingGenerator &
   Blockly.CodeGenerator;

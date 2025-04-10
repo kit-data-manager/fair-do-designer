@@ -63,7 +63,15 @@ def createSingleRecord(pidrecord):
   }
 
   makeAddAttributeChainCall(key: string, value: string): string {
-    return `.add(${key}, ${value})\n`;
+    return `.add("${key}", ${value})\n`;
+  }
+
+  makeSetIDChainCall(id: string): string {
+    return `.setId(${id})\n`;
+  }
+
+  makeLineComment(text: string): string {
+    return this.prefixLines(`${text}\n`, "# ");
   }
 }
 
@@ -82,8 +90,12 @@ forBlock["pidrecord"] = function <T extends Util.FairDoCodeGenerator>(
 
   const statement_record = generator.statementToCode(block, "record");
 
-  var code = `records_graph.append( PidRecord()\n`;
-  code += generator.INDENT + ".setId(" + value_localid + ")\n";
+  var code = generator.makeLineComment(`${block.type}`);
+  code += `records_graph.append( PidRecord()\n`;
+  code += generator.prefixLines(
+    generator.makeSetIDChainCall(value_localid),
+    generator.INDENT,
+  );
   code += statement_record + "\n";
   code += ")\n";
   return code;
@@ -93,7 +105,7 @@ forBlock["hmc_profile"] = function <T extends Util.FairDoCodeGenerator>(
   block: Blockly.Block,
   generator: T,
 ): String {
-  var code = `# Block: ${block.type}\n`;
+  var code = generator.makeLineComment(`${block.type}`);
 
   code += generator.makeAddAttributeChainCall(
     HmcProfile.data.self_attribute_key,
@@ -123,6 +135,7 @@ forBlock["attribute_key"] = function <T extends Util.FairDoCodeGenerator>(
 
   var code = "";
   if (value_slot) {
+    code += generator.makeLineComment(`${block.type}`);
     code += generator.makeAddAttributeChainCall(text_pid, value_slot);
   }
   return code;
