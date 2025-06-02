@@ -633,5 +633,11 @@ export const toolbox = {
         },
       ],
     },
+    {
+      kind: "category",
+      name: "Input",
+      categorystyle: "procedure_category",
+      custom: "INPUT"
+    }
   ],
 };

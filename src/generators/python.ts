@@ -51,7 +51,7 @@ class PidRecord:
 
 records_graph = []
 `;
-    this.definitions_["typped-pid-maker-connections"] = `
+    this.definitions_["typed-pid-maker-connections"] = `
 def createSingleRecord(pidrecord):
     # TODO implement request to a typed PID Maker instance
     # pseudocode:
@@ -84,7 +84,7 @@ const forBlock = Object.create(null);
 forBlock["pidrecord"] = function <T extends Util.FairDoCodeGenerator>(
   block: Blockly.Block,
   generator: T,
-): String {
+) {
   // TODO: change Order.ATOMIC to the correct operator precedence strength
   const value_localid = generator.valueToCode(block, "local-id", Order.ATOMIC);
 
@@ -104,7 +104,7 @@ forBlock["pidrecord"] = function <T extends Util.FairDoCodeGenerator>(
 forBlock["hmc_profile"] = function <T extends Util.FairDoCodeGenerator>(
   block: Blockly.Block,
   generator: T,
-): String {
+) {
   var code = generator.makeLineComment(`${block.type}`);
 
   code += generator.makeAddAttributeChainCall(
@@ -127,7 +127,7 @@ forBlock["hmc_profile"] = function <T extends Util.FairDoCodeGenerator>(
 forBlock["attribute_key"] = function <T extends Util.FairDoCodeGenerator>(
   block: Blockly.Block,
   generator: T,
-): String {
+) {
   const dropdown_on_fail = block.getFieldValue("on_fail");
   // TODO: change Order.ATOMIC to the correct operator precedence strength
   const value_slot = generator.valueToCode(block, "slot", Order.ATOMIC);
@@ -140,3 +140,60 @@ forBlock["attribute_key"] = function <T extends Util.FairDoCodeGenerator>(
   }
   return code;
 };
+
+forBlock["input_json"] = function <T extends Util.FairDoCodeGenerator>(
+    block: Blockly.Block,
+    generator: T,
+) {
+  const keyBlock = block.getInputTargetBlock("KEY")
+  const input = block.getFieldValue("INPUT")
+  let key = ""
+
+  if (keyBlock) {
+    key = generator.blockToCode(keyBlock)[0]
+  }
+
+  return [`${input}.getKey(${key})`, Order.ATOMIC]
+};
+
+forBlock["input_read_object"] = function <T extends Util.FairDoCodeGenerator>(
+    block: Blockly.Block,
+    generator: T,
+) {
+  const keyBlock = block.getInputTargetBlock("KEY")
+  const objBlock = block.getInputTargetBlock("OBJ")
+  let key = "null"
+  let obj = "{}"
+
+  if (keyBlock) {
+    key = generator.blockToCode(keyBlock)[0]
+  }
+
+  if (objBlock) {
+    obj = generator.blockToCode(objBlock)[0]
+  }
+
+  return [`${obj}.getKey(${key})`, Order.ATOMIC]
+};
+
+forBlock["transform_string"] = function <T extends Util.FairDoCodeGenerator>(
+    block: Blockly.Block,
+    generator: T,
+) {
+  const inBlock = block.getInputTargetBlock("INPUT")
+  let inText = "null"
+
+  if (inBlock) {
+    inText = generator.blockToCode(inBlock)[0]
+  }
+
+  return [`transform.toString(${inText})`, Order.ATOMIC]
+};
+
+forBlock["input_jsonpath"] = function <T extends Util.FairDoCodeGenerator>(
+    block: Blockly.Block,
+    generator: T,
+) {
+  return ["None", Order.ATOMIC]
+};
+
