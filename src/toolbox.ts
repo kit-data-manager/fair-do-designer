@@ -637,7 +637,12 @@ export const toolbox = {
       kind: "category",
       name: "Input",
       categorystyle: "procedure_category",
-      custom: "INPUT"
+      contents: [
+        {
+          kind: "block",
+          type: "input_dataquery",
+        }
+      ]
     }
   ],
 };
