@@ -42,6 +42,14 @@ export function registerInputToolbox(workspace: WorkspaceSvg) {
                 kind: "block",
                 type: "input_jsonpath",
             },
+            {
+                kind: "block",
+                type: "input_read_key",
+            },
+            {
+                kind: "block",
+                type: "input_source",
+            }
         ]
     })
 }

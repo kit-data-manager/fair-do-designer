@@ -7,7 +7,7 @@ import { profile } from "./hmc_profile";
 import { attribute } from "./attribute";
 
 import * as Blockly from "blockly/core";
-import {input_json, input_read_object} from "./input";
+import {input_json, input_read_key, input_read_object, input_source} from "./input";
 import {transform_string} from "./transform";
 
 export const blocks = Blockly.common.createBlockDefinitionsFromJsonArray([
@@ -16,5 +16,7 @@ export const blocks = Blockly.common.createBlockDefinitionsFromJsonArray([
   attribute,
   input_json,
   input_read_object,
+  input_read_key,
+  input_source,
   transform_string
 ]);

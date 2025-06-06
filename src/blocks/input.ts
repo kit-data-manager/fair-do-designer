@@ -53,3 +53,55 @@ export const input_read_object = {
     "inputsInline": true
 }
 
+export const input_read_key = {
+    "type": "input_read_key",
+    "tooltip": "",
+    "helpUrl": "",
+    "message0": "Read key %1 %2",
+    "args0": [
+        {
+            "type": "field_input",
+            "name": "KEY",
+            "text": "key"
+        },
+        {
+            "type": "input_value",
+            "name": "INPUT",
+            "check": "JSON"
+        }
+    ],
+    "output": "JSON",
+    "colour": 0,
+    "inputsInline": false
+}
+
+export const input_source = {
+    "type": "input_source",
+    "tooltip": "",
+    "helpUrl": "",
+    "message0": "%1 %2 %3",
+    "args0": [
+    {
+        "type": "field_label_serializable",
+        "text": "Source",
+        "name": "NAME"
+    },
+    {
+        "type": "field_dropdown",
+        "name": "SOURCE",
+        "options": [
+            [
+                "A",
+                "A"
+            ]
+        ]
+    },
+    {
+        "type": "input_end_row",
+        "name": "NAME"
+    }
+],
+    "output": "JSON",
+    "colour": 225
+}
+
