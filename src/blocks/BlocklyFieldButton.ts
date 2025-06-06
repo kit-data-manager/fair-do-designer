@@ -1,6 +1,6 @@
-import {FieldLabel} from "blockly";
+import {Field, FieldImage, FieldLabel} from "blockly";
 
-export class InputDataQueryButton extends FieldLabel {
+export class BlocklyFieldButton extends FieldLabel {
     callback: (block: any) => void
     wrapper_: HTMLElement | null = null;
 
