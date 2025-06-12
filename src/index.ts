@@ -13,12 +13,12 @@ import "./index.css";
 import {registerInputToolbox} from "./toolboxes/input";
 import {BlocklyFieldButton} from "./blocks/BlocklyFieldButton";
 import {FieldTextInput} from "blockly";
+import "unified-document"
 
 Blockly.fieldRegistry.register("button_field", BlocklyFieldButton)
 
 // Register the blocks and generator with Blockly
 Blockly.common.defineBlocks(profile_blocks);
-
 
 Blockly.Blocks["input_jsonpath"] = {
   init: function () {
