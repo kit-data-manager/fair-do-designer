@@ -1,38 +1,38 @@
-import { WorkspaceSvg } from "blockly";
+import { WorkspaceSvg } from "blockly"
 
 export function registerInputToolbox(workspace: WorkspaceSvg) {
-    workspace.registerToolboxCategoryCallback("INPUT", workspace => {
+    workspace.registerToolboxCategoryCallback("INPUT", (workspace) => {
         return [
             {
                 kind: "block",
                 type: "input_json",
                 fields: {
-                    "INPUT": "A"
+                    INPUT: "A",
                 },
                 inputs: {
-                    "KEY": {
+                    KEY: {
                         shadow: {
                             type: "text",
                             fields: {
-                                "TEXT": "Test"
-                            }
-                        }
-                    }
-                }
+                                TEXT: "Test",
+                            },
+                        },
+                    },
+                },
             },
             {
                 kind: "block",
                 type: "input_read_object",
                 inputs: {
-                    "KEY": {
+                    KEY: {
                         shadow: {
                             type: "text",
                             fields: {
-                                "TEXT": "Test"
-                            }
-                        }
-                    }
-                }
+                                TEXT: "Test",
+                            },
+                        },
+                    },
+                },
             },
             {
                 kind: "block",
@@ -48,9 +48,12 @@ export function registerInputToolbox(workspace: WorkspaceSvg) {
             },
             {
                 kind: "block",
+                type: "input_read_index",
+            },
+            {
+                kind: "block",
                 type: "input_source",
-            }
+            },
         ]
     })
 }
-

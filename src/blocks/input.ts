@@ -73,6 +73,28 @@ export const input_read_key = {
     inputsInline: false,
 }
 
+export const input_read_index = {
+    type: "input_read_index",
+    tooltip: "",
+    helpUrl: "",
+    message0: "Read index %1 %2",
+    args0: [
+        {
+            type: "field_input",
+            name: "KEY",
+            text: "0",
+        },
+        {
+            type: "input_value",
+            name: "INPUT",
+            check: "JSON",
+        },
+    ],
+    output: null, //"JSON",
+    colour: 0,
+    inputsInline: false,
+}
+
 export const input_source = {
     type: "input_source",
     tooltip: "",

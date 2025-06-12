@@ -22,7 +22,10 @@ globalThis.blocklyDivDropHandler = (event: DragEvent) => {
 
     // # input_read_key
     const path = event.dataTransfer?.getData("text/plain") ?? "null"
-    const keys = path.split(/[.\[\]]/gm).filter((s) => s.length > 0)
+    const keys = path
+        .replaceAll(/\[(\d+)]/g, ".__array_index_$1")
+        .split(/[.\[\]]/gm)
+        .filter((s) => s.length > 0)
     const blocks: Blockly.BlockSvg[] = []
 
     for (const key of keys) {
@@ -34,8 +37,15 @@ globalThis.blocklyDivDropHandler = (event: DragEvent) => {
             block.render()
             blocks.push(block)
         } else {
-            const block = workspace.newBlock("input_read_key")
-            block.setFieldValue(key, "KEY")
+            const block = workspace.newBlock(
+                key.startsWith("__array_index")
+                    ? "input_read_index"
+                    : "input_read_key",
+            )
+            block.setFieldValue(
+                key.startsWith("__array_index") ? key.split("_")[4] : key,
+                "KEY",
+            )
             const input = block.getInput("INPUT")
             if (input?.connection) {
                 const previous = blocks.slice().pop()
