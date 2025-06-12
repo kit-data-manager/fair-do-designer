@@ -24,6 +24,7 @@
   "devDependencies": {
     "css-loader": "^6.7.1",
     "html-webpack-plugin": "^5.5.0",
+    "prettier": "^3.5.3",
     "source-map-loader": "^4.0.1",
     "style-loader": "^3.3.1",
     "ts-loader": "^9.4.2",
@@ -33,6 +34,7 @@
     "webpack-dev-server": "^4.11.1"
   },
   "dependencies": {
-    "blockly": "^11.0.0"
+    "blockly": "^11.0.0",
+    "unified-document": "file:../unified-document"
   }
 }

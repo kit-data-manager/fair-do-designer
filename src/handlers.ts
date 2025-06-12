@@ -1,0 +1,68 @@
+import * as Blockly from "blockly"
+import { WorkspaceSvg } from "blockly"
+
+// @ts-ignore
+globalThis.blocklyDivDropHandler = (event: DragEvent) => {
+    // # input_jsonpath
+    const workspace = Blockly.getMainWorkspace() as WorkspaceSvg
+    const block = workspace.newBlock("input_jsonpath")
+    block.setFieldValue(
+        event.dataTransfer?.getData("text/plain") ?? "undefined",
+        "QUERY",
+    )
+    block.initSvg()
+    const offset = workspace.getOriginOffsetInPixels()
+    block.moveTo(
+        new Blockly.utils.Coordinate(
+            event.offsetX - offset.x,
+            event.offsetY - offset.y,
+        ),
+    )
+    block.render()
+
+    // # input_read_key
+    const path = event.dataTransfer?.getData("text/plain") ?? "null"
+    const keys = path.split(/[.\[\]]/gm).filter((s) => s.length > 0)
+    const blocks: Blockly.BlockSvg[] = []
+
+    for (const key of keys) {
+        if (keys.indexOf(key) == 0) {
+            const block = workspace.newBlock("input_source")
+            block.setFieldValue("JSON", "SOURCE")
+
+            block.initSvg()
+            block.render()
+            blocks.push(block)
+        } else {
+            const block = workspace.newBlock("input_read_key")
+            block.setFieldValue(key, "KEY")
+            const input = block.getInput("INPUT")
+            if (input?.connection) {
+                const previous = blocks.slice().pop()
+                if (previous) {
+                    input.connection.connect(previous.outputConnection)
+                }
+            }
+
+            block.initSvg()
+            block.render()
+            blocks.push(block)
+        }
+    }
+
+    const last = blocks.slice().pop()
+    if (last) {
+        const offset = workspace.getOriginOffsetInPixels()
+        last.moveTo(
+            new Blockly.utils.Coordinate(
+                event.offsetX - offset.x,
+                event.offsetY + 30 - offset.y,
+            ),
+        )
+    }
+}
+
+// @ts-ignore
+globalThis.blocklyDivDragoverHandler = (e: DragEvent) => {
+    e.preventDefault()
+}

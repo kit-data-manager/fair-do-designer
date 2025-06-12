@@ -10,9 +10,8 @@
                 <pre id="generatedCode"><code></code></pre>
                 <!--div id="output"></div-->
             </div>
-            <div id="blocklyDiv"></div>
-            <query-builder></query-builder>
-            <unified-document></unified-document>
+            <div id="blocklyDiv" ondrop="blocklyDivDropHandler(event)" ondragover="blocklyDivDragoverHandler(event)"></div>
+            <unified-document class="jsonPicker"></unified-document>
         </div>
     </body>
 </html>

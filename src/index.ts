@@ -14,6 +14,7 @@ import {registerInputToolbox} from "./toolboxes/input";
 import {BlocklyFieldButton} from "./blocks/BlocklyFieldButton";
 import {FieldTextInput} from "blockly";
 import "unified-document"
+import "./handlers"
 
 Blockly.fieldRegistry.register("button_field", BlocklyFieldButton)
 
