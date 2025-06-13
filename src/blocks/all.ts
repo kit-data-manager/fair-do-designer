@@ -9,6 +9,7 @@ import { attribute } from "./attribute"
 import * as Blockly from "blockly/core"
 import {
     input_json,
+    input_jsonpath,
     input_read_index,
     input_read_key,
     input_read_object,
@@ -27,3 +28,5 @@ export const blocks = Blockly.common.createBlockDefinitionsFromJsonArray([
     input_source,
     transform_string,
 ])
+
+Blockly.Blocks["input_jsonpath"] = input_jsonpath

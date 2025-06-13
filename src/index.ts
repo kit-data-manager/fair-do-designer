@@ -11,28 +11,11 @@ import { save, load } from "./serialization"
 import { toolbox } from "./toolbox"
 import "./index.css"
 import { registerInputToolbox } from "./toolboxes/input"
-import { BlocklyFieldButton } from "./blocks/BlocklyFieldButton"
-import { FieldTextInput } from "blockly"
 import "json-picker-stencil"
 import "./handlers"
 
-Blockly.fieldRegistry.register("button_field", BlocklyFieldButton)
-
 // Register the blocks and generator with Blockly
 Blockly.common.defineBlocks(profile_blocks)
-
-Blockly.Blocks["input_jsonpath"] = {
-    init: function () {
-        this.appendDummyInput()
-            .appendField("Data Query")
-            .appendField(new FieldTextInput(), "QUERY")
-            .appendField(new BlocklyFieldButton("Ändern", () => alert("click")))
-        this.setTooltip("A block with an interactive button.")
-        this.setHelpUrl("")
-        this.setOutput(true, null)
-        this.setColour(230)
-    },
-} as Blockly.Block
 
 var codeGenerator = new RecordMappingGenerator("PidRecordMappingPython")
 

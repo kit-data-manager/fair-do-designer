@@ -1,3 +1,7 @@
+import * as Blockly from "blockly"
+import { FieldTextInput } from "blockly"
+import { FieldButton } from "../fields/FieldButton"
+
 export const input_json = {
     type: "input_json",
     tooltip: "",
@@ -122,3 +126,16 @@ export const input_source = {
     output: null, //"JSON",
     colour: 225,
 }
+
+export const input_jsonpath = {
+    init: function () {
+        this.appendDummyInput()
+            .appendField("Data Query")
+            .appendField(new FieldTextInput(), "QUERY")
+            .appendField(new FieldButton("Ändern", () => alert("click")))
+        this.setTooltip("A block with an interactive button.")
+        this.setHelpUrl("")
+        this.setOutput(true, null)
+        this.setColour(230)
+    },
+} as Blockly.Block

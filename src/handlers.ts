@@ -1,8 +1,15 @@
 import * as Blockly from "blockly"
 import { WorkspaceSvg } from "blockly"
 
-// @ts-ignore
-globalThis.blocklyDivDropHandler = (event: DragEvent) => {
+const blocklyDiv = document.querySelector(
+    "div#blocklyDiv",
+) as HTMLDivElement | null
+
+if (!blocklyDiv) {
+    throw "handlers: missing blocklyDiv"
+}
+
+blocklyDiv.addEventListener("drop", (event: DragEvent) => {
     // # input_jsonpath
     const workspace = Blockly.getMainWorkspace() as WorkspaceSvg
     const block = workspace.newBlock("input_jsonpath")
@@ -70,9 +77,8 @@ globalThis.blocklyDivDropHandler = (event: DragEvent) => {
             ),
         )
     }
-}
+})
 
-// @ts-ignore
-globalThis.blocklyDivDragoverHandler = (e: DragEvent) => {
-    e.preventDefault()
-}
+blocklyDiv.addEventListener("dragover", (event: DragEvent) => {
+    event.preventDefault()
+})
