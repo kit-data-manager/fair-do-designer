@@ -12,12 +12,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-#      - name: Clone json-picker-stencil
-#        uses: GuillaumeFalourd/clone-github-repo-action@v2.3
-#        with:
-#          owner: 'kit-data-manager'
-#          repository: 'json-picker-stencil'
-#          access-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Clone json-picker-stencil
+        uses: GuillaumeFalourd/clone-github-repo-action@v2.3
+        with:
+          owner: 'kit-data-manager'
+          repository: 'json-picker-stencil'
+          access-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Get dependency components
         run: bash get-deps.sh
       - name: Setup Node.js
