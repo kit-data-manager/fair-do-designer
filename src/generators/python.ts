@@ -236,3 +236,13 @@ forBlock["input_source"] = function <T extends Util.FairDoCodeGenerator>(
     // TODO: Change Order.NONE to the correct operator precedence strength
     return [code, Order.ATOMIC]
 }
+
+forBlock["hmc_testblock"] = function <T extends Util.FairDoCodeGenerator>(
+    block: Blockly.Block,
+    generator: T,
+) {
+    // TODO: Assemble python into the code variable.
+    const code = `hmc_testblock`
+    // TODO: Change Order.NONE to the correct operator precedence strength
+    return code
+}

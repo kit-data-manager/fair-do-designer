@@ -3,7 +3,7 @@
  */
 
 import { pidrecord } from "./pidrecord"
-import { profile } from "./hmc_profile"
+import { hmc_testblock, profile } from "./hmc_profile"
 import { attribute } from "./attribute"
 
 import * as Blockly from "blockly/core"
@@ -30,3 +30,4 @@ export const blocks = Blockly.common.createBlockDefinitionsFromJsonArray([
 ])
 
 Blockly.Blocks["input_jsonpath"] = input_jsonpath
+Blockly.Blocks["hmc_testblock"] = hmc_testblock

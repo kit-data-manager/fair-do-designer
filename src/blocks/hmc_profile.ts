@@ -1,65 +1,68 @@
+import * as Blockly from "blockly"
+import { ValidationField } from "../fields/ValidationField"
+
 export const profile = {
-  type: "hmc_profile",
-  tooltip: "",
-  helpUrl: "",
-  message0:
-    "Profile %1 %2 Digital Object Type %3 Digital Object Location [+] %4 [-] %5 Add %6 %7 hasMetadata [+] %8 [-] %9",
-  args0: [
-    {
-      type: "field_label_serializable",
-      text: '"Helmholtz KIP"',
-      name: "name_label",
-    },
-    {
-      type: "input_dummy",
-      name: "name",
-    },
-    {
-      type: "input_value",
-      name: "digitalObjectType",
-      check: "String",
-    },
-    {
-      type: "input_value",
-      name: "digitalObjectLocation",
-      check: "String",
-    },
-    {
-      type: "input_value",
-      name: "digitalObjectLocation1",
-      align: "RIGHT",
-      check: "String",
-    },
-    {
-      type: "field_dropdown",
-      name: "opt_selector",
-      options: [
-        ["--some optional attribute--", "empty"],
-        ["hasMetadata (repeatable)", "hasmd"],
-        ["isMetadataFor", "ismd"],
-        ["Contact (repeatable)", "contact"],
-      ],
-    },
-    {
-      type: "input_dummy",
-      name: "opt",
-    },
-    {
-      type: "input_value",
-      name: "hasMetadata",
-    },
-    {
-      type: "input_value",
-      name: "hasMetadata1",
-      align: "RIGHT",
-      check: "String",
-    },
-  ],
-  previousStatement: "profile",
-  nextStatement: ["profile", "attribute_key"],
-  colour: 195,
-  inputsInline: false,
-};
+    type: "hmc_profile",
+    tooltip: "",
+    helpUrl: "",
+    message0:
+        "Profile %1 %2 Digital Object Type %3 Digital Object Location [+] %4 [-] %5 Add %6 %7 hasMetadata [+] %8 [-] %9",
+    args0: [
+        {
+            type: "field_label_serializable",
+            text: '"Helmholtz KIP"',
+            name: "name_label",
+        },
+        {
+            type: "input_dummy",
+            name: "name",
+        },
+        {
+            type: "input_value",
+            name: "digitalObjectType",
+            check: "String",
+        },
+        {
+            type: "input_value",
+            name: "digitalObjectLocation",
+            check: "String",
+        },
+        {
+            type: "input_value",
+            name: "digitalObjectLocation1",
+            align: "RIGHT",
+            check: "String",
+        },
+        {
+            type: "field_dropdown",
+            name: "opt_selector",
+            options: [
+                ["--some optional attribute--", "empty"],
+                ["hasMetadata (repeatable)", "hasmd"],
+                ["isMetadataFor", "ismd"],
+                ["Contact (repeatable)", "contact"],
+            ],
+        },
+        {
+            type: "input_dummy",
+            name: "opt",
+        },
+        {
+            type: "input_value",
+            name: "hasMetadata",
+        },
+        {
+            type: "input_value",
+            name: "hasMetadata1",
+            align: "RIGHT",
+            check: "String",
+        },
+    ],
+    previousStatement: "profile",
+    nextStatement: ["profile", "attribute_key"],
+    colour: 195,
+    inputsInline: false,
+}
 
 /**
  * Contains data associated with the profile.
@@ -91,11 +94,66 @@ export const profile = {
  * - For repeatable attribute, the amount of inputs may be dynamic (at runtime)
  */
 export const data = {
-  self_pid: "21.T11148/b9b76f887845e32d29f7",
-  self_attribute_key: "21.T11148/076759916209e5d62bd5",
-  pidMap: {
-    digitalObjectType: "21.T11148/1c699a5d1b4ad3ba4956",
-    digitalObjectLocation: "21.T11148/b8457812905b83046284",
-    hasMetadata: "21.T11148/d0773859091aeb451528",
-  },
-};
+    self_pid: "21.T11148/b9b76f887845e32d29f7",
+    self_attribute_key: "21.T11148/076759916209e5d62bd5",
+    pidMap: {
+        digitalObjectType: "21.T11148/1c699a5d1b4ad3ba4956",
+        digitalObjectLocation: "21.T11148/b8457812905b83046284",
+        hasMetadata: "21.T11148/d0773859091aeb451528",
+    },
+}
+
+export const hmc_testblock = {
+    init: function () {
+        this.appendDummyInput("0").appendField("Profile Helmholtz KIP")
+        this.appendValueInput("1")
+            .appendField("hasMetadata")
+            .appendField(new ValidationField(), "val-1")
+            .setAlign(1)
+        this.setTooltip("A block with an interactive button.")
+        this.setPreviousStatement(true, null)
+        this.setNextStatement(true, null)
+        this.setHelpUrl("")
+        this.setColour(230)
+    },
+
+    onchange: function (abstract) {
+        if (
+            "newParentId" in abstract &&
+            abstract.newParentId === this.id &&
+            "reason" in abstract &&
+            Array.isArray(abstract.reason) &&
+            abstract.reason.includes("connect")
+        ) {
+            setTimeout(() => {
+                const fields = Array.from(this.getFields())
+                for (const field of fields) {
+                    if (field instanceof ValidationField) {
+                        field.forceCheck()
+                    }
+                }
+            }, 100)
+
+            // this.getField("val-1")?.setValue("Ja")
+        }
+
+        if (
+            "oldParentId" in abstract &&
+            abstract.oldParentId === this.id &&
+            "reason" in abstract &&
+            Array.isArray(abstract.reason) &&
+            abstract.reason.includes("disconnect")
+        ) {
+            setTimeout(() => {
+                const fields = Array.from(this.getFields())
+                for (const field of fields) {
+                    if (field instanceof ValidationField) {
+                        field.forceCheck()
+                    }
+                }
+            }, 100)
+
+            // this.getField("val-1")?.setValue("Nein")
+        }
+    },
+} as Blockly.Block

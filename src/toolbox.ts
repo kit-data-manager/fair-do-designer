@@ -631,6 +631,10 @@ export const toolbox = {
                     kind: "block",
                     type: "attribute_key",
                 },
+                {
+                    kind: "block",
+                    type: "hmc_testblock",
+                },
             ],
         },
         {

@@ -13,6 +13,7 @@ import "./index.css"
 import { registerInputToolbox } from "./toolboxes/input"
 import "json-picker-stencil"
 import "./handlers"
+import { ValidationField } from "./fields/ValidationField"
 
 // Register the blocks and generator with Blockly
 Blockly.common.defineBlocks(profile_blocks)
@@ -76,3 +77,24 @@ if (workspace) {
 }
 
 registerInputToolbox(workspace)
+
+// Initialize all validation fields
+checkAllValidationFields()
+
+function checkAllValidationFields() {
+    workspace.getAllBlocks().forEach((block) => {
+        if (block.type === "hmc_testblock") {
+            const fields = Array.from(block.getFields())
+            for (const field of fields) {
+                if (field instanceof ValidationField) {
+                    field.forceCheck()
+                }
+            }
+        }
+    })
+}
+
+// Periodically check them as well
+setInterval(() => {
+    checkAllValidationFields()
+}, 2000)

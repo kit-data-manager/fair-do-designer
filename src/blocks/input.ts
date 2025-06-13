@@ -138,4 +138,10 @@ export const input_jsonpath = {
         this.setOutput(true, null)
         this.setColour(230)
     },
+
+    onchange: function (abstract) {
+        if ("blockId" in abstract && abstract.blockId === this.id) {
+            console.log("Change event", abstract)
+        }
+    },
 } as Blockly.Block
