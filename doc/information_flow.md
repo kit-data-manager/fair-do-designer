@@ -97,6 +97,7 @@ d --> r1(Record);
 d -- assigns LID from source --> r1
 
 r1 -- references with LID --> r2("Record of the same Design, may not exist yet (no PID)")
+r2 --"(optional) Callback( inverse-attribute, LID )"--> r1
 d -- assigns LID from source (in a later iteration) --> r2
 ```
 
@@ -115,8 +116,6 @@ s2 --replaceLater(LID)--> ref2[Record B: hasMetadata];
 
 lid1 --put via callback--> ref3[Record B: isMetadataFor];
 ```
-
-**TODO** The issue is the back-reference from the Source B LID to the Record B isMetadataFor.
 
 
 ## Mixing / interacting multiple different designs
