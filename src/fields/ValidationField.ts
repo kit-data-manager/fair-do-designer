@@ -30,7 +30,9 @@ export class ValidationField extends FieldLabel {
     forceCheck() {
         const connection = this.getParentInput().connection
         const connected = connection?.isConnected()
-        this.setValidationResult(connected)
+        this.setValidationResult(
+            connected && !connection?.targetBlock()?.isInsertionMarker(),
+        )
     }
 
     setValidationResult(success: boolean | undefined) {
