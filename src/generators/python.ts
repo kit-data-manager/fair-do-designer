@@ -194,7 +194,8 @@ forBlock["input_jsonpath"] = function <T extends Util.FairDoCodeGenerator>(
     block: Blockly.Block,
     generator: T,
 ) {
-    return ["None", Order.ATOMIC]
+    const value_input = block.getFieldValue("QUERY")
+    return [`jsonpath("${value_input}")`, Order.ATOMIC]
 }
 
 forBlock["input_read_key"] = function <T extends Util.FairDoCodeGenerator>(
@@ -241,8 +242,21 @@ forBlock["hmc_testblock"] = function <T extends Util.FairDoCodeGenerator>(
     block: Blockly.Block,
     generator: T,
 ) {
-    // TODO: Assemble python into the code variable.
-    const code = `hmc_testblock`
-    // TODO: Change Order.NONE to the correct operator precedence strength
+    var code = generator.makeLineComment(`${block.type}`)
+
+    code += generator.makeAddAttributeChainCall(
+        HmcProfile.data.self_attribute_key,
+        HmcProfile.data.self_pid,
+    )
+
+    for (const input of block.inputList) {
+        const name = input.name
+        const pid = Util.getPidByPrefixMap(name, HmcProfile.data.pidMap)
+        // TODO: change Order.ATOMIC to the correct operator precedence strength
+        const value = generator.valueToCode(block, name, Order.ATOMIC)
+        if (pid !== undefined && value && value != "") {
+            code += generator.makeAddAttributeChainCall(pid, value)
+        }
+    }
     return code
 }

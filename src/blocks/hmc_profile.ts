@@ -105,7 +105,9 @@ export const data = {
 
 export const hmc_testblock = {
     init: function () {
-        this.appendDummyInput("0").appendField("Profile Helmholtz KIP")
+        this.appendDummyInput("0").appendField(
+            `Profile "Helmholtz KIP" with Validation`,
+        )
 
         for (const [key, pid] of Object.entries(data.pidMap)) {
             this.appendValueInput(key)
