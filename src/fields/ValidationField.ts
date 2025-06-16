@@ -4,7 +4,7 @@ export class ValidationField extends FieldLabel {
     wrapper_: HTMLElement | null = null
 
     constructor() {
-        super("?")
+        super("❔")
     }
 
     initView() {
@@ -24,7 +24,7 @@ export class ValidationField extends FieldLabel {
     }
 
     setValidationResult(success: boolean | undefined) {
-        this.setValue(success === undefined ? "?" : success ? "Ja" : "Nein")
+        this.setValue(success === undefined ? "?" : success ? "✅" : "❌")
     }
 
     dispose() {
