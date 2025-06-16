@@ -1,0 +1,328 @@
+{
+  "identifier": "21.T11148/b9b76f887845e32d29f7",
+  "name": "HelmholtzKIP",
+  "description": "Draft Kernel Information Profile based on the RDA recommendations used within the Helmholtz Metadata Incubator Platform (HMC).",
+  "provenance": {
+    "contributors": [
+      {
+        "identifiedUsing": "Handle",
+        "name": "21.T11148/fc3224b0abc8b35bd3cb",
+        "details": "Thomas Jejkal, Karlsruhe Institute of Technology"
+      },
+      {
+        "identifiedUsing": "ORCID",
+        "name": "https://orcid.org/0000-0001-6575-1022",
+        "details": "Andreas Pfeil, Karlsruhe Institute of Technology"
+      },
+      {
+        "identifiedUsing": "Handle",
+        "name": "21.T11148/97a37cc7ae18266fd8e3",
+        "details": "Jan Schweikert, Karlsruhe Institute of Technology"
+      }
+    ],
+    "creationDate": "2020-03-05T13:47:48.915Z",
+    "lastModificationDate": "2025-02-03T12:48:25.933Z"
+  },
+  "expectedUses": [
+    "Generic PID Kernel Information Type Profile used in the context of HMC to describe any kind of FAIR Digital Object."
+  ],
+  "representationsAndSemantics": [
+    {
+      "expression": "Format",
+      "value": "PROFILE_DEFINITION",
+      "subSchemaRelation": ""
+    }
+  ],
+  "properties": [
+    {
+      "name": "KernelInformationProfile",
+      "identifier": "21.T11148/076759916209e5d62bd5",
+      "representationsAndSemantics": [
+        {
+          "expression": "Format",
+          "value": "PROFILE_DEFINITION",
+          "obligation": "Mandatory",
+          "repeatable": "No"
+        }
+      ]
+    },
+    {
+      "name": "digitalObjectType",
+      "identifier": "21.T11148/1c699a5d1b4ad3ba4956",
+      "representationsAndSemantics": [
+        {
+          "expression": "Format",
+          "value": "TYPE_DEFINITION",
+          "obligation": "Mandatory",
+          "repeatable": "No"
+        }
+      ]
+    },
+    {
+      "name": "digitalObjectLocation",
+      "identifier": "21.T11148/b8457812905b83046284",
+      "representationsAndSemantics": [
+        {
+          "expression": "Format",
+          "value": "TYPE_DEFINITION",
+          "obligation": "Mandatory",
+          "repeatable": "Yes"
+        }
+      ]
+    },
+    {
+      "name": "digitalObjectLocationAccessProtocol",
+      "identifier": "21.T11148/dcd4e99d26a00b8132f8",
+      "representationsAndSemantics": [
+        {
+          "expression": "Format",
+          "value": "TYPE_DEFINITION",
+          "obligation": "Optional",
+          "repeatable": "No"
+        }
+      ]
+    },
+    {
+      "name": "dateCreated",
+      "identifier": "21.T11148/aafd5fb4c7222e2d950a",
+      "representationsAndSemantics": [
+        {
+          "expression": "Format",
+          "value": "TYPE_DEFINITION",
+          "obligation": "Mandatory",
+          "repeatable": "No"
+        }
+      ]
+    },
+    {
+      "name": "dateModified",
+      "identifier": "21.T11148/397d831aa3a9d18eb52c",
+      "representationsAndSemantics": [
+        {
+          "expression": "Format",
+          "value": "TYPE_DEFINITION",
+          "obligation": "Optional",
+          "repeatable": "No"
+        }
+      ]
+    },
+    {
+      "name": "underEmbargoUntil",
+      "identifier": "21.T11148/796a3ea6c9a38633fb7e",
+      "representationsAndSemantics": [
+        {
+          "expression": "Format",
+          "value": "TYPE_DEFINITION",
+          "obligation": "Optional",
+          "repeatable": "No"
+        }
+      ]
+    },
+    {
+      "name": "version",
+      "identifier": "21.T11148/c692273deb2772da307f",
+      "representationsAndSemantics": [
+        {
+          "expression": "Format",
+          "value": "TYPE_DEFINITION",
+          "obligation": "Optional",
+          "repeatable": "No"
+        }
+      ]
+    },
+    {
+      "name": "license",
+      "identifier": "21.T11148/2f314c8fe5fb6a0063a8",
+      "representationsAndSemantics": [
+        {
+          "expression": "Format",
+          "value": "TYPE_DEFINITION",
+          "obligation": "Mandatory",
+          "repeatable": "No"
+        }
+      ]
+    },
+    {
+      "name": "checksum",
+      "identifier": "21.T11148/82e2503c49209e987740",
+      "representationsAndSemantics": [
+        {
+          "expression": "Format",
+          "value": "TYPE_DEFINITION",
+          "obligation": "Optional",
+          "repeatable": "No"
+        }
+      ]
+    },
+    {
+      "name": "hasMetadata",
+      "identifier": "21.T11148/d0773859091aeb451528",
+      "representationsAndSemantics": [
+        {
+          "expression": "Format",
+          "value": "TYPE_DEFINITION",
+          "obligation": "Optional",
+          "repeatable": "Yes"
+        }
+      ]
+    },
+    {
+      "name": "isMetadataFor",
+      "identifier": "21.T11148/4fe7cde52629b61e3b82",
+      "representationsAndSemantics": [
+        {
+          "expression": "Format",
+          "value": "TYPE_DEFINITION",
+          "obligation": "Optional",
+          "repeatable": "No"
+        }
+      ]
+    },
+    {
+      "name": "topic",
+      "identifier": "21.T11148/b415e16fbe4ca40f2270",
+      "representationsAndSemantics": [
+        {
+          "expression": "Format",
+          "value": "TYPE_DEFINITION",
+          "obligation": "Optional",
+          "repeatable": "Yes"
+        }
+      ]
+    },
+    {
+      "name": "locationPreview",
+      "identifier": "21.T11148/7fdada5846281ef5d461",
+      "representationsAndSemantics": [
+        {
+          "expression": "Format",
+          "value": "TYPE_DEFINITION",
+          "obligation": "Optional",
+          "repeatable": "Yes"
+        }
+      ]
+    },
+    {
+      "name": "contact",
+      "identifier": "21.T11148/1a73af9e7ae00182733b",
+      "representationsAndSemantics": [
+        {
+          "expression": "Format",
+          "value": "TYPE_DEFINITION",
+          "obligation": "Optional",
+          "repeatable": "Yes"
+        }
+      ]
+    },
+    {
+      "name": "wasDerivedFrom",
+      "identifier": "21.T11148/c6e4c19f294ee6f41b1e",
+      "representationsAndSemantics": [
+        {
+          "obligation": "Optional",
+          "repeatable": "Yes"
+        }
+      ]
+    },
+    {
+      "name": "wasRevisionOf",
+      "identifier": "21.T11148/2a1cad55473b20407c78",
+      "representationsAndSemantics": [
+        {
+          "obligation": "Optional",
+          "repeatable": "Yes"
+        }
+      ]
+    },
+    {
+      "name": "hadPrimarySource",
+      "identifier": "21.T11148/a753134738da82809fc1",
+      "representationsAndSemantics": [
+        {
+          "obligation": "Optional",
+          "repeatable": "Yes"
+        }
+      ]
+    },
+    {
+      "name": "wasQuotedFrom",
+      "identifier": "21.T11148/beaeecebec408908de35",
+      "representationsAndSemantics": [
+        {
+          "obligation": "Optional",
+          "repeatable": "Yes"
+        }
+      ]
+    },
+    {
+      "name": "alternateOf",
+      "identifier": "21.T11148/432132bdbd946b2baf2b",
+      "representationsAndSemantics": [
+        {
+          "obligation": "Optional",
+          "repeatable": "Yes"
+        }
+      ]
+    },
+    {
+      "name": "specializationOf",
+      "identifier": "21.T11148/ab53242825e85a0a7f76",
+      "representationsAndSemantics": [
+        {
+          "obligation": "Optional",
+          "repeatable": "Yes"
+        }
+      ]
+    },
+    {
+      "name": "provenanceGraph",
+      "identifier": "21.T11148/af11e18f83466642c47d",
+      "representationsAndSemantics": [
+        {
+          "obligation": "Optional",
+          "repeatable": "No"
+        }
+      ]
+    },
+    {
+      "name": "wasGeneratedBy",
+      "identifier": "21.T11148/c085f1292d7d4a338d96",
+      "representationsAndSemantics": [
+        {
+          "obligation": "Optional",
+          "repeatable": "No"
+        }
+      ]
+    },
+    {
+      "name": "schemaReference",
+      "identifier": "21.T11148/49330041ca5fddf9af92",
+      "representationsAndSemantics": [
+        {
+          "obligation": "Optional",
+          "repeatable": "No"
+        }
+      ]
+    },
+    {
+      "name": "identifier",
+      "identifier": "21.T11148/f3f0cbaa39fa9966b279",
+      "representationsAndSemantics": [
+        {
+          "obligation": "Optional",
+          "repeatable": "No"
+        }
+      ]
+    },
+    {
+      "name": "dataCite-language",
+      "identifier": "21.T11148/43fd02fd11bca92e7b37",
+      "representationsAndSemantics": [
+        {
+          "obligation": "Optional",
+          "repeatable": "Yes"
+        }
+      ]
+    }
+  ]
+}

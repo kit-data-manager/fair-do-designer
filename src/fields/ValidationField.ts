@@ -1,15 +1,24 @@
 import { FieldLabel } from "blockly"
 
+export interface ValidationFieldOptions {
+    mandatory?: boolean
+    repeatable?: boolean
+}
+
 export class ValidationField extends FieldLabel {
     wrapper_: HTMLElement | null = null
+    options: ValidationFieldOptions
 
-    constructor() {
+    constructor(opts: ValidationFieldOptions) {
         super("❔")
+
+        this.options = opts
     }
 
     initView() {
         super.initView()
 
+        this.setValidationResult(undefined)
         this.wrapper_ = document.createElement("foreignObject")
     }
 
@@ -19,12 +28,17 @@ export class ValidationField extends FieldLabel {
     }
 
     forceCheck() {
-        const connected = this.getParentInput().connection?.isConnected()
+        const connection = this.getParentInput().connection
+        const connected = connection?.isConnected()
         this.setValidationResult(connected)
     }
 
     setValidationResult(success: boolean | undefined) {
-        this.setValue(success === undefined ? "?" : success ? "✅" : "❌")
+        const required = this.options.mandatory ? "❗️" : "❔"
+        const repeatable = this.options.repeatable ? "🔢" : "1️⃣"
+        const validationResult =
+            success === undefined ? "❔" : success ? "✅" : "❌"
+        this.setValue(required + repeatable + validationResult)
     }
 
     dispose() {

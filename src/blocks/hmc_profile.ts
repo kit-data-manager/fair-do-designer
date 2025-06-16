@@ -1,5 +1,6 @@
 import * as Blockly from "blockly"
 import { ValidationField } from "../fields/ValidationField"
+import * as HMCProfile from "./profiles/HMC.json"
 
 export const profile = {
     type: "hmc_profile",
@@ -103,20 +104,39 @@ export const data = {
     },
 }
 
+interface HMCBlock extends Blockly.Block {
+    profile: typeof HMCProfile
+}
+
 export const hmc_testblock = {
+    profile: HMCProfile,
+
     init: function () {
         this.appendDummyInput("0").appendField(
             `Profile "Helmholtz KIP" with Validation`,
         )
 
-        for (const [key, pid] of Object.entries(data.pidMap)) {
-            this.appendValueInput(key)
-                .appendField(key)
-                .appendField(new ValidationField(), `val-${key}`)
+        for (const property of this.profile.properties) {
+            const details = property.representationsAndSemantics[0]
+            if (details.obligation !== "Mandatory") continue // Skip optional properties by default
+
+            this.appendValueInput(property.name)
+                .appendField(property.name)
+                .appendField(
+                    new ValidationField({
+                        mandatory: details.obligation == "Mandatory",
+                        repeatable: details.repeatable == "Yes",
+                    }),
+                    `val-${property.name}`,
+                )
+                .setCheck(
+                    details.repeatable == "Yes" ? ["Array", "JSON"] : ["JSON"],
+                )
                 .setAlign(1)
         }
 
-        this.setTooltip("A block with an interactive button.")
+        this.setInputsInline(false)
+        this.setTooltip("Tooltip")
         this.setPreviousStatement(true, null)
         this.setNextStatement(true, null)
         this.setHelpUrl("")
@@ -152,4 +172,4 @@ export const hmc_testblock = {
             }
         }
     },
-} as Blockly.Block
+} as HMCBlock
