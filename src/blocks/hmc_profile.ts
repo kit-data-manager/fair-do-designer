@@ -1,6 +1,7 @@
 import * as Blockly from "blockly"
 import { ValidationField } from "../fields/ValidationField"
 import * as HMCProfile from "./profiles/HMC.json"
+import { WorkspaceSvg } from "blockly"
 
 export const profile = {
     type: "hmc_profile",
@@ -104,14 +105,21 @@ export const data = {
     },
 }
 
-interface HMCBlock extends Blockly.Block {
+interface HMCBlock extends Blockly.BlockSvg {
     profile: typeof HMCProfile
+    activeProperties: string[]
 }
 
-export const hmc_testblock = {
+/* @ts-ignore */
+export const hmc_testblock: HMCBlock = {
     profile: HMCProfile,
+    activeProperties: [],
 
-    init: function () {
+    init: function init() {
+        this.addIcon(
+            new Blockly.icons.MutatorIcon(["lists_create_with_item"], this),
+        )
+
         this.appendDummyInput("0").appendField(
             `Profile "Helmholtz KIP" with Validation`,
         )
@@ -119,6 +127,8 @@ export const hmc_testblock = {
         for (const property of this.profile.properties) {
             const details = property.representationsAndSemantics[0]
             if (details.obligation !== "Mandatory") continue // Skip optional properties by default
+
+            this.activeProperties.push(property.name)
 
             this.appendValueInput(property.name)
                 .appendField(property.name)
@@ -143,7 +153,7 @@ export const hmc_testblock = {
         this.setColour(230)
     },
 
-    onchange: function (abstract) {
+    onchange: function onchange(abstract) {
         if (abstract instanceof Blockly.Events.BlockMove) {
             if (
                 abstract.newParentId === this.id &&
@@ -172,4 +182,32 @@ export const hmc_testblock = {
             }
         }
     },
-} as HMCBlock
+
+    decompose: function decompose(workspace) {
+        const workspaceSvg = workspace as WorkspaceSvg
+        // This is a special sub-block that only gets created in the mutator UI.
+        // It acts as our "top block"
+        const topBlock = workspaceSvg.newBlock("lists_create_with_container")
+        topBlock.initSvg()
+
+        // Then we add one sub-block for each item in the list.
+        let connection = topBlock.getInput("STACK")?.connection
+        for (const property of this.profile.properties.filter(
+            (p) => p.representationsAndSemantics[0].obligation === "Optional",
+        )) {
+            const itemBlock = workspaceSvg.newBlock("lists_create_with_item")
+            const fields = [...itemBlock.getFields()]
+            fields.forEach((f) => f.setValue(property.name))
+            itemBlock.initSvg()
+            if (connection) {
+                connection.connect(itemBlock.previousConnection)
+                connection = itemBlock.nextConnection
+            }
+        }
+
+        // And finally we have to return the top-block.
+        return topBlock
+    },
+
+    compose: function compose(topBlock) {},
+}
