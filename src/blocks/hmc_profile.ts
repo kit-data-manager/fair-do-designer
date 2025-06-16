@@ -107,13 +107,14 @@ export const data = {
 
 interface HMCBlock extends Blockly.BlockSvg {
     profile: typeof HMCProfile
-    activeProperties: string[]
+    activeOptionalProperties: string[]
+    addFieldForProperty(propertyName: string): void
 }
 
 /* @ts-ignore */
 export const hmc_testblock: HMCBlock = {
     profile: HMCProfile,
-    activeProperties: [],
+    activeOptionalProperties: [],
 
     init: function init() {
         this.addIcon(
@@ -127,23 +128,21 @@ export const hmc_testblock: HMCBlock = {
         for (const property of this.profile.properties) {
             const details = property.representationsAndSemantics[0]
             if (details.obligation !== "Mandatory") continue // Skip optional properties by default
-
-            this.activeProperties.push(property.name)
-
-            this.appendValueInput(property.name)
-                .appendField(property.name)
-                .appendField(
-                    new ValidationField({
-                        mandatory: details.obligation == "Mandatory",
-                        repeatable: details.repeatable == "Yes",
-                    }),
-                    `val-${property.name}`,
-                )
-                .setCheck(
-                    details.repeatable == "Yes" ? ["Array", "JSON"] : ["JSON"],
-                )
-                .setAlign(1)
+            this.addFieldForProperty(property.name)
         }
+
+        this.appendDummyInput("DUMMY-DROPDOWN")
+            .appendField(
+                new Blockly.FieldDropdown([
+                    ["-- Add Property --", "ADD"] as [string, string],
+                    ...this.profile.properties.map(
+                        (profile) =>
+                            [profile.name, profile.name] as [string, string],
+                    ),
+                ]),
+                "DROPDOWN",
+            )
+            .setAlign(0)
 
         this.setInputsInline(false)
         this.setTooltip("Tooltip")
@@ -151,6 +150,29 @@ export const hmc_testblock: HMCBlock = {
         this.setNextStatement(true, null)
         this.setHelpUrl("")
         this.setColour(230)
+    },
+
+    addFieldForProperty(propertyName) {
+        const property = this.profile.properties.find(
+            (p) => p.name === propertyName,
+        )
+        if (!property) return
+
+        const details = property.representationsAndSemantics[0]
+
+        this.appendValueInput(property.name)
+            .appendField(property.name)
+            .appendField(
+                new ValidationField({
+                    mandatory: details.obligation == "Mandatory",
+                    repeatable: details.repeatable == "Yes",
+                }),
+                `val-${property.name}`,
+            )
+            .setCheck(
+                details.repeatable == "Yes" ? ["Array", "JSON"] : ["JSON"],
+            )
+            .setAlign(1)
     },
 
     onchange: function onchange(abstract) {
@@ -179,6 +201,40 @@ export const hmc_testblock: HMCBlock = {
                         field.forceCheck()
                     }
                 }, 100)
+            }
+        }
+
+        if (abstract instanceof Blockly.Events.BlockChange) {
+            if (
+                abstract.blockId === this.id &&
+                abstract.name === "DROPDOWN" &&
+                typeof abstract.newValue === "string" &&
+                abstract.newValue !== "ADD"
+            ) {
+                this.addFieldForProperty(abstract.newValue)
+                this.activeOptionalProperties.push(abstract.newValue)
+                this.setFieldValue("ADD", "DROPDOWN")
+            }
+        }
+    },
+
+    saveExtraState() {
+        return JSON.stringify({
+            activeOptionalProperties: this.activeOptionalProperties,
+        })
+    },
+
+    loadExtraState(data) {
+        const parsed = JSON.parse(data)
+        if (
+            typeof parsed === "object" &&
+            "activeOptionalProperties" in parsed &&
+            Array.isArray(parsed.activeOptionalProperties)
+        ) {
+            this.activeOptionalProperties = parsed.activeOptionalProperties
+
+            for (const opt of this.activeOptionalProperties) {
+                this.addFieldForProperty(opt)
             }
         }
     },
