@@ -106,10 +106,14 @@ export const data = {
 export const hmc_testblock = {
     init: function () {
         this.appendDummyInput("0").appendField("Profile Helmholtz KIP")
-        this.appendValueInput("1")
-            .appendField("hasMetadata")
-            .appendField(new ValidationField(), "val-1")
-            .setAlign(1)
+
+        for (const [key, pid] of Object.entries(data.pidMap)) {
+            this.appendValueInput(key)
+                .appendField(key)
+                .appendField(new ValidationField(), `val-${key}`)
+                .setAlign(1)
+        }
+
         this.setTooltip("A block with an interactive button.")
         this.setPreviousStatement(true, null)
         this.setNextStatement(true, null)
@@ -118,42 +122,32 @@ export const hmc_testblock = {
     },
 
     onchange: function (abstract) {
-        if (
-            "newParentId" in abstract &&
-            abstract.newParentId === this.id &&
-            "reason" in abstract &&
-            Array.isArray(abstract.reason) &&
-            abstract.reason.includes("connect")
-        ) {
-            setTimeout(() => {
-                const fields = Array.from(this.getFields())
-                for (const field of fields) {
+        if (abstract instanceof Blockly.Events.BlockMove) {
+            if (
+                abstract.newParentId === this.id &&
+                abstract.reason?.includes("connect")
+            ) {
+                setTimeout(() => {
+                    if (!abstract.newInputName) return
+                    const field = this.getField("val-" + abstract.newInputName)
                     if (field instanceof ValidationField) {
                         field.forceCheck()
                     }
-                }
-            }, 100)
+                }, 100)
+            }
 
-            // this.getField("val-1")?.setValue("Ja")
-        }
-
-        if (
-            "oldParentId" in abstract &&
-            abstract.oldParentId === this.id &&
-            "reason" in abstract &&
-            Array.isArray(abstract.reason) &&
-            abstract.reason.includes("disconnect")
-        ) {
-            setTimeout(() => {
-                const fields = Array.from(this.getFields())
-                for (const field of fields) {
+            if (
+                abstract.oldParentId === this.id &&
+                abstract.reason?.includes("disconnect")
+            ) {
+                setTimeout(() => {
+                    if (!abstract.oldInputName) return
+                    const field = this.getField("val-" + abstract.oldInputName)
                     if (field instanceof ValidationField) {
                         field.forceCheck()
                     }
-                }
-            }, 100)
-
-            // this.getField("val-1")?.setValue("Nein")
+                }, 100)
+            }
         }
     },
 } as Blockly.Block
