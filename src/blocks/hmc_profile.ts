@@ -2,6 +2,7 @@ import * as Blockly from "blockly"
 import { ValidationField } from "../fields/ValidationField"
 import * as HMCProfile from "./profiles/HMC.json"
 import { WorkspaceSvg } from "blockly"
+import { FieldButton } from "../fields/FieldButton"
 
 export const profile = {
     type: "hmc_profile",
@@ -109,6 +110,7 @@ interface HMCBlock extends Blockly.BlockSvg {
     profile: typeof HMCProfile
     activeOptionalProperties: string[]
     addFieldForProperty(propertyName: string): void
+    removeFieldForProperty(propertyName: string): void
 }
 
 /* @ts-ignore */
@@ -135,10 +137,19 @@ export const hmc_testblock: HMCBlock = {
             .appendField(
                 new Blockly.FieldDropdown([
                     ["-- Add Property --", "ADD"] as [string, string],
-                    ...this.profile.properties.map(
-                        (profile) =>
-                            [profile.name, profile.name] as [string, string],
-                    ),
+                    ...this.profile.properties
+                        .filter(
+                            (profile) =>
+                                profile.representationsAndSemantics[0]
+                                    .obligation === "Optional",
+                        )
+                        .map(
+                            (profile) =>
+                                [profile.name, profile.name] as [
+                                    string,
+                                    string,
+                                ],
+                        ),
                 ]),
                 "DROPDOWN",
             )
@@ -160,7 +171,7 @@ export const hmc_testblock: HMCBlock = {
 
         const details = property.representationsAndSemantics[0]
 
-        this.appendValueInput(property.name)
+        const input = this.appendValueInput(property.name)
             .appendField(property.name)
             .appendField(
                 new ValidationField({
@@ -173,6 +184,22 @@ export const hmc_testblock: HMCBlock = {
                 details.repeatable == "Yes" ? ["Array", "JSON"] : ["JSON"],
             )
             .setAlign(1)
+
+        if (details.obligation === "Optional") {
+            input.appendField(
+                new FieldButton("X", () =>
+                    this.removeFieldForProperty(propertyName),
+                ),
+            )
+        }
+    },
+
+    removeFieldForProperty(propertyName: string) {
+        console.log(propertyName)
+        this.activeOptionalProperties = this.activeOptionalProperties.filter(
+            (e) => e !== propertyName,
+        )
+        this.removeInput(propertyName)
     },
 
     onchange: function onchange(abstract) {
@@ -211,9 +238,14 @@ export const hmc_testblock: HMCBlock = {
                 typeof abstract.newValue === "string" &&
                 abstract.newValue !== "ADD"
             ) {
-                this.addFieldForProperty(abstract.newValue)
-                this.activeOptionalProperties.push(abstract.newValue)
                 this.setFieldValue("ADD", "DROPDOWN")
+
+                if (
+                    !this.activeOptionalProperties.includes(abstract.newValue)
+                ) {
+                    this.addFieldForProperty(abstract.newValue)
+                    this.activeOptionalProperties.push(abstract.newValue)
+                }
             }
         }
     },
