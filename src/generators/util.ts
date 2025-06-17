@@ -15,6 +15,10 @@ export function getPidByPrefixMap(
       return pid;
     }
   }
+  // This is a config error: It means the profile likely is missing
+  // the PIDs for the given input name.
+  // Should not happen in future as soon as we generate the profile
+  // blocks from a given profile PID. Then, this may be removed.
   console.debug(`PID not found for input ${name}`);
   return undefined;
 }
