@@ -109,7 +109,7 @@ forBlock["hmc_profile"] = function <T extends Util.FairDoCodeGenerator>(
 
     code += generator.makeAddAttributeChainCall(
         HmcProfile.data.self_attribute_key,
-        HmcProfile.data.self_pid,
+        "'" + HmcProfile.data.self_pid + "'"
     )
 
     for (const input of block.inputList) {
