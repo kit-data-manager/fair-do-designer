@@ -242,21 +242,5 @@ forBlock["hmc_testblock"] = function <T extends Util.FairDoCodeGenerator>(
     block: Blockly.Block,
     generator: T,
 ) {
-    var code = generator.makeLineComment(`${block.type}`)
-
-    code += generator.makeAddAttributeChainCall(
-        HmcProfile.data.self_attribute_key,
-        HmcProfile.data.self_pid,
-    )
-
-    for (const input of block.inputList) {
-        const name = input.name
-        const pid = Util.getPidByPrefixMap(name, HmcProfile.data.pidMap)
-        // TODO: change Order.ATOMIC to the correct operator precedence strength
-        const value = generator.valueToCode(block, name, Order.ATOMIC)
-        if (pid !== undefined && value && value != "") {
-            code += generator.makeAddAttributeChainCall(pid, value)
-        }
-    }
-    return code
+    return forBlock["hmc_profile"](block, generator)
 }
