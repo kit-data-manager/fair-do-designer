@@ -39,8 +39,14 @@ class PidRecord:
         self._id = id
         return self
 
-    def add(self, a, b):
-        self._tuples.add((a, b))
+    def add(self, a: str, b: str | list):
+        if isinstance(b, list):
+            for item in b:
+                if item is None:
+                    continue
+                self._tuples.add((a, item))
+        else:
+            self._tuples.add((a, b))
         return self
 
     def toSimpleJSON(self):
@@ -117,8 +123,9 @@ forBlock["hmc_profile"] = function <T extends Util.FairDoCodeGenerator>(
         const pid = Util.getPidByPrefixMap(name, HmcProfile.data.pidMap)
         // TODO: change Order.ATOMIC to the correct operator precedence strength
         const value = generator.valueToCode(block, name, Order.ATOMIC)
+        const isList: boolean = input.connection?.targetBlock()?.type.startsWith("lists_") || false;
         if (pid !== undefined && value && value != "") {
-            code += generator.makeAddAttributeChainCall(pid, value)
+            code += generator.makeAddAttributeChainCall(pid, value, isList);
         }
     }
     return code

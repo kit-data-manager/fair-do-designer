@@ -30,9 +30,11 @@ export interface RecordMappingGenerator {
    * Generates a chain call to add an attribute key-value pair to a record or entity.
    * @param key The attribute name or identifier
    * @param value The value to be associated with the key
+   * @param isList Optional flag indicating if the value is a list
+   *              (if undefined, value is treated as a single value)
    * @returns A string representing the chain call, e.g., ".add('name', 'value')"
    */
-  makeAddAttributeChainCall(key: string, value: string): string;
+  makeAddAttributeChainCall(key: string, value: string, isList?: boolean): string;
   /**
    * Generates a line comment in the target programming language.
    * @param text The comment text to be included
