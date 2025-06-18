@@ -143,13 +143,13 @@ export const hmc_testblock: HMCBlock = {
                     ["-- Add Property --", "ADD"] as [string, string],
                     ...this.profile.properties
                         .filter(
-                            (profile) =>
-                                profile.representationsAndSemantics[0]
+                            (property) =>
+                                property.representationsAndSemantics[0]
                                     .obligation === "Optional",
                         )
                         .map(
-                            (profile) =>
-                                [profile.name, profile.name] as [
+                            (property) =>
+                                [property.name, property.name] as [
                                     string,
                                     string,
                                 ],
