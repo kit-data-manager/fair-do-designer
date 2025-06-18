@@ -111,6 +111,9 @@ interface HMCBlock extends Blockly.BlockSvg {
     activeOptionalProperties: string[]
     addFieldForProperty(propertyName: string): void
     removeFieldForProperty(propertyName: string): void
+    onBlockCreate(event: Blockly.Events.BlockCreate): void
+    onBlockMove(event: Blockly.Events.BlockMove): void
+    onBlockChange(event: Blockly.Events.BlockChange): void
 }
 
 /* @ts-ignore */
@@ -170,19 +173,18 @@ export const hmc_testblock: HMCBlock = {
         if (!property) return
 
         const details = property.representationsAndSemantics[0]
+        const isRepeatable = details.repeatable == "Yes"
 
         const input = this.appendValueInput(property.name)
             .appendField(property.name)
             .appendField(
                 new ValidationField({
                     mandatory: details.obligation == "Mandatory",
-                    repeatable: details.repeatable == "Yes",
+                    repeatable: isRepeatable,
                 }),
                 `val-${property.name}`,
             )
-            .setCheck(
-                details.repeatable == "Yes" ? ["Array", "JSON"] : ["JSON"],
-            )
+            .setCheck(isRepeatable ? ["Array", "JSON"] : ["JSON"])
             .setAlign(1)
 
         if (details.obligation === "Optional") {
@@ -202,51 +204,91 @@ export const hmc_testblock: HMCBlock = {
         this.removeInput(propertyName)
     },
 
-    onchange: function onchange(abstract) {
-        if (abstract instanceof Blockly.Events.BlockMove) {
-            if (
-                abstract.newParentId === this.id &&
-                abstract.reason?.includes("connect")
-            ) {
-                setTimeout(() => {
-                    if (!abstract.newInputName) return
-                    const field = this.getField("val-" + abstract.newInputName)
-                    if (field instanceof ValidationField) {
-                        field.forceCheck()
+    onBlockCreate(event: Blockly.Events.BlockCreate) {
+        if (event.blockId === this.id) {
+            for (const input of this.inputList) {
+                const property = this.profile.properties.find(
+                    (p) => p.name === input.name,
+                )
+                if (!property) continue
+
+                const details = property.representationsAndSemantics[0]
+                const isRepeatable: boolean = details.repeatable == "Yes"
+                const hasConnection: boolean = input.connection != null
+                const isConnected: boolean =
+                    (hasConnection &&
+                        input.connection?.targetConnection != null) ||
+                    false
+                if (isRepeatable && !isConnected) {
+                    // Spawn a new list block and connect it to input
+                    const listBlock =
+                        this.workspace.newBlock("lists_create_with")
+                    listBlock.initSvg()
+                    listBlock.render()
+
+                    // Connect the list block to the input
+                    const connection = input.connection
+                    if (connection && listBlock.outputConnection) {
+                        connection.connect(listBlock.outputConnection)
                     }
-                }, 100)
-            }
-
-            if (
-                abstract.oldParentId === this.id &&
-                abstract.reason?.includes("disconnect")
-            ) {
-                setTimeout(() => {
-                    if (!abstract.oldInputName) return
-                    const field = this.getField("val-" + abstract.oldInputName)
-                    if (field instanceof ValidationField) {
-                        field.forceCheck()
-                    }
-                }, 100)
-            }
-        }
-
-        if (abstract instanceof Blockly.Events.BlockChange) {
-            if (
-                abstract.blockId === this.id &&
-                abstract.name === "DROPDOWN" &&
-                typeof abstract.newValue === "string" &&
-                abstract.newValue !== "ADD"
-            ) {
-                this.setFieldValue("ADD", "DROPDOWN")
-
-                if (
-                    !this.activeOptionalProperties.includes(abstract.newValue)
-                ) {
-                    this.addFieldForProperty(abstract.newValue)
-                    this.activeOptionalProperties.push(abstract.newValue)
                 }
             }
+        }
+    },
+
+    onBlockMove(event: Blockly.Events.BlockMove) {
+        if (
+            event.newParentId === this.id &&
+            event.reason?.includes("connect")
+        ) {
+            setTimeout(() => {
+                if (!event.newInputName) return
+                const field = this.getField("val-" + event.newInputName)
+                if (field instanceof ValidationField) {
+                    field.forceCheck()
+                }
+            }, 100)
+        }
+
+        if (
+            event.oldParentId === this.id &&
+            event.reason?.includes("disconnect")
+        ) {
+            setTimeout(() => {
+                if (!event.oldInputName) return
+                const field = this.getField("val-" + event.oldInputName)
+                if (field instanceof ValidationField) {
+                    field.forceCheck()
+                }
+            }, 100)
+        }
+    },
+
+    onBlockChange(event: Blockly.Events.BlockChange) {
+        if (
+            event.blockId === this.id &&
+            event.name === "DROPDOWN" &&
+            typeof event.newValue === "string" &&
+            event.newValue !== "ADD"
+        ) {
+            this.setFieldValue("ADD", "DROPDOWN")
+
+            if (!this.activeOptionalProperties.includes(event.newValue)) {
+                this.addFieldForProperty(event.newValue)
+                this.activeOptionalProperties.push(event.newValue)
+            }
+        }
+    },
+
+    onchange: function onchange(abstract) {
+        if (abstract instanceof Blockly.Events.BlockCreate) {
+            this.onBlockCreate(abstract)
+        }
+        if (abstract instanceof Blockly.Events.BlockMove) {
+            this.onBlockMove(abstract)
+        }
+        if (abstract instanceof Blockly.Events.BlockChange) {
+            this.onBlockChange(abstract)
         }
     },
 
