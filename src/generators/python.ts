@@ -40,6 +40,8 @@ class PidRecord:
         return self
 
     def add(self, a: str, b: str | list):
+        if not b or b is None:
+            return self
         if isinstance(b, list):
             for item in b:
                 if item is None:
