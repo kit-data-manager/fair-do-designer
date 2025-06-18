@@ -111,6 +111,7 @@ interface HMCBlock extends Blockly.BlockSvg {
     activeOptionalProperties: string[]
     addFieldForProperty(propertyName: string): void
     removeFieldForProperty(propertyName: string): void
+    addListBlockToEmptyInput(input: Blockly.Input): void
     onBlockCreate(event: Blockly.Events.BlockCreate): void
     onBlockMove(event: Blockly.Events.BlockMove): void
     onBlockChange(event: Blockly.Events.BlockChange): void
@@ -204,34 +205,35 @@ export const hmc_testblock: HMCBlock = {
         this.removeInput(propertyName)
     },
 
+    addListBlockToEmptyInput(input: Blockly.Input) {
+        const property = this.profile.properties.find(
+            (p) => p.name === input.name,
+        )
+        if (!property) return
+
+        const details = property.representationsAndSemantics[0]
+        const isRepeatable: boolean = details.repeatable == "Yes"
+        const hasConnection: boolean = input.connection != null
+        const isConnected: boolean =
+            hasConnection && input.connection?.targetConnection != null
+        if (isRepeatable && !isConnected) {
+            // Spawn a new list block and connect it to input
+            const listBlock = this.workspace.newBlock("lists_create_with")
+            listBlock.initSvg()
+            listBlock.render()
+
+            // Connect the list block to the input
+            const connection = input.connection
+            if (connection && listBlock.outputConnection) {
+                connection.connect(listBlock.outputConnection)
+            }
+        }
+    },
+
     onBlockCreate(event: Blockly.Events.BlockCreate) {
         if (event.blockId === this.id) {
             for (const input of this.inputList) {
-                const property = this.profile.properties.find(
-                    (p) => p.name === input.name,
-                )
-                if (!property) continue
-
-                const details = property.representationsAndSemantics[0]
-                const isRepeatable: boolean = details.repeatable == "Yes"
-                const hasConnection: boolean = input.connection != null
-                const isConnected: boolean =
-                    (hasConnection &&
-                        input.connection?.targetConnection != null) ||
-                    false
-                if (isRepeatable && !isConnected) {
-                    // Spawn a new list block and connect it to input
-                    const listBlock =
-                        this.workspace.newBlock("lists_create_with")
-                    listBlock.initSvg()
-                    listBlock.render()
-
-                    // Connect the list block to the input
-                    const connection = input.connection
-                    if (connection && listBlock.outputConnection) {
-                        connection.connect(listBlock.outputConnection)
-                    }
-                }
+                this.addListBlockToEmptyInput(input)
             }
         }
     },
@@ -271,11 +273,16 @@ export const hmc_testblock: HMCBlock = {
             typeof event.newValue === "string" &&
             event.newValue !== "ADD"
         ) {
+            // reset dropdown menu
             this.setFieldValue("ADD", "DROPDOWN")
-
+            // add property if not already present
             if (!this.activeOptionalProperties.includes(event.newValue)) {
                 this.addFieldForProperty(event.newValue)
                 this.activeOptionalProperties.push(event.newValue)
+                const input = this.getInput(event.newValue)
+                if (input) {
+                    this.addListBlockToEmptyInput(input)
+                }
             }
         }
     },
