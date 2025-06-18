@@ -320,7 +320,7 @@ export const hmc_testblock: HMCBlock = {
         }
     },
 
-    decompose: function decompose(workspace) {
+    decompose(workspace) {
         const workspaceSvg = workspace as WorkspaceSvg
         // This is a special sub-block that only gets created in the mutator UI.
         // It acts as our "top block"
@@ -346,5 +346,5 @@ export const hmc_testblock: HMCBlock = {
         return topBlock
     },
 
-    compose: function compose(topBlock) {},
+    compose(topBlock) {},
 }
