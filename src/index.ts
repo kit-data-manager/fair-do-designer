@@ -90,7 +90,7 @@ checkAllValidationFields()
 
 function checkAllValidationFields() {
     workspace.getAllBlocks().forEach((block) => {
-        if (block.type === "hmc_testblock") {
+        if (block.type === "profile_hmc") {
             const fields = Array.from(block.getFields())
             for (const field of fields) {
                 if (field instanceof ValidationField) {
