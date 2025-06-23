@@ -17,6 +17,34 @@ export const toolbox = {
     contents: [
         {
             kind: "category",
+            name: "Profiles",
+            categorystyle: "procedure_category",
+            contents: [
+                {
+                    kind: "block",
+                    type: "pidrecord",
+                },
+                {
+                    kind: "block",
+                    type: "attribute_key",
+                },
+                {
+                    kind: "block",
+                    type: "profile_hmc",
+                },
+            ],
+        },
+        {
+            kind: "category",
+            name: "Data Access",
+            categorystyle: "procedure_category",
+            custom: "INPUT",
+        },
+        {
+            kind: "sep",
+        },
+        {
+            kind: "category",
             name: "Logic",
             categorystyle: "logic_category",
             contents: [
@@ -610,34 +638,6 @@ export const toolbox = {
             name: "Functions",
             categorystyle: "procedure_category",
             custom: "PROCEDURE",
-        },
-        {
-            kind: "sep",
-        },
-        {
-            kind: "category",
-            name: "Profile",
-            categorystyle: "procedure_category",
-            contents: [
-                {
-                    kind: "block",
-                    type: "pidrecord",
-                },
-                {
-                    kind: "block",
-                    type: "attribute_key",
-                },
-                {
-                    kind: "block",
-                    type: "profile_hmc",
-                },
-            ],
-        },
-        {
-            kind: "category",
-            name: "Input",
-            categorystyle: "procedure_category",
-            custom: "INPUT",
-        },
+        }
     ],
 }
