@@ -5,6 +5,8 @@
  */
 
 import * as Blockly from "blockly"
+import * as BlockDynamicConnection from "@blockly/block-dynamic-connection"
+
 import { blocks as profile_blocks } from "./blocks/all"
 import { RecordMappingGenerator } from "./generators/python"
 import { save, load } from "./serialization"
@@ -17,24 +19,29 @@ import { ValidationField } from "./fields/ValidationField"
 
 // Register the blocks and generator with Blockly
 Blockly.common.defineBlocks(profile_blocks)
-
-var codeGenerator = new RecordMappingGenerator("PidRecordMappingPython")
+BlockDynamicConnection.overrideOldBlockDefinitions()
 
 // Set up UI elements and inject Blockly
-const codeDiv = document.getElementById("generatedCode")?.firstChild
-//const outputDiv = document.getElementById("output");
 const blocklyDiv = document.getElementById("blocklyDiv")
-
 if (!blocklyDiv) {
     throw new Error(`div with id 'blocklyDiv' not found`)
 }
+
 const workspace = Blockly.inject(blocklyDiv, {
     rtl: false,
     toolbox,
     grid: { spacing: 20, length: 3, colour: "#ccc", snap: true },
+    plugins: {
+        connectionPreviewer: BlockDynamicConnection.decoratePreviewer(
+            Blockly.InsertionMarkerPreviewer,
+        ),
+    },
 })
 workspace.addChangeListener(Blockly.Events.disableOrphans)
+workspace.addChangeListener(BlockDynamicConnection.finalizeConnections)
 
+const codeGenerator = new RecordMappingGenerator("PidRecordMappingPython")
+const codeDiv = document.getElementById("generatedCode")?.firstChild
 // This function resets the code and output divs, shows the
 // generated code from the workspace, and evals the code.
 // In a real application, you probably shouldn't use `eval`.
@@ -83,7 +90,7 @@ checkAllValidationFields()
 
 function checkAllValidationFields() {
     workspace.getAllBlocks().forEach((block) => {
-        if (block.type === "hmc_testblock") {
+        if (block.type === "profile_hmc") {
             const fields = Array.from(block.getFields())
             for (const field of fields) {
                 if (field instanceof ValidationField) {

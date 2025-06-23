@@ -39,8 +39,16 @@ class PidRecord:
         self._id = id
         return self
 
-    def add(self, a, b):
-        self._tuples.add((a, b))
+    def add(self, a: str, b: str | list):
+        if not b or b is None:
+            return self
+        if isinstance(b, list):
+            for item in b:
+                if item is None:
+                    continue
+                self._tuples.add((a, item))
+        else:
+            self._tuples.add((a, b))
         return self
 
     def toSimpleJSON(self):
@@ -98,29 +106,6 @@ forBlock["pidrecord"] = function <T extends Util.FairDoCodeGenerator>(
     )
     code += statement_record + "\n"
     code += ")\n"
-    return code
-}
-
-forBlock["hmc_profile"] = function <T extends Util.FairDoCodeGenerator>(
-    block: Blockly.Block,
-    generator: T,
-) {
-    var code = generator.makeLineComment(`${block.type}`)
-
-    code += generator.makeAddAttributeChainCall(
-        HmcProfile.data.self_attribute_key,
-        HmcProfile.data.self_pid,
-    )
-
-    for (const input of block.inputList) {
-        const name = input.name
-        const pid = Util.getPidByPrefixMap(name, HmcProfile.data.pidMap)
-        // TODO: change Order.ATOMIC to the correct operator precedence strength
-        const value = generator.valueToCode(block, name, Order.ATOMIC)
-        if (pid !== undefined && value && value != "") {
-            code += generator.makeAddAttributeChainCall(pid, value)
-        }
-    }
     return code
 }
 
@@ -238,22 +223,41 @@ forBlock["input_source"] = function <T extends Util.FairDoCodeGenerator>(
     return [code, Order.ATOMIC]
 }
 
-forBlock["hmc_testblock"] = function <T extends Util.FairDoCodeGenerator>(
+// Type guard for HmcBlock interface
+function isHmcBlock(obj: any): obj is HmcProfile.HMCBlock {
+    return (
+        obj &&
+        typeof obj.profileAttributeKey === "string" &&
+        typeof obj.profile === "object" &&
+        typeof obj.profile.identifier === "string" &&
+        Array.isArray(obj.inputList) &&
+        typeof obj.extractPidFromProperty === "function"
+    )
+}
+
+forBlock["profile_hmc"] = function <T extends Util.FairDoCodeGenerator>(
     block: Blockly.Block,
     generator: T,
 ) {
-    var code = generator.makeLineComment(`${block.type}`)
+    if (!isHmcBlock(block)) {
+        throw new Error("Expected block to conform to HmcBlock interface")
+    }
 
+    var code = generator.makeLineComment(`${block.type}`)
     code += generator.makeAddAttributeChainCall(
-        HmcProfile.data.self_attribute_key,
-        HmcProfile.data.self_pid,
+        block.profileAttributeKey,
+        "'" + block.profile.identifier + "'",
     )
 
     for (const input of block.inputList) {
         const name = input.name
-        const pid = Util.getPidByPrefixMap(name, HmcProfile.data.pidMap)
+        const pid = block.extractPidFromProperty(name)
         // TODO: change Order.ATOMIC to the correct operator precedence strength
         const value = generator.valueToCode(block, name, Order.ATOMIC)
+        // If we want to check if the result is technically a python list, we can do it this way.
+        // We currently simply push this further down to the python code itself.
+        // Still, this information may be used to format the list in the generated code or so.
+        //const isList: boolean = input.connection?.targetBlock()?.type.startsWith("lists_") || false;
         if (pid !== undefined && value && value != "") {
             code += generator.makeAddAttributeChainCall(pid, value)
         }
