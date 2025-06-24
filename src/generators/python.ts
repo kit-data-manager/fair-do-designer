@@ -73,6 +73,36 @@ forBlock["pidrecord"] = function <T extends Util.FairDoCodeGenerator>(
     return code
 }
 
+forBlock["pidrecord_skipable"] = function <T extends Util.FairDoCodeGenerator>(
+    block: Blockly.Block,
+    generator: T,
+) {
+    let value_skip_condition = generator.valueToCode(block, "skip-condition", Order.ATOMIC)
+    if (!value_skip_condition || value_skip_condition.trim() == "") {
+        value_skip_condition = "True" // Default to True if no condition is provided
+    }
+
+    // TODO: change Order.ATOMIC to the correct operator precedence strength
+    const value_localid = generator.valueToCode(block, "local-id", Order.ATOMIC)
+
+    const statement_record = generator.statementToCode(block, "record")
+
+    const start_comment = generator.makeLineComment(`${block.type}`)
+    let code = `records_graph.append( PidRecord()\n`
+    code += generator.prefixLines(
+        generator.makeSetIDChainCall(value_localid),
+        generator.INDENT,
+    )
+    code += statement_record
+        + generator.makeSimpleJsonBuildCall()
+        + "\n"
+    code += ")\n"
+
+    const intendedCode = generator.prefixLines(code, generator.INDENT)
+    const outerCode = `${start_comment}if ${value_skip_condition}:\n${intendedCode}\n`
+    return outerCode
+}
+
 forBlock["attribute_key"] = function <T extends Util.FairDoCodeGenerator>(
     block: Blockly.Block,
     generator: T,

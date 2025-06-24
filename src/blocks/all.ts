@@ -2,7 +2,7 @@
  * @fileoverview Exports all block definitions available.
  */
 
-import { pidrecord } from "./pidrecord"
+import { pidrecord, pidrecord_skipable } from "./pidrecord"
 import { profile_hmc } from "./hmc_profile"
 import { attribute } from "./attribute"
 import { stop_design, log_value } from "./error_handling"
@@ -20,6 +20,7 @@ import { transform_string } from "./transform"
 
 export const blocks = Blockly.common.createBlockDefinitionsFromJsonArray([
     pidrecord,
+    pidrecord_skipable,
     attribute,
     input_json,
     input_read_object,

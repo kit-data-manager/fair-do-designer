@@ -26,6 +26,10 @@ export const toolbox = {
                 },
                 {
                     kind: "block",
+                    type: "pidrecord_skipable",
+                },
+                {
+                    kind: "block",
                     type: "attribute_key",
                 },
                 {
