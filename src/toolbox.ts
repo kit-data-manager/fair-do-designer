@@ -41,6 +41,12 @@ export const toolbox = {
             custom: "INPUT",
         },
         {
+            kind: "category",
+            name: "Errors and documentation",
+            categorystyle: "procedure_category",
+            custom: "ERRORS",
+        },
+        {
             kind: "sep",
         },
         {

@@ -228,3 +228,16 @@ forBlock["profile_hmc"] = function <T extends Util.FairDoCodeGenerator>(
     }
     return code
 }
+
+forBlock['stop_design'] = function <T extends Util.FairDoCodeGenerator>(
+    block: Blockly.Block,
+    generator: T,
+) {
+    // TODO: change Order.ATOMIC to the correct operator precedence strength
+    let value_message = generator.valueToCode(block, 'MESSAGE', Order.ATOMIC);
+    if (!value_message || value_message.trim() == "") {
+        value_message = '"No error message provided"'
+    }
+    const code = `raise Exception("Design stopped. " + ${value_message})`;
+    return [code, Order.ATOMIC];
+}
