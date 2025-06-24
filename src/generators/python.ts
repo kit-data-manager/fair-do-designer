@@ -241,3 +241,20 @@ forBlock['stop_design'] = function <T extends Util.FairDoCodeGenerator>(
     const code = `raise Exception("Design stopped. " + ${value_message})`;
     return [code, Order.ATOMIC];
 }
+
+forBlock['log_value'] = function <T extends Util.FairDoCodeGenerator>(
+    block: Blockly.Block,
+    generator: T,
+) {
+  // TODO: change Order.ATOMIC to the correct operator precedence strength
+  const value_value = generator.valueToCode(block, 'VALUE', Order.ATOMIC);
+
+  // TODO: change Order.ATOMIC to the correct operator precedence strength
+  const value_name = generator.valueToCode(block, 'DESC', Order.ATOMIC);
+
+  // TODO: change Order.ATOMIC to the correct operator precedence strength
+  const value_reason = generator.valueToCode(block, 'REASON', Order.ATOMIC);
+
+  const code = `log(${value_value}, ${value_name}, ${value_reason})\n`;
+  return [code, Order.ATOMIC];
+}

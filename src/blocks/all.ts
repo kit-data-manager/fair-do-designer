@@ -5,7 +5,7 @@
 import { pidrecord } from "./pidrecord"
 import { profile_hmc } from "./hmc_profile"
 import { attribute } from "./attribute"
-import { stop_design } from "./error_handling"
+import { stop_design, log_value } from "./error_handling"
 
 import * as Blockly from "blockly/core"
 import {
@@ -27,6 +27,7 @@ export const blocks = Blockly.common.createBlockDefinitionsFromJsonArray([
     input_read_index,
     input_source,
     transform_string,
+    log_value
 ])
 
 Blockly.Blocks["input_jsonpath"] = input_jsonpath

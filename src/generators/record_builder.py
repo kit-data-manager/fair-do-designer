@@ -29,6 +29,9 @@ class PidRecord:
         if self._pid and self._pid != "":
             result["pid"] = self._pid
         return result
+    
+def log(value: any, name: str, reason: str):
+    print(f"logging value of {name}: {value} (because {reason})")
 
 records_graph = []
 
