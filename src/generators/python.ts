@@ -39,6 +39,10 @@ export class RecordMappingGenerator
     makeLineComment(text: string): string {
         return this.prefixLines(`${text}\n`, "# ")
     }
+
+    makeSimpleJsonBuildCall(): string {
+        return this.prefixLines(".toSimpleJSON()\n", this.INDENT)
+    }
 }
 
 /**
@@ -62,7 +66,9 @@ forBlock["pidrecord"] = function <T extends Util.FairDoCodeGenerator>(
         generator.makeSetIDChainCall(value_localid),
         generator.INDENT,
     )
-    code += statement_record + "\n"
+    code += statement_record
+        + generator.makeSimpleJsonBuildCall()
+        + "\n"
     code += ")\n"
     return code
 }

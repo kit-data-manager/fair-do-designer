@@ -43,6 +43,11 @@ export interface RecordMappingGenerator {
    * @returns A formatted comment string according to the language syntax
    */
   makeLineComment(text: string): string;
+  /**
+   * Generates a call to build a simple JSON representation of the record.
+   * @returns A string representing the method call, e.g., ".toSimpleJSON()"
+   */
+  makeSimpleJsonBuildCall(): string;
 }
 export type FairDoCodeGenerator = RecordMappingGenerator &
   Blockly.CodeGenerator;
