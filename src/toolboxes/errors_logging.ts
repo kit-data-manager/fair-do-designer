@@ -39,7 +39,52 @@ export function registerErrorsToolbox(workspace: WorkspaceSvg) {
                         },
                     },
                 },
-            } as BlockInfo
-        ]
+            },
+            {
+                kind: "block",
+                type: "logic_ternary",
+                inputs: {
+                    IF: {
+                        shadow: {
+                            type: "logic_boolean",
+                            fields: {
+                                BOOLEAN: true,
+                            },
+                        },
+                    },
+                    THEN: {
+                        shadow: {
+                            type: "text",
+                            fields: {
+                                TEXT: "My value",
+                            },
+                        },
+                    },
+                    ELSE: {
+                        shadow: {
+                            type: "log_value",
+                            fields: {
+                                DESC: {
+                                    shadow: {
+                                        type: "text",
+                                        fields: {
+                                            TEXT: "Variable in Situation X",
+                                        },
+                                    },
+                                },
+                                REASON: {
+                                    shadow: {
+                                        type: "text",
+                                        fields: {
+                                            TEXT: "WARNING: ???",
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        ] as BlockInfo[]
     })
 }
