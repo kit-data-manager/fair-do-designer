@@ -13,9 +13,8 @@ export const input_jsonpath: InputJsonPath = {
         hiddenQueryField.setVisible(false)
 
         this.appendDummyInput()
-            .appendField("👁️")
+            .appendField("Read")
             .appendField("JSON", "DISPLAY_QUERY")
-            .appendField(new FieldButton("⚙️", () => alert("click")))
             .appendField(new FieldButton("🔍", () => alert("click")))
             .appendField(hiddenQueryField, "QUERY")
         this.setTooltip("Read data from input")
