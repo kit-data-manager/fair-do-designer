@@ -1,4 +1,4 @@
-import { FieldLabel } from "blockly"
+import { Block, FieldLabel } from "blockly"
 
 export interface ValidationFieldOptions {
     mandatory?: boolean
@@ -43,9 +43,12 @@ export class ValidationField extends FieldLabel {
         if (!connectedBlock || !connectedBlock.type.startsWith("lists_"))
             return true
 
-        const checkBlock = (block: any): boolean => {
+        const checkBlock = (block: Block): boolean => {
             if (!block) return false
-            if (!block.type.startsWith("lists_")) {
+            if (
+                !block.type.startsWith("lists_") &&
+                !block.isInsertionMarker()
+            ) {
                 return true // Non-list block found, array is non-empty
             }
 
