@@ -35,12 +35,6 @@ export const toolbox = {
             ],
         },
         {
-            kind: "category",
-            name: "Data Access",
-            categorystyle: "procedure_category",
-            custom: "INPUT",
-        },
-        {
             kind: "sep",
         },
         {
@@ -638,6 +632,6 @@ export const toolbox = {
             name: "Functions",
             categorystyle: "procedure_category",
             custom: "PROCEDURE",
-        }
+        },
     ],
 }
