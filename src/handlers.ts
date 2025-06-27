@@ -22,8 +22,10 @@ blocklyDiv.addEventListener("drop", (event: DragEvent) => {
         return
     }
 
-    const display = query.split(".")[query.split(".").length - 1]
-    block.setFieldValue(display, "QUERY")
+    if ("updateQuery" in block && typeof block.updateQuery === "function") {
+        block.updateQuery(query)
+    }
+
     block.initSvg()
     const offset = workspace.getOriginOffsetInPixels()
     block.moveTo(
