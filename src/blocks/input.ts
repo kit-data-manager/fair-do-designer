@@ -3,6 +3,7 @@ import { FieldButton } from "../fields/FieldButton"
 import { FieldLabel } from "blockly"
 
 export interface InputJsonPath extends Blockly.BlockSvg {
+    findQueryProperty(): void
     updateQuery(query: string): void
 }
 
@@ -15,12 +16,21 @@ export const input_jsonpath: InputJsonPath = {
         this.appendDummyInput()
             .appendField("Read")
             .appendField("JSON", "DISPLAY_QUERY")
-            .appendField(new FieldButton("🔍", () => alert("click")))
+            .appendField(
+                new FieldButton("🔍", this.findQueryProperty.bind(this)),
+            )
             .appendField(hiddenQueryField, "QUERY")
         this.setTooltip("Read data from input")
         this.setHelpUrl("")
         this.setOutput(true, null)
         this.setColour(230)
+    },
+
+    findQueryProperty() {
+        const query = this.getField("QUERY")?.getValue()
+        if (!query || typeof query !== "string") return
+        const unified = document.querySelector("unified-document")
+        unified?.setFocusedPath(query)
     },
 
     updateQuery: function (query: string) {
