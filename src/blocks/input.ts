@@ -1,142 +1,57 @@
 import * as Blockly from "blockly"
-import { FieldTextInput } from "blockly"
 import { FieldButton } from "../fields/FieldButton"
+import { FieldLabel } from "blockly"
 
-export const input_json = {
-    type: "input_json",
-    tooltip: "",
-    helpUrl: "",
-    message0: "%1 %2 read %3",
-    args0: [
-        {
-            type: "field_label_serializable",
-            text: "From",
-            name: "label",
-        },
-        {
-            type: "field_input",
-            name: "INPUT",
-            text: "A",
-        },
-        {
-            type: "input_value",
-            name: "KEY",
-            check: "String",
-        },
-    ],
-    output: null, //"JSON",
-    colour: 225,
-    inputsInline: true,
+export interface InputJsonPath extends Blockly.BlockSvg {
+    findQueryProperty(): void
+    updateQuery(query: string): void
 }
 
-export const input_read_object = {
-    type: "input_read_object",
-    tooltip: "",
-    helpUrl: "",
-    message0: "From %1 read %2 %3",
-    args0: [
-        {
-            type: "input_value",
-            name: "OBJ",
-            check: "JSON",
-        },
-        {
-            type: "input_dummy",
-            name: "label",
-        },
-        {
-            type: "input_value",
-            name: "KEY",
-            check: "String",
-        },
-    ],
-    colour: 225,
-    output: null,
-    inputsInline: true,
-}
-
-export const input_read_key = {
-    type: "input_read_key",
-    tooltip: "",
-    helpUrl: "",
-    message0: "Read key %1 %2",
-    args0: [
-        {
-            type: "field_input",
-            name: "KEY",
-            text: "key",
-        },
-        {
-            type: "input_value",
-            name: "INPUT",
-            check: "JSON",
-        },
-    ],
-    output: null, //"JSON",
-    colour: 0,
-    inputsInline: false,
-}
-
-export const input_read_index = {
-    type: "input_read_index",
-    tooltip: "",
-    helpUrl: "",
-    message0: "Read index %1 %2",
-    args0: [
-        {
-            type: "field_input",
-            name: "KEY",
-            text: "0",
-        },
-        {
-            type: "input_value",
-            name: "INPUT",
-            check: "JSON",
-        },
-    ],
-    output: null, //"JSON",
-    colour: 0,
-    inputsInline: false,
-}
-
-export const input_source = {
-    type: "input_source",
-    tooltip: "",
-    helpUrl: "",
-    message0: "%1 %2 %3",
-    args0: [
-        {
-            type: "field_label_serializable",
-            text: "Source",
-            name: "NAME",
-        },
-        {
-            type: "field_dropdown",
-            name: "SOURCE",
-            options: [
-                ["A", "A"],
-                ["JSON", "JSON"],
-            ],
-        },
-        {
-            type: "input_end_row",
-            name: "NAME",
-        },
-    ],
-    output: null, //"JSON",
-    colour: 225,
-}
-
-export const input_jsonpath = {
+/* @ts-ignore */
+export const input_jsonpath: InputJsonPath = {
     init: function () {
+        const hiddenQueryField = new FieldLabel("JSON")
+        hiddenQueryField.setVisible(false)
+
         this.appendDummyInput()
-            .appendField("Data Query")
-            .appendField(new FieldTextInput(), "QUERY")
-            .appendField(new FieldButton("Ändern", () => alert("click")))
-        this.setTooltip("A block with an interactive button.")
+            .appendField("Read")
+            .appendField("JSON", "DISPLAY_QUERY")
+            .appendField(
+                new FieldButton("🔍", this.findQueryProperty.bind(this)),
+            )
+            .appendField(hiddenQueryField, "QUERY")
+        this.setTooltip("Read data from input")
         this.setHelpUrl("")
         this.setOutput(true, null)
         this.setColour(230)
+    },
+
+    findQueryProperty() {
+        const query = this.getField("QUERY")?.getValue()
+        if (!query || typeof query !== "string") return
+        const unified = document.querySelector("unified-document")
+        unified?.setFocusedPath(query)
+    },
+
+    updateQuery: function (query: string) {
+        const display = query.split(".")[query.split(".").length - 1]
+        this.setFieldValue(display, "DISPLAY_QUERY")
+        this.setFieldValue(query, "QUERY")
+        this.getField("QUERY")?.setVisible(false)
+        this.getField("DISPLAY_QUERY")?.setTooltip(query)
+    },
+
+    saveExtraState: function () {
+        return this.getField("QUERY")?.getValue()
+    },
+
+    loadExtraState: function (query: any) {
+        if (typeof query !== "string") {
+            console.error("input_jsonpath extra state is not a string")
+            return
+        }
+
+        this.updateQuery(query)
     },
 
     onchange: function (abstract) {
@@ -144,4 +59,21 @@ export const input_jsonpath = {
             console.log("Change event", abstract)
         }
     },
-} as Blockly.Block
+}
+
+/* @ts-ignore */
+export const input_custom_json: Blockly.BlockSvg = {
+    init: function () {
+        this.appendValueInput("QUERY")
+            .setCheck("String")
+            .appendField(
+                new Blockly.FieldLabelSerializable("JSON Query"),
+                "NAME",
+            )
+        this.setInputsInline(true)
+        this.setOutput(true, "JSON")
+        this.setTooltip("")
+        this.setHelpUrl("")
+        this.setColour(315)
+    },
+}

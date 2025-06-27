@@ -12,7 +12,6 @@ import { RecordMappingGenerator } from "./generators/python"
 import { save, load } from "./serialization"
 import { toolbox } from "./toolbox"
 import "./index.css"
-import { registerInputToolbox } from "./toolboxes/input"
 import "json-picker-stencil"
 import "./handlers"
 import { ValidationField } from "./fields/ValidationField"
@@ -82,8 +81,6 @@ if (workspace) {
         runCode()
     })
 }
-
-registerInputToolbox(workspace)
 
 // Initialize all validation fields
 checkAllValidationFields()
