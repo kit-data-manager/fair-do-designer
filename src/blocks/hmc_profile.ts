@@ -82,6 +82,9 @@ export const profile_hmc: HMCBlock = {
         const details = property.representationsAndSemantics[0]
         const isRepeatable = details.repeatable == "Yes"
 
+        const typeCheck = ["JSON", "String", "Boolean", "Number"]
+        if (isRepeatable) typeCheck.push("Array")
+
         const input = this.appendValueInput(property.name)
             .appendField(property.name)
             .appendField(
@@ -91,7 +94,7 @@ export const profile_hmc: HMCBlock = {
                 }),
                 `val-${property.name}`,
             )
-            .setCheck(isRepeatable ? ["Array", "JSON"] : ["JSON"])
+            .setCheck(typeCheck)
             .setAlign(1)
 
         if (details.obligation === "Optional") {
