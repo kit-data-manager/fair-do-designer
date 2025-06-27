@@ -35,6 +35,27 @@ export const toolbox = {
             ],
         },
         {
+            kind: "category",
+            name: "Input",
+            categorystyle: "procedure_category",
+            contents: [
+                {
+                    kind: "block",
+                    type: "input_custom_json",
+                    inputs: {
+                        QUERY: {
+                            shadow: {
+                                type: "text",
+                                fields: {
+                                    TEXT: "JSON.property",
+                                },
+                            },
+                        },
+                    },
+                },
+            ],
+        },
+        {
             kind: "sep",
         },
         {

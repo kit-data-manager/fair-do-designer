@@ -60,3 +60,20 @@ export const input_jsonpath: InputJsonPath = {
         }
     },
 }
+
+/* @ts-ignore */
+export const input_custom_json: Blockly.BlockSvg = {
+    init: function () {
+        this.appendValueInput("QUERY")
+            .setCheck("String")
+            .appendField(
+                new Blockly.FieldLabelSerializable("JSON Query"),
+                "NAME",
+            )
+        this.setInputsInline(true)
+        this.setOutput(true, "JSON")
+        this.setTooltip("")
+        this.setHelpUrl("")
+        this.setColour(315)
+    },
+}

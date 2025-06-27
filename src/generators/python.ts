@@ -175,52 +175,14 @@ forBlock["transform_string"] = function <T extends Util.FairDoCodeGenerator>(
     return [`transform.toString(${inText})`, Order.ATOMIC]
 }
 
-forBlock["input_jsonpath"] = function <T extends Util.FairDoCodeGenerator>(
-    block: Blockly.Block,
-    generator: T,
-) {
+forBlock["input_jsonpath"] = function (block: Blockly.Block) {
     const value_input = block.getFieldValue("QUERY")
     return [`jsonpath("${value_input}")`, Order.ATOMIC]
 }
 
-forBlock["input_read_key"] = function <T extends Util.FairDoCodeGenerator>(
-    block: Blockly.Block,
-    generator: T,
-) {
-    const text_key = block.getFieldValue("KEY")
-    // TODO: change Order.ATOMIC to the correct operator precedence strength
-    const value_input = generator.valueToCode(block, "INPUT", Order.ATOMIC)
-
-    // TODO: Assemble python into the code variable.
-    const code = `${value_input}.readKey("${(text_key + "").replace(/"/g, "")}")`
-    // TODO: Change Order.NONE to the correct operator precedence strength
-    return [code, Order.ATOMIC]
-}
-
-forBlock["input_read_index"] = function <T extends Util.FairDoCodeGenerator>(
-    block: Blockly.Block,
-    generator: T,
-) {
-    const text_key = block.getFieldValue("KEY")
-    // TODO: change Order.ATOMIC to the correct operator precedence strength
-    const value_input = generator.valueToCode(block, "INPUT", Order.ATOMIC)
-
-    // TODO: Assemble python into the code variable.
-    const code = `${value_input}.readIndex(${(text_key + "").replaceAll(/\D/g, "")})`
-    // TODO: Change Order.NONE to the correct operator precedence strength
-    return [code, Order.ATOMIC]
-}
-
-forBlock["input_source"] = function <T extends Util.FairDoCodeGenerator>(
-    block: Blockly.Block,
-    generator: T,
-) {
-    const dropdown_source = block.getFieldValue("SOURCE")
-
-    // TODO: Assemble python into the code variable.
-    const code = `getSource(${dropdown_source})`
-    // TODO: Change Order.NONE to the correct operator precedence strength
-    return [code, Order.ATOMIC]
+forBlock["input_custom_json"] = function (block: Blockly.Block) {
+    const value_block = block.getInputTargetBlock("QUERY")
+    return [`jsonpath("${value_block?.getFieldValue("TEXT")}")`, Order.ATOMIC]
 }
 
 // Type guard for HmcBlock interface
