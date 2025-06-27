@@ -26,6 +26,10 @@ const config = {
         test: /\.css$/i,
         use: ["style-loader", "css-loader"],
       },
+            {
+        test: /\.py$/i,
+        type: 'asset/source', // This will import the file as a string
+      },
     ],
   },
   resolve: {

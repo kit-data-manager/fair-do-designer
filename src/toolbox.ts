@@ -26,6 +26,10 @@ export const toolbox = {
                 },
                 {
                     kind: "block",
+                    type: "pidrecord_skipable",
+                },
+                {
+                    kind: "block",
                     type: "attribute_key",
                 },
                 {
@@ -39,6 +43,12 @@ export const toolbox = {
             name: "Data Access",
             categorystyle: "procedure_category",
             custom: "INPUT",
+        },
+        {
+            kind: "category",
+            name: "Errors and documentation",
+            categorystyle: "procedure_category",
+            custom: "ERRORS",
         },
         {
             kind: "sep",
