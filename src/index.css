@@ -27,7 +27,28 @@ code {
     width: 400px;
     flex: 0 0 400px;
     overflow: auto;
-    margin: 1rem;
+    padding: 0.5rem;
+    background: rgb(247, 240, 228);
+}
+
+#outputPane.collapsed {
+    display: none;
+}
+
+#collapseOutputPaneBtn {
+    width: 1em;
+    height: 100vh;
+    margin: auto 1px;
+    padding: 0.6em;
+    background: rgb(247, 240, 228);
+    border-radius: 0 6px 6px 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1em;
+    writing-mode: sideways-lr;
+    text-align: center;
 }
 
 #generatedCode {
