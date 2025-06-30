@@ -36,7 +36,7 @@ export const toolbox = {
         },
         {
             kind: "category",
-            name: "Input",
+            name: "Data Access",
             categorystyle: "procedure_category",
             contents: [
                 {
