@@ -26,6 +26,10 @@ export const toolbox = {
                 },
                 {
                     kind: "block",
+                    type: "pidrecord_skipable",
+                },
+                {
+                    kind: "block",
                     type: "attribute_key",
                 },
                 {
@@ -54,6 +58,12 @@ export const toolbox = {
                     },
                 },
             ],
+        },
+        {
+            kind: "category",
+            name: "Checks and Errors",
+            categorystyle: "procedure_category",
+            custom: "ERRORS",
         },
         {
             kind: "sep",

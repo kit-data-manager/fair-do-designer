@@ -8,6 +8,8 @@ import { Order, PythonGenerator, pythonGenerator } from "blockly/python"
 import * as Blockly from "blockly/core"
 import * as HmcProfile from "../blocks/hmc_profile"
 import * as Util from "./util"
+import builderCode from './record_builder.py'
+import conditionalsCode from "./conditionals.py"
 
 /**
  * Specialized generator for our code.
@@ -24,50 +26,8 @@ export class RecordMappingGenerator
         this.addReservedWords("math,random,Number")
         Object.assign(this.forBlock, pythonGenerator.forBlock)
         Object.assign(this.forBlock, forBlock)
-        this.definitions_["record-bucket-class"] = `
-class PidRecord:
-    def __init__(self):
-        self._id = ""
-        self._pid = ""
-        self._tuples = set()
-
-    def setPid(self, pid):
-        self._pid = pid
-        return self
-
-    def setId(self, id):
-        self._id = id
-        return self
-
-    def add(self, a: str, b: str | list):
-        if not b or b is None:
-            return self
-        if isinstance(b, list):
-            for item in b:
-                if item is None:
-                    continue
-                self._tuples.add((a, item))
-        else:
-            self._tuples.add((a, b))
-        return self
-
-    def toSimpleJSON(self):
-        result = {"entries": list(self._tuples)}
-        if self._pid and self._pid != "":
-            result["pid"] = self._pid
-        return result
-
-records_graph = []
-`
-        this.definitions_["typed-pid-maker-connections"] = `
-def createSingleRecord(pidrecord):
-    # TODO implement request to a typed PID Maker instance
-    # pseudocode:
-    # if pidrecord.hasPid: update(pidrecord)
-    # else: create(pidrecord)
-    # onError: to be decided
-    return "pid-of-pidrecord"
-`
+        this.definitions_["record-builder-code"] = builderCode
+        this.definitions_["conditionals-code"] = conditionalsCode
     }
 
     makeAddAttributeChainCall(key: string, value: string): string {
@@ -80,6 +40,10 @@ def createSingleRecord(pidrecord):
 
     makeLineComment(text: string): string {
         return this.prefixLines(`${text}\n`, "# ")
+    }
+
+    makeSimpleJsonBuildCall(): string {
+        return this.prefixLines(".toSimpleJSON()\n", this.INDENT)
     }
 }
 
@@ -104,9 +68,41 @@ forBlock["pidrecord"] = function <T extends Util.FairDoCodeGenerator>(
         generator.makeSetIDChainCall(value_localid),
         generator.INDENT,
     )
-    code += statement_record + "\n"
+    code += statement_record
+        + generator.makeSimpleJsonBuildCall()
+        + "\n"
     code += ")\n"
     return code
+}
+
+forBlock["pidrecord_skipable"] = function <T extends Util.FairDoCodeGenerator>(
+    block: Blockly.Block,
+    generator: T,
+) {
+    let value_skip_condition = generator.valueToCode(block, "skip-condition", Order.ATOMIC)
+    if (!value_skip_condition || value_skip_condition.trim() == "") {
+        value_skip_condition = "True" // Default to True if no condition is provided
+    }
+
+    // TODO: change Order.ATOMIC to the correct operator precedence strength
+    const value_localid = generator.valueToCode(block, "local-id", Order.ATOMIC)
+
+    const statement_record = generator.statementToCode(block, "record")
+
+    const start_comment = generator.makeLineComment(`${block.type}`)
+    let code = `records_graph.append( PidRecord()\n`
+    code += generator.prefixLines(
+        generator.makeSetIDChainCall(value_localid),
+        generator.INDENT,
+    )
+    code += statement_record
+        + generator.makeSimpleJsonBuildCall()
+        + "\n"
+    code += ")\n"
+
+    const intendedCode = generator.prefixLines(code, generator.INDENT)
+    const outerCode = `${start_comment}if ${value_skip_condition}:\n${intendedCode}\n`
+    return outerCode
 }
 
 forBlock["attribute_key"] = function <T extends Util.FairDoCodeGenerator>(
@@ -225,4 +221,45 @@ forBlock["profile_hmc"] = function <T extends Util.FairDoCodeGenerator>(
         }
     }
     return code
+}
+
+forBlock['stop_design'] = function <T extends Util.FairDoCodeGenerator>(
+    block: Blockly.Block,
+    generator: T,
+) {
+    // TODO: change Order.ATOMIC to the correct operator precedence strength
+    let value_message = generator.valueToCode(block, 'MESSAGE', Order.ATOMIC);
+    if (!value_message || value_message.trim() == "") {
+        value_message = '"No error message provided"'
+    }
+    const code = `raise Exception("Design stopped. " + ${value_message})`;
+    return [code, Order.ATOMIC];
+}
+
+forBlock['log_value'] = function <T extends Util.FairDoCodeGenerator>(
+    block: Blockly.Block,
+    generator: T,
+) {
+    const text_desc = block.getFieldValue('DESC');
+    // TODO: change Order.ATOMIC to the correct operator precedence strength
+    const value_invar = generator.valueToCode(block, 'INVAR', Order.ATOMIC);
+
+    const code = `log(${value_invar}, ${text_desc})\n`;
+    // TODO: Change Order.NONE to the correct operator precedence strength
+    return [code, Order.NONE];
+}
+
+forBlock['otherwise'] = function <T extends Util.FairDoCodeGenerator>(
+    block: Blockly.Block,
+    generator: T,
+) {
+  // TODO: change Order.ATOMIC to the correct operator precedence strength
+  const value_value = generator.valueToCode(block, 'VALUE', Order.ATOMIC);
+
+  // TODO: change Order.ATOMIC to the correct operator precedence strength
+  const value_other = generator.valueToCode(block, 'OTHER', Order.ATOMIC);
+
+  const code = `otherwise(${value_value}, ${value_other})\n`;
+  // TODO: Change Order.NONE to the correct operator precedence strength
+  return [code, Order.NONE];
 }
