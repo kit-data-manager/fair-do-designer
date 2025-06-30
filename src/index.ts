@@ -16,6 +16,12 @@ import "json-picker-stencil"
 import "./handlers"
 import { ValidationField } from "./fields/ValidationField"
 
+import * as m1 from "./demo/json/metadata.json"
+import * as m2 from "./demo/json/metadata(1).json"
+import * as m3 from "./demo/json/metadata(2).json"
+import * as m4 from "./demo/json/metadata(3).json"
+import * as m5 from "./demo/json/metadata(4).json"
+
 // Register the blocks and generator with Blockly
 Blockly.common.defineBlocks(profile_blocks)
 BlockDynamicConnection.overrideOldBlockDefinitions()
@@ -102,3 +108,16 @@ function checkAllValidationFields() {
 setInterval(() => {
     checkAllValidationFields()
 }, 2000)
+
+document.addEventListener("DOMContentLoaded", () => {
+    const jsonPicker = document.querySelector("unified-document")
+    if (jsonPicker) {
+        jsonPicker.addFiles([
+            new Blob([JSON.stringify(m1)]),
+            new Blob([JSON.stringify(m2)]),
+            new Blob([JSON.stringify(m3)]),
+            new Blob([JSON.stringify(m4)]),
+            new Blob([JSON.stringify(m5)]),
+        ])
+    }
+})
