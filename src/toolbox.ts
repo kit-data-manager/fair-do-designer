@@ -46,7 +46,7 @@ export const toolbox = {
         },
         {
             kind: "category",
-            name: "Errors and documentation",
+            name: "Checks and Errors",
             categorystyle: "procedure_category",
             custom: "ERRORS",
         },
