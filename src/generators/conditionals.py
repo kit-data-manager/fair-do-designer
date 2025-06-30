@@ -6,6 +6,13 @@ def otherwise(either: any, otherwise: any):
     :param otherwise: The value to return if `either` is None.
     :return: `either` if it is not None, otherwise `otherwise`.
     """
+    if type(either) == str and either.strip().lower() in ("null", "", "()", "[]", "\{\}"):
+        either = None
+
     notNone = either is not None
-    notNull = otherwise != "null"
-    return either if notNone and notNull else otherwise
+    notEmptyArray = type(either) == list and len(either) > 0
+    notEmptyTuple = type(either) == tuple and len(either) > 0
+    notEmptyishString = type(either) == str and either.strip().lower() not in ("null", "", "()", "[]", "\{\}")
+
+    isOk = notNone and notEmptyArray and notEmptyTuple and notEmptyishString
+    return either if isOk else otherwise
