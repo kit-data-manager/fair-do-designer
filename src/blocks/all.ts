@@ -8,29 +8,18 @@ import { attribute } from "./attribute"
 import { stop_design, log_value, otherwise } from "./error_handling"
 
 import * as Blockly from "blockly/core"
-import {
-    input_json,
-    input_jsonpath,
-    input_read_index,
-    input_read_key,
-    input_read_object,
-    input_source,
-} from "./input"
+import { input_custom_json, input_jsonpath } from "./input"
 import { transform_string } from "./transform"
 
 export const blocks = Blockly.common.createBlockDefinitionsFromJsonArray([
     pidrecord,
     pidrecord_skipable,
     attribute,
-    input_json,
-    input_read_object,
-    input_read_key,
-    input_read_index,
-    input_source,
     transform_string,
 ])
 
 Blockly.Blocks["input_jsonpath"] = input_jsonpath
+Blockly.Blocks["input_custom_json"] = input_custom_json
 Blockly.Blocks["profile_hmc"] = profile_hmc
 Blockly.Blocks["stop_design"] = stop_design
 Blockly.Blocks["log_value"] = log_value

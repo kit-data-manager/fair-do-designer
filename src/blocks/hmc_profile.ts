@@ -1,7 +1,6 @@
 import * as Blockly from "blockly"
 import { ValidationField } from "../fields/ValidationField"
 import * as HMCProfile from "./profiles/HMC.json"
-import { WorkspaceSvg } from "blockly"
 import { FieldButton } from "../fields/FieldButton"
 
 export interface HMCBlock extends Blockly.BlockSvg {
@@ -28,9 +27,6 @@ export const profile_hmc: HMCBlock = {
 
     init: function init() {
         this.profileAttributeKey = extractProfileAttributeKey(this)
-        this.addIcon(
-            new Blockly.icons.MutatorIcon(["lists_create_with_item"], this),
-        )
 
         this.appendDummyInput("0").appendField(
             `Profile "Helmholtz KIP" with Validation`,
@@ -86,6 +82,9 @@ export const profile_hmc: HMCBlock = {
         const details = property.representationsAndSemantics[0]
         const isRepeatable = details.repeatable == "Yes"
 
+        const typeCheck = ["JSON", "String", "Boolean", "Number"]
+        if (isRepeatable) typeCheck.push("Array")
+
         const input = this.appendValueInput(property.name)
             .appendField(property.name)
             .appendField(
@@ -95,7 +94,7 @@ export const profile_hmc: HMCBlock = {
                 }),
                 `val-${property.name}`,
             )
-            .setCheck(isRepeatable ? ["Array", "JSON"] : ["JSON"])
+            .setCheck(typeCheck)
             .setAlign(1)
 
         if (details.obligation === "Optional") {
@@ -229,34 +228,6 @@ export const profile_hmc: HMCBlock = {
             }
         }
     },
-
-    decompose(workspace) {
-        const workspaceSvg = workspace as WorkspaceSvg
-        // This is a special sub-block that only gets created in the mutator UI.
-        // It acts as our "top block"
-        const topBlock = workspaceSvg.newBlock("lists_create_with_container")
-        topBlock.initSvg()
-
-        // Then we add one sub-block for each item in the list.
-        let connection = topBlock.getInput("STACK")?.connection
-        for (const property of this.profile.properties.filter(
-            (p) => p.representationsAndSemantics[0].obligation === "Optional",
-        )) {
-            const itemBlock = workspaceSvg.newBlock("lists_create_with_item")
-            const fields = [...itemBlock.getFields()]
-            fields.forEach((f) => f.setValue(property.name))
-            itemBlock.initSvg()
-            if (connection) {
-                connection.connect(itemBlock.previousConnection)
-                connection = itemBlock.nextConnection
-            }
-        }
-
-        // And finally we have to return the top-block.
-        return topBlock
-    },
-
-    compose(topBlock) {},
 }
 
 function extractProfileAttributeKey(block: HMCBlock): string {

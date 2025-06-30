@@ -6,13 +6,26 @@
     </head>
     <body>
         <div id="pageContainer">
-            <div id="outputPane">
+            <div id="outputPane" class="collapsed">
                 <pre id="generatedCode"><code></code></pre>
             </div>
+            <button id="collapseOutputPaneBtn" title="Toggle output pane">
+                Show output pane
+            </button>
             <div id="blocklyDiv"></div>
             <div style="max-height: 100vh; width: 800px; overflow: scroll">
                 <unified-document class="jsonPicker"></unified-document>
             </div>
         </div>
+        <script>
+        const outputPane = document.getElementById('outputPane');
+        const btn = document.getElementById('collapseOutputPaneBtn');
+        btn.onclick = function() {
+            outputPane.classList.toggle('collapsed');
+            const collapsed = outputPane.classList.contains('collapsed');
+            btn.innerHTML = collapsed ? 'Show output pane' : 'Hide output pane';
+            btn.title = collapsed ? 'Show output pane' : 'Hide output pane';
+        };
+        </script>
     </body>
 </html>
