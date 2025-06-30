@@ -9,6 +9,7 @@ import * as Blockly from "blockly/core"
 import * as HmcProfile from "../blocks/hmc_profile"
 import * as Util from "./util"
 import builderCode from './record_builder.py'
+import conditionalsCode from "./conditionals.py"
 
 /**
  * Specialized generator for our code.
@@ -26,6 +27,7 @@ export class RecordMappingGenerator
         Object.assign(this.forBlock, pythonGenerator.forBlock)
         Object.assign(this.forBlock, forBlock)
         this.definitions_["record-builder-code"] = builderCode
+        this.definitions_["conditionals-code"] = conditionalsCode
     }
 
     makeAddAttributeChainCall(key: string, value: string): string {
@@ -276,15 +278,26 @@ forBlock['log_value'] = function <T extends Util.FairDoCodeGenerator>(
     block: Blockly.Block,
     generator: T,
 ) {
+    const text_desc = block.getFieldValue('DESC');
+    // TODO: change Order.ATOMIC to the correct operator precedence strength
+    const value_invar = generator.valueToCode(block, 'INVAR', Order.ATOMIC);
+
+    const code = `log(${value_invar}, ${text_desc})\n`;
+    // TODO: Change Order.NONE to the correct operator precedence strength
+    return [code, Order.NONE];
+}
+
+forBlock['otherwise'] = function <T extends Util.FairDoCodeGenerator>(
+    block: Blockly.Block,
+    generator: T,
+) {
   // TODO: change Order.ATOMIC to the correct operator precedence strength
   const value_value = generator.valueToCode(block, 'VALUE', Order.ATOMIC);
 
   // TODO: change Order.ATOMIC to the correct operator precedence strength
-  const value_name = generator.valueToCode(block, 'DESC', Order.ATOMIC);
+  const value_other = generator.valueToCode(block, 'OTHER', Order.ATOMIC);
 
-  // TODO: change Order.ATOMIC to the correct operator precedence strength
-  const value_reason = generator.valueToCode(block, 'REASON', Order.ATOMIC);
-
-  const code = `log(${value_value}, ${value_name}, ${value_reason})\n`;
-  return [code, Order.ATOMIC];
+  const code = `otherwise(${value_value}, ${value_other})\n`;
+  // TODO: Change Order.NONE to the correct operator precedence strength
+  return [code, Order.NONE];
 }

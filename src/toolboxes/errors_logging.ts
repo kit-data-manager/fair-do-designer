@@ -21,58 +21,16 @@ export function registerErrorsToolbox(workspace: WorkspaceSvg) {
             {
                 kind: "block",
                 type: "log_value",
-                inputs: {
-                    DESC: {
-                        shadow: {
-                            type: "text",
-                            fields: {
-                                TEXT: "Variable in Situation X",
-                            },
-                        },
-                    },
-                    REASON: {
-                        shadow: {
-                            type: "text",
-                            fields: {
-                                TEXT: "debugging",
-                            },
-                        },
-                    },
-                },
             },
             {
                 kind: "block",
-                type: "logic_ternary",
+                type: "otherwise",
                 inputs: {
-                    IF: {
+                    OTHER: {
                         shadow: {
-                            type: "logic_boolean",
+                            type: "stop_design",
                             fields: {
-                                BOOLEAN: true,
-                            },
-                        },
-                    },
-                    THEN: {
-                        shadow: {
-                            type: "text",
-                            fields: {
-                                TEXT: "My value",
-                            },
-                        },
-                    },
-                    ELSE: {
-                        shadow: {
-                            type: "log_value",
-                            fields: {
-                                DESC: {
-                                    shadow: {
-                                        type: "text",
-                                        fields: {
-                                            TEXT: "Variable in Situation X",
-                                        },
-                                    },
-                                },
-                                REASON: {
+                                MESSAGE: {
                                     shadow: {
                                         type: "text",
                                         fields: {

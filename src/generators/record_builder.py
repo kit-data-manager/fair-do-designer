@@ -30,8 +30,8 @@ class PidRecord:
             result["pid"] = self._pid
         return result
     
-def log(value: any, name: str, reason: str):
-    print(f"logging value of {name}: {value} (because {reason})")
+def log(value: any, name: str):
+    print(f"logging value of {name}: {value}")
 
 records_graph = []
 
