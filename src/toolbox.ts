@@ -38,7 +38,22 @@ export const toolbox = {
             kind: "category",
             name: "Data Access",
             categorystyle: "procedure_category",
-            custom: "INPUT",
+            contents: [
+                {
+                    kind: "block",
+                    type: "input_custom_json",
+                    inputs: {
+                        QUERY: {
+                            shadow: {
+                                type: "text",
+                                fields: {
+                                    TEXT: "JSON.property",
+                                },
+                            },
+                        },
+                    },
+                },
+            ],
         },
         {
             kind: "sep",
@@ -638,6 +653,6 @@ export const toolbox = {
             name: "Functions",
             categorystyle: "procedure_category",
             custom: "PROCEDURE",
-        }
+        },
     ],
 }
