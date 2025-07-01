@@ -263,3 +263,16 @@ forBlock['otherwise'] = function <T extends Util.FairDoCodeGenerator>(
   // TODO: Change Order.NONE to the correct operator precedence strength
   return [code, Order.NONE];
 }
+
+forBlock['backlink_declaration'] = function <T extends Util.FairDoCodeGenerator>(
+    block: Blockly.Block,
+    generator: T,
+) {
+  // TODO: change Order.ATOMIC to the correct operator precedence strength
+  const value_attribute_key = generator.valueToCode(block, 'ATTRIBUTE_KEY', Order.ATOMIC);
+
+  // TODO: Assemble python into the code variable.
+  const code = '.addBacklink(' + value_attribute_key + ')\n';
+  // TODO: Change Order.NONE to the correct operator precedence strength
+  return [code, Order.ATOMIC];
+}

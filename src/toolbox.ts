@@ -30,11 +30,15 @@ export const toolbox = {
                 },
                 {
                     kind: "block",
-                    type: "attribute_key",
+                    type: "profile_hmc",
                 },
                 {
                     kind: "block",
-                    type: "profile_hmc",
+                    type: "backlink_declaration",
+                },
+                {
+                    kind: "block",
+                    type: "attribute_key",
                 },
             ],
         },
