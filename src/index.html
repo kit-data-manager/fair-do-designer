@@ -13,10 +13,16 @@
                 Show output pane
             </button>
             <div id="blocklyDiv"></div>
-            <div style="max-height: 100vh; width: 800px; overflow: scroll">
-                <h2 style="font-family: sans-serif; margin: 0; padding: 10px;">Data Input</h2>
-                <p style="font-family: sans-serif; margin: 0; padding: 10px;">You can drag and drop <span style="color: oklch(0.546 0.245 262.881);">keys</span> from below to the workspace to add a read block.</p>
-                <unified-document class="jsonPicker"></unified-document>
+            <div class="jsonPickerWrapper">
+                <div class="jsonPickerHeader">
+                    <h4 class="jsonPickerHeading">Data Input</h4>
+                </div>
+                <div class="jsonPicker">
+                    <div class="jsonPickerHint">
+                        Hint: Use drag-and-drop to place Data Access blocks in the workspace
+                    </div>
+                    <unified-document></unified-document>
+                </div>
             </div>
         </div>
         <script>
