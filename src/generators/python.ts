@@ -31,7 +31,7 @@ export class RecordMappingGenerator
     }
 
     makeAddAttributeChainCall(key: string, value: string): string {
-        return `.add("${key}", ${value})\n`
+        return `.add(lambda: "${key}", lambda: ${value})\n`
     }
 
     makeSetIDChainCall(id: string): string {
@@ -45,6 +45,8 @@ export class RecordMappingGenerator
     makeSimpleJsonBuildCall(): string {
         return this.prefixLines(".toSimpleJSON()\n", this.INDENT)
     }
+
+    
 }
 
 /**
@@ -262,4 +264,17 @@ forBlock['otherwise'] = function <T extends Util.FairDoCodeGenerator>(
   const code = `otherwise(${value_value}, ${value_other})\n`;
   // TODO: Change Order.NONE to the correct operator precedence strength
   return [code, Order.NONE];
+}
+
+forBlock['backlink_declaration'] = function <T extends Util.FairDoCodeGenerator>(
+    block: Blockly.Block,
+    generator: T,
+) {
+  // TODO: change Order.ATOMIC to the correct operator precedence strength
+  const value_attribute_key = generator.valueToCode(block, 'ATTRIBUTE_KEY', Order.ATOMIC);
+
+  // TODO: Assemble python into the code variable.
+  const code = '.addBacklink(' + value_attribute_key + ')\n';
+  // TODO: Change Order.NONE to the correct operator precedence strength
+  return [code, Order.ATOMIC];
 }
