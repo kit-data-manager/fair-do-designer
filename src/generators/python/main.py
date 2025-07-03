@@ -1,6 +1,6 @@
 import sys, json
 from typing import Dict, Set, List, Tuple, Callable, TypeVar, Any, Sequence, Mapping
-import jsonpath
+import jsonpath # type: ignore
 
 JsonType = str | Sequence[Any] | Mapping[str, Any]
 T = TypeVar('T')
@@ -76,6 +76,9 @@ class RecordDesign:
         return self
     
     def apply(self, json: JsonType) -> PidRecord:
+        global current_source_json
+        current_source_json = json
+
         record: PidRecord = PidRecord()
         record.setId(self._id(json))
         record.setPid(self._pid(json))
@@ -86,8 +89,22 @@ class RecordDesign:
                     record.add(key, value)
         return record
 
+"""
+A function that executes a design must assign the current JSON to this global variable.
+This is a workaround to allow the design to access the current JSON in any case the user
+intends to use it. This is not a good practice, but it is the only way to allow users to
+define their own functions that can access the current JSON. This is requied because
+users may define functions and may use a "read from json" block in them. These blocks
+are using this variable to refer to the current JSON.
+"""
+current_source_json: JsonType | None = None
+
 INPUT = CliInputProvider(sys.argv[1:])
 RECORD_DESIGNS: list[RecordDesign] = []
+
+#---8<---insert-user-defined-code-here---8<---
+
+# Example to do some linter checks:
 RECORD_DESIGNS.append(
     RecordDesign()
         .setId(lambda json: str(jsonpath.findall("$.id", json)[0]) if jsonpath.findall("$.id", json) else "")
@@ -102,8 +119,11 @@ for design in RECORD_DESIGNS:
     while True:
         input_file = INPUT.nextInputFile()
         if not input_file:
+            print("No more input files.")
             break
         with open(input_file, 'r') as file:
             json_data: JsonType = json.load(file)
             record: PidRecord = design.apply(json_data)
             RECORD_GRAPH.append(record)
+
+# TODO send record graph to typed pid maker instance

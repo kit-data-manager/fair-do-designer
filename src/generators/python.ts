@@ -31,7 +31,7 @@ export class RecordMappingGenerator
     }
 
     makeAddAttributeChainCall(key: string, value: string): string {
-        return `.add("${key}", ${value})\n`
+        return `.add(lambda: "${key}", lambda: ${value})\n`
     }
 
     makeSetIDChainCall(id: string): string {
@@ -45,6 +45,8 @@ export class RecordMappingGenerator
     makeSimpleJsonBuildCall(): string {
         return this.prefixLines(".toSimpleJSON()\n", this.INDENT)
     }
+
+    
 }
 
 /**
