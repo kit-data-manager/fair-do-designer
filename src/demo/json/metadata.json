@@ -1,0 +1,194 @@
+{
+	"sampleIdentification": {
+		"sampleName": "Carbonnanotubes",
+		"sampleProducer": "self",
+		"samplePurpose": {
+			"samplePurposeOptions": [
+				"assessment (to given categories or values)",
+				"completeness check (presence or absence of given properties)",
+				"test specific hypothesis (focus only on given aspects)"
+			]
+		},
+		"sampleID": {
+			"sampleID": "C04_200nm_A4",
+			"sampleIDType": "text",
+			"sampleIDPosition": [
+				"top"
+			]
+		}
+	},
+	"sampleCharacterization": {
+		"phaseOfMatter": "solid - definition: https://en.wikipedia.org/wiki/Solid",
+		"materialType": "organicCompound",
+		"materialProperties": {
+			"propertiesOptions": [
+				"semiconductor"
+			]
+		}
+	},
+	"featuresOfInterest": {
+		"defects": {
+			"defectsOptions": [
+				"interstitial defects"
+			]
+		},
+		"interfaces": {
+			"interfacesOptions": [
+				"grain boundaries"
+			]
+		},
+		"dominantStructures": {
+			"reinforcementStructures": {
+				"scale": "not applicable"
+			},
+			"alignedStructures": {
+				"scale": "not applicable"
+			},
+			"lamellarStructures": {
+				"scale": "not applicable"
+			},
+			"particles": {
+				"particleType": "not applicable"
+			},
+			"crystalStructures": {
+				"crystallinity": "not applicable",
+				"scale": "not applicable",
+				"twinned": false
+			},
+			"porousStructures": {
+				"percolated": false
+			}
+		}
+	},
+	"sampleDescription": {
+		"sampleVisibleElements": {
+			"visibleElementsOptions": [
+				"sample ID"
+			]
+		},
+		"sampleShape": {
+			"shapeOptions": "rod/bar",
+			"sheet": {
+				"sheetType": "not applicable"
+			},
+			"layer": {
+				"layerType": "not applicable"
+			},
+			"wire": {
+				"diameter": {
+					"value": 7,
+					"unit": "nm"
+				}
+			}
+		},
+		"sampleSize": {
+			"sizeX": {
+				"value": 2,
+				"unit": "nm"
+			},
+			"sizeY": {
+				"value": 1,
+				"unit": "um"
+			}
+		},
+		"sampleSurfaceRoughness": {
+			"quantitative": {
+				"amplitudeParameter": "not applicable"
+			}
+		}
+	},
+	"sampleHandlingPrecaution": {
+		"sensitivityAgainst": {
+			"sensitivityList": [
+				"eBeam",
+				"radiation",
+				"variations of gas concentration",
+				"variations of humidity"
+			]
+		},
+		"safetyInfo": {
+			"hazard": [
+				"toxic or irritant",
+				"nanostructured/nanoparticles"
+			]
+		},
+		"sampleHandling": {
+			"gloves": true,
+			"gasAtmosphere": {
+				"gasAtmosphereOptions": "air"
+			},
+			"shockProtection": false
+		},
+		"storageConditions": {
+			"storageEquipment": {
+				"storageEquipmentOptions": []
+			}
+		}
+	},
+	"parents": [
+		{
+			"parentType": "sample",
+			"parentReferenceType": "external URL",
+			"parentReference": "https://tuball.com/about-tuball"
+		}
+	],
+	"samplePreparation": {
+		"researchUser": {
+			"userName": "Self",
+			"userRole": "Team Member"
+		},
+		"preparationDate": "2018-12-10",
+		"preparationDescription": "Silicon substrate cleaning with IPA and metal sputtering. Next dielectrophoresis of CNTs.",
+		"preparationHistoryFile": "Data Repository"
+	},
+	"sampleHolder": {
+		"sampleHolderType": "stub",
+		"sampleHolderSize": {
+			"sizeX": {
+				"value": 0,
+				"unit": "cm"
+			}
+		},
+		"fixingMethod": "Other (please add in the comments)",
+		"otherFixingMethod": "Carbon tape"
+	},
+	"sampleCarrier": {
+		"sampleCarrierType": "Silicon",
+		"sampleCarrierSize": {
+			"sizeX": {
+				"value": 1,
+				"unit": "cm"
+			},
+			"sizeY": {
+				"value": 1,
+				"unit": "cm"
+			},
+			"sizeZ": {
+				"value": 5,
+				"unit": "um"
+			}
+		}
+	},
+	"sampleReferencing": {
+		"sampleReference": "notApplicable"
+	},
+	"holderReferencing": {
+		"sampleOnHolder": {
+			"samplePositionOnHolder": "notApplicable"
+		},
+		"markerOnHolder": {
+			"holderReference": "notApplicable"
+		}
+	},
+	"carrierReferencing": {
+		"holderOnCarrier": {
+			"holderPositionOnCarrier": "notApplicable"
+		},
+		"markerOnCarrier": {
+			"carrierReference": "notApplicable"
+		}
+	},
+	"ROI": {
+		"ROIReference": "notApplicable"
+	}
+}

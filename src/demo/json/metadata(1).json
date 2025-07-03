@@ -1,0 +1,144 @@
+{
+	"sampleIdentification": {
+		"sampleName": "CVD15030_InAs",
+		"sampleProducer": "Carina B. Maliakkal, Mahesh Gokhale",
+		"samplePurpose": {
+			"samplePurposeOptions": [
+				"assessment (to given categories or values)",
+				"completeness check (presence or absence of given properties)",
+				"exploratory (routine check of known properties)"
+			]
+		},
+		"sampleID": {
+			"sampleID": "CVD15030_InAs",
+			"sampleIDType": "text",
+			"sampleIDPosition": [
+				"not applicable"
+			]
+		}
+	},
+	"sampleCharacterization": {
+		"phaseOfMatter": "solid - definition: https://en.wikipedia.org/wiki/Solid",
+		"materialProperties": {
+			"propertiesOptions": [
+				"semiconductor"
+			]
+		}
+	},
+	"featuresOfInterest": {
+		"defects": {
+			"defectsOptions": [
+				"dislocations",
+				"vacancies"
+			]
+		},
+		"interfaces": {
+			"interfacesOptions": [
+				"stacking faults",
+				"twin boundaries"
+			]
+		},
+		"dominantStructures": {
+			"reinforcementStructures": {
+				"scale": "not applicable"
+			},
+			"alignedStructures": {
+				"scale": "not applicable"
+			},
+			"lamellarStructures": {
+				"scale": "not applicable"
+			},
+			"particles": {
+				"particleType": "not applicable"
+			},
+			"crystalStructures": {
+				"crystallinity": "not applicable",
+				"scale": "not applicable",
+				"twinned": false
+			},
+			"nanostructures": {
+				"nanoparticles": {
+					"particleShape": "InAs nanowires on Si substrate"
+				}
+			},
+			"porousStructures": {
+				"percolated": false
+			}
+		}
+	},
+	"sampleDescription": {
+		"sampleChemicalFormula": "InAs",
+		"sampleCASNumber": "1303-11-3",
+		"sampleShape": {
+			"sheet": {
+				"sheetType": "not applicable"
+			},
+			"layer": {
+				"layerType": "not applicable"
+			}
+		},
+		"sampleSurfaceRoughness": {
+			"quantitative": {
+				"amplitudeParameter": "not applicable"
+			}
+		},
+		"sampleVisibleElements": {
+			"visibleElementsOptions": []
+		}
+	},
+	"sampleHandlingPrecaution": {
+		"sensitivityAgainst": {
+			"sensitivityList": [
+				"O2",
+				"H2O/moisture"
+			]
+		},
+		"storageConditions": {
+			"storageGasAtmosphere": {
+				"storageGasAtmosphereOptions": "Ar",
+				"otherStorageGasAtmosphere": "Any O2 free & water vapor free glove box"
+			},
+			"storageEquipment": {
+				"storageEquipmentOptions": [
+					"glove box"
+				]
+			}
+		},
+		"safetyInfo": {
+			"hazard": []
+		},
+		"sampleHandling": {
+			"gloves": false,
+			"shockProtection": false
+		}
+	},
+	"samplePreparation": {
+		"preparationHistoryFile": "Not Applicable"
+	},
+	"sampleHolder": {
+		"sampleHolderType": "stub",
+		"fixingMethod": "Not applicable"
+	},
+	"sampleReferencing": {
+		"sampleReference": "notApplicable"
+	},
+	"holderReferencing": {
+		"sampleOnHolder": {
+			"samplePositionOnHolder": "notApplicable"
+		},
+		"markerOnHolder": {
+			"holderReference": "notApplicable"
+		}
+	},
+	"carrierReferencing": {
+		"holderOnCarrier": {
+			"holderPositionOnCarrier": "notApplicable"
+		},
+		"markerOnCarrier": {
+			"carrierReference": "notApplicable"
+		}
+	},
+	"ROI": {
+		"ROIReference": "notApplicable"
+	}
+}

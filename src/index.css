@@ -59,3 +59,30 @@ code {
 #output {
     height: 50%;
 }
+
+.jsonPicker {
+    overflow: scroll;
+}
+
+.jsonPickerWrapper {
+    display: grid;
+    grid-template-rows: 50px auto;
+    max-height: 100vh;
+    width: 800px;
+    font-family: sans-serif;
+}
+
+.jsonPickerHeader {
+    background: #f6f6f6;
+}
+
+.jsonPickerHeading {
+    margin: 0;
+    padding: 16px;
+}
+
+.jsonPickerHint {
+    padding: 16px 16px 0;
+    font-size: 14px;
+    opacity: .5;
+}
