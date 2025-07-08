@@ -1,5 +1,6 @@
 import * as Blockly from "blockly"
 import { WorkspaceSvg } from "blockly"
+import { KeyClickEvent } from "json-picker-stencil"
 
 const blocklyDiv = document.querySelector(
     "div#blocklyDiv",
@@ -39,4 +40,23 @@ blocklyDiv.addEventListener("drop", (event: DragEvent) => {
 
 blocklyDiv.addEventListener("dragover", (event: DragEvent) => {
     event.preventDefault()
+})
+
+const jsonPicker = document.querySelector("unified-document")
+
+if (!jsonPicker) {
+    throw "handlers: missing unified-document"
+}
+
+jsonPicker.addEventListener("keyClick", (e: Event) => {
+    const workspace = Blockly.getMainWorkspace() as WorkspaceSvg
+    const block = workspace.newBlock("input_jsonpath")
+    const query = (e as CustomEvent<KeyClickEvent>).detail.path
+
+    if ("updateQuery" in block && typeof block.updateQuery === "function") {
+        block.updateQuery(query)
+    }
+
+    block.initSvg()
+    block.render()
 })
