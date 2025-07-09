@@ -41,12 +41,12 @@ class PidRecord:
         self._id = id
         return self
 
-    def add(self, a: str, b: str | List[str] | None):
+    def addAttribute(self, a: str, b: str | List[str] | None):
         if not b and not isinstance(b, list):
             return self
         if isinstance(b, list):
             for item in b:
-                self.add(a, item)
+                self.addAttribute(a, item)
             return
         else:
             self._tuples.add((a, b))
@@ -104,7 +104,7 @@ class RecordDesign:
             for lazy_value in lazy_values:
                 value = lazy_value(json)
                 if value is not None:
-                    record.add(key, value)
+                    record.addAttribute(key, value)
         return record
 
 """
