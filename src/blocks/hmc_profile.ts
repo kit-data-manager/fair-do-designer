@@ -233,7 +233,7 @@ export const profile_hmc: HMCBlock = {
 function extractProfileAttributeKey(block: HMCBlock): string {
     const attributeKey = block.profile.properties
         .filter((p) => p.name.toLowerCase().includes("profile"))
-        .map((p) => p.name)
+        .map((p) => p.identifier)
         .at(0)
     if (!attributeKey) {
         throw new Error("No profile property found for HmcBlock")
