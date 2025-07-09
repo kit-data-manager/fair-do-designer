@@ -44,10 +44,13 @@ export interface RecordMappingGenerator {
    */
   makeLineComment(text: string): string;
   /**
-   * Generates a call to build a simple JSON representation of the record.
-   * @returns A string representing the method call, e.g., ".toSimpleJSON()"
+   * Prefixes given lines only if the test contains relevant code,
+   * i.e. the text is not empty and is not just an empty string
+   * within the target language
+   * @param text the lines to prefix
+   * @param prefix the prefix to prepent to each line
    */
-  makeSimpleJsonBuildCall(): string;
+  prefixNonemptyLines(text: string, prefix: string): string;
 }
 export type FairDoCodeGenerator = RecordMappingGenerator &
   Blockly.CodeGenerator;

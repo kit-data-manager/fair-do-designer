@@ -8,7 +8,7 @@ import { Order, PythonGenerator, pythonGenerator } from "blockly/python"
 import * as Blockly from "blockly/core"
 import * as HmcProfile from "../blocks/hmc_profile"
 import * as Util from "./util"
-import builderCode from './record_builder.py'
+import builderCode from './python/main.py'
 import conditionalsCode from "./conditionals.py"
 
 /**
@@ -31,19 +31,31 @@ export class RecordMappingGenerator
     }
 
     makeAddAttributeChainCall(key: string, value: string): string {
-        return `.add("${key}", ${value})\n`
+        return `.addAttribute("${key}", lambda: ${value})\n`
     }
 
     makeSetIDChainCall(id: string): string {
-        return `.setId(${id})\n`
+        if (!this.isEmptyPythonString(id)) {
+            return `.setId(lambda: ${id})\n`
+        } else {
+            return ""
+        }
     }
 
     makeLineComment(text: string): string {
         return this.prefixLines(`${text}\n`, "# ")
     }
 
-    makeSimpleJsonBuildCall(): string {
-        return this.prefixLines(".toSimpleJSON()\n", this.INDENT)
+    isEmptyPythonString(s: string): boolean {
+        return s == null || s == undefined || s.length <= 0 || s == "''" || s == "\"\"";
+    }
+
+    prefixNonemptyLines(text: string, prefix: string): string {
+        if (this.isEmptyPythonString(text)) {
+            return text
+        } else {
+            return this.prefixLines(text, prefix)
+        }
     }
 }
 
@@ -62,15 +74,13 @@ forBlock["pidrecord"] = function <T extends Util.FairDoCodeGenerator>(
 
     const statement_record = generator.statementToCode(block, "record")
 
-    var code = generator.makeLineComment(`${block.type}`)
-    code += `records_graph.append( PidRecord()\n`
-    code += generator.prefixLines(
+    let code = generator.makeLineComment(`${block.type}`)
+    code += `RECORD_DESIGNS.append( RecordDesign()\n`
+    code += generator.prefixNonemptyLines(
         generator.makeSetIDChainCall(value_localid),
         generator.INDENT,
     )
     code += statement_record
-        + generator.makeSimpleJsonBuildCall()
-        + "\n"
     code += ")\n"
     return code
 }
@@ -90,17 +100,15 @@ forBlock["pidrecord_skipable"] = function <T extends Util.FairDoCodeGenerator>(
     const statement_record = generator.statementToCode(block, "record")
 
     const start_comment = generator.makeLineComment(`${block.type}`)
-    let code = `records_graph.append( PidRecord()\n`
-    code += generator.prefixLines(
+    let code = `RECORD_DESIGNS.append( RecordDesign()\n`
+    code += generator.prefixNonemptyLines(
         generator.makeSetIDChainCall(value_localid),
         generator.INDENT,
     )
     code += statement_record
-        + generator.makeSimpleJsonBuildCall()
-        + "\n"
     code += ")\n"
 
-    const intendedCode = generator.prefixLines(code, generator.INDENT)
+    const intendedCode = generator.prefixNonemptyLines(code, generator.INDENT)
     const outerCode = `${start_comment}if ${value_skip_condition}:\n${intendedCode}\n`
     return outerCode
 }
@@ -120,41 +128,6 @@ forBlock["attribute_key"] = function <T extends Util.FairDoCodeGenerator>(
         code += generator.makeAddAttributeChainCall(text_pid, value_slot)
     }
     return code
-}
-
-forBlock["input_json"] = function <T extends Util.FairDoCodeGenerator>(
-    block: Blockly.Block,
-    generator: T,
-) {
-    const keyBlock = block.getInputTargetBlock("KEY")
-    const input = block.getFieldValue("INPUT")
-    let key = ""
-
-    if (keyBlock) {
-        key = generator.blockToCode(keyBlock)[0]
-    }
-
-    return [`${input}.getKey(${key})`, Order.ATOMIC]
-}
-
-forBlock["input_read_object"] = function <T extends Util.FairDoCodeGenerator>(
-    block: Blockly.Block,
-    generator: T,
-) {
-    const keyBlock = block.getInputTargetBlock("KEY")
-    const objBlock = block.getInputTargetBlock("OBJ")
-    let key = "null"
-    let obj = "{}"
-
-    if (keyBlock) {
-        key = generator.blockToCode(keyBlock)[0]
-    }
-
-    if (objBlock) {
-        obj = generator.blockToCode(objBlock)[0]
-    }
-
-    return [`${obj}.getKey(${key})`, Order.ATOMIC]
 }
 
 forBlock["transform_string"] = function <T extends Util.FairDoCodeGenerator>(
