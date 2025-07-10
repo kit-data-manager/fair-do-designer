@@ -3,8 +3,8 @@ from main import *
 #Example user code to do some linter checks:
 RECORD_DESIGNS.append(
     RecordDesign()
-        .setId(lambda json: str(jsonpath.findall("$.id", json)[0]) if jsonpath.findall("$.id", json) else "")
-        .setPid(lambda json: str(jsonpath.findall("$.id", json)[0]) if jsonpath.findall("$.id", json) else "")
-        .addAttribute("name", lambda json: str(jsonpath.findall("$.name", json)[0]) if jsonpath.findall("$.name", json) else "")
-        .addAttribute("description", lambda json: str(jsonpath.findall("$.description", json)[0]) if jsonpath.findall("$.description", json) else "")
+        .setId(lambda: str(jsonpath.findall("$.id", current_source_json)[0]) if jsonpath.findall("$.id", current_source_json) else "")
+        .setPid(lambda: str(jsonpath.findall("$.id", current_source_json)[0]) if jsonpath.findall("$.id", current_source_json) else "")
+        .addAttribute("name", lambda: str(jsonpath.findall("$.name", current_source_json)[0]) if jsonpath.findall("$.name", current_source_json) else "")
+        .addAttribute("description", lambda: str(jsonpath.findall("$.description", current_source_json)[0]) if jsonpath.findall("$.description", current_source_json) else "")
 )

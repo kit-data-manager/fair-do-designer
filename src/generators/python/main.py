@@ -4,7 +4,7 @@ import jsonpath # type: ignore
 
 JsonType = str | Sequence[Any] | Mapping[str, Any]
 T = TypeVar('T')
-Eval = Callable[[JsonType], T]
+Eval = Callable[[], T]
 EvalPrimitive = Eval[str] | Eval[int] | Eval[float] | Eval[bool]
 
 class CliInputProvider:
@@ -70,8 +70,8 @@ class RecordDesign:
     on this.
     """
     def __init__(self):
-        self._id: Eval[str] = lambda _: ""
-        self._pid: Eval[str] = lambda _: ""
+        self._id: Eval[str] = lambda: ""
+        self._pid: Eval[str] = lambda: ""
         self._attributes: Dict[str, List[Eval[Any]]] = dict()
 
     def setId(self, id: Eval[str]):
@@ -98,11 +98,11 @@ class RecordDesign:
         current_source_json = json
 
         record: PidRecord = PidRecord()
-        record.setId(self._id(json))
-        record.setPid(self._pid(json))
+        record.setId(self._id())
+        record.setPid(self._pid())
         for key, lazy_values in self._attributes.items():
             for lazy_value in lazy_values:
-                value = lazy_value(json)
+                value = lazy_value()
                 if value is not None:
                     record.addAttribute(key, value)
         return record
@@ -115,7 +115,7 @@ define their own functions that can access the current JSON. This is requied bec
 users may define functions and may use a "read from json" block in them. These blocks
 are using this variable to refer to the current JSON.
 """
-current_source_json: JsonType | None = None
+current_source_json: JsonType = "{}"
 
 INPUT = CliInputProvider(sys.argv[1:])
 RECORD_DESIGNS: list[RecordDesign] = []
