@@ -1,4 +1,4 @@
-import sys, json
+import sys
 from typing import Dict, Set, List, Tuple, Callable, TypeVar, Any, Sequence, Mapping
 import jsonpath # type: ignore
 
@@ -120,7 +120,7 @@ current_source_json: JsonType | None = None
 INPUT = CliInputProvider(sys.argv[1:])
 RECORD_DESIGNS: list[RecordDesign] = []
 
-#---8<---insert-user-defined-code-here---8<---
+#---8<---user-defined-code---8<---
 
 # Example user code to do some linter checks:
 # RECORD_DESIGNS.append(
@@ -130,18 +130,3 @@ RECORD_DESIGNS: list[RecordDesign] = []
 #         .addAttribute("name", lambda json: str(jsonpath.findall("$.name", json)[0]) if jsonpath.findall("$.name", json) else "")
 #         .addAttribute("description", lambda json: str(jsonpath.findall("$.description", json)[0]) if jsonpath.findall("$.description", json) else "")
 # )
-
-RECORD_GRAPH: list[PidRecord] = []
-
-for design in RECORD_DESIGNS:
-    while True:
-        input_file = INPUT.nextInputFile()
-        if not input_file:
-            print("No more input files.")
-            break
-        with open(input_file, 'r') as file:
-            json_data: JsonType = json.load(file)
-            record: PidRecord = design.apply(json_data)
-            RECORD_GRAPH.append(record)
-
-# TODO send record graph to typed pid maker instance

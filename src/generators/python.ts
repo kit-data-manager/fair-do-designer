@@ -9,6 +9,7 @@ import * as Blockly from "blockly/core"
 import * as HmcProfile from "../blocks/hmc_profile"
 import * as Util from "./util"
 import builderCode from './python/main.py'
+import executionCode from './python/execute.py'
 import conditionalsCode from "./conditionals.py"
 
 /**
@@ -56,6 +57,17 @@ export class RecordMappingGenerator
         } else {
             return this.prefixLines(text, prefix)
         }
+    }
+
+    finish(code: string): string {
+        code = super.finish(code);
+        // Remove main imports
+        // They are only present to make valid python code as the files are split up.
+        let suffix: string = executionCode.split("\n")
+            .filter((value: string, _index: number, _array: Array<string>) => 
+                !value.startsWith("import main") && !value.startsWith("from main "))
+            .join("\n");
+        return code + suffix
     }
 }
 
