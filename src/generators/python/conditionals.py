@@ -1,4 +1,6 @@
-def otherwise(either: any, otherwise: any):
+from typing import Any, List, Tuple
+
+def otherwise(either: Any, otherwise: Any) -> Any:
     """
     Returns `either` if it is somehow a valid value, otherwise returns `otherwise`.
     
@@ -6,13 +8,13 @@ def otherwise(either: any, otherwise: any):
     :param otherwise: The value to return if `either` is None.
     :return: `either` if it is not None, otherwise `otherwise`.
     """
-    if type(either) == str and either.strip().lower() in ("null", "", "()", "[]", "\{\}"):
+    if type(either) == str and either.strip().lower() in ("null", "", "()", "[]", "{}"):
         either = None
 
     notNone = either is not None
-    notEmptyArray = type(either) == list and len(either) > 0
-    notEmptyTuple = type(either) == tuple and len(either) > 0
-    notEmptyishString = type(either) == str and either.strip().lower() not in ("null", "", "()", "[]", "\{\}")
+    notEmptyArray = type(either) == List[Any] and len(either) > 0
+    notEmptyTuple = type(either) == Tuple[Any, Any] and len(either) > 0
+    notEmptyishString = type(either) == str and either.strip().lower() not in ("null", "", "()", "[]", "{}")
 
     isOk = notNone and notEmptyArray and notEmptyTuple and notEmptyishString
     return either if isOk else otherwise

@@ -10,7 +10,7 @@ import * as HmcProfile from "../blocks/hmc_profile"
 import * as Util from "./util"
 import builderCode from './python/main.py'
 import executionCode from './python/execute.py'
-import conditionalsCode from "./conditionals.py"
+import conditionalsCode from "./python/conditionals.py"
 
 /**
  * Specialized generator for our code.
