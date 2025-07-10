@@ -29,6 +29,10 @@ export class RecordMappingGenerator
         Object.assign(this.forBlock, forBlock)
         this.definitions_["record-builder-code"] = builderCode
         this.definitions_["conditionals-code"] = conditionalsCode
+        this.addReservedWords("RECORD_GRAPH")
+        this.addReservedWords("RECORD_DESIGNS")
+        this.addReservedWords("INPUT")
+        this.addReservedWords("current_source_json")
     }
 
     makeAddAttributeChainCall(key: string, value: string): string {
