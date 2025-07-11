@@ -43,6 +43,9 @@ RECORD_DESIGNS.append( RecordDesign()
   # attribute: profile_hmc
   .addAttribute("21.T11148/796a3ea6c9a38633fb7e", lambda: jsonpath.findall("JSON.sampleIdentification.samplePurpose.samplePurposeOptions", current_source_json))
   # attribute: profile_hmc
+  .addAttribute("21.T11148/82e2503c49209e987740", lambda: (otherwise('not?', lambda: stop_with_fail("No error message provided"))
+  ))
+  # attribute: profile_hmc
   .addAttribute("21.T11148/d0773859091aeb451528", lambda: [])
   # attribute: profile_hmc
   .addAttribute("21.T11148/7fdada5846281ef5d461", lambda: [])

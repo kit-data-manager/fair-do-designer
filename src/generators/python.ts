@@ -109,7 +109,11 @@ forBlock["pidrecord_skipable"] = function <T extends Util.FairDoCodeGenerator>(
     block: Blockly.Block,
     generator: T,
 ) {
-    let value_skip_condition = generator.valueToCode(block, "skip-condition", Order.ATOMIC)
+    let value_skip_condition = generator.valueToCode(
+        block,
+        "skip-condition",
+        Order.ATOMIC,
+    )
     if (!value_skip_condition || value_skip_condition.trim() == "") {
         value_skip_condition = "True" // Default to True if no condition is provided
     }
@@ -219,12 +223,12 @@ forBlock["profile_hmc"] = function <T extends Util.FairDoCodeGenerator>(
     return code
 }
 
-forBlock['stop_design'] = function <T extends Util.FairDoCodeGenerator>(
+forBlock["stop_design"] = function <T extends Util.FairDoCodeGenerator>(
     block: Blockly.Block,
     generator: T,
 ) {
     // TODO: change Order.ATOMIC to the correct operator precedence strength
-    let value_message = generator.valueToCode(block, 'MESSAGE', Order.ATOMIC);
+    let value_message = generator.valueToCode(block, "MESSAGE", Order.ATOMIC)
     if (!value_message || value_message.trim() == "") {
         value_message = '"No error message provided"'
     }
@@ -232,28 +236,28 @@ forBlock['stop_design'] = function <T extends Util.FairDoCodeGenerator>(
     return [code, Order.ATOMIC];
 }
 
-forBlock['log_value'] = function <T extends Util.FairDoCodeGenerator>(
+forBlock["log_value"] = function <T extends Util.FairDoCodeGenerator>(
     block: Blockly.Block,
     generator: T,
 ) {
-    const text_desc = block.getFieldValue('DESC');
+    const text_desc = block.getFieldValue("DESC")
     // TODO: change Order.ATOMIC to the correct operator precedence strength
-    const value_invar = generator.valueToCode(block, 'INVAR', Order.ATOMIC);
+    const value_invar = generator.valueToCode(block, "INVAR", Order.ATOMIC)
 
-    const code = `log(${value_invar}, ${text_desc})\n`;
+    const code = `log(${value_invar}, ${text_desc})\n`
     // TODO: Change Order.NONE to the correct operator precedence strength
-    return [code, Order.NONE];
+    return [code, Order.NONE]
 }
 
-forBlock['otherwise'] = function <T extends Util.FairDoCodeGenerator>(
+forBlock["otherwise"] = function <T extends Util.FairDoCodeGenerator>(
     block: Blockly.Block,
     generator: T,
 ) {
-  // TODO: change Order.ATOMIC to the correct operator precedence strength
-  const value_value = generator.valueToCode(block, 'VALUE', Order.ATOMIC);
+    // TODO: change Order.ATOMIC to the correct operator precedence strength
+    const value_value = generator.valueToCode(block, "VALUE", Order.ATOMIC)
 
-  // TODO: change Order.ATOMIC to the correct operator precedence strength
-  const value_other = generator.valueToCode(block, 'OTHER', Order.ATOMIC);
+    // TODO: change Order.ATOMIC to the correct operator precedence strength
+    const value_other = generator.valueToCode(block, "OTHER", Order.ATOMIC)
 
   const code = `otherwise(${value_value}, lambda: ${value_other})\n`;
   // TODO: Change Order.NONE to the correct operator precedence strength
