@@ -1,11 +1,31 @@
 import sys
 from typing import Dict, Set, List, Tuple, Callable, TypeVar, Any, Sequence, Mapping
+# unused, but required by user generated code:
 import jsonpath # type: ignore
 
+Primitive = str | bool | int | float
+# ---Types-for-designs------------------------------------------- #
 JsonType = str | Sequence[Any] | Mapping[str, Any]
 T = TypeVar('T')
 Eval = Callable[[], T]
 EvalPrimitive = Eval[str] | Eval[int] | Eval[float] | Eval[bool]
+
+# ---Types-for-backlink-inference--------------------------------------- #
+class Reaction:
+    def __init__(self, receiver: str, backward_link_type: str) -> None:
+        self.receiver = receiver
+        self.backward_link_type = backward_link_type
+
+# forward link-----v    v---receiver
+Condition = Tuple[str, str]
+InferenceRules = Dict[Condition, Reaction]
+class BackwardLinkFor:
+    def __init__(self, forward_link_type: str) -> None:
+        self._forward_link_type = forward_link_type
+    
+    def get_forward_link_type(self) -> str:
+        return self._forward_link_type
+# ---------------------------------------------------------------------  #
 
 class CliInputProvider:
     """
@@ -31,7 +51,7 @@ class PidRecord:
     def __init__(self):
         self._id: str = ""
         self._pid: str = ""
-        self._tuples: Set[Tuple[str, Any]] = set()
+        self._tuples: Set[Tuple[str, Primitive]] = set()
 
     def setPid(self, pid: str):
         self._pid = pid
@@ -40,18 +60,24 @@ class PidRecord:
     def setId(self, id: str):
         self._id = id
         return self
+    
+    def getId(self) -> str:
+        return self._id
 
-    def addAttribute(self, a: str, b: str | List[str] | None):
-        if not b and not isinstance(b, list):
+    def addAttribute(self, a: str, b: Primitive | List[Primitive] | None):
+        if b is None:
             return self
-        if isinstance(b, list):
+        if isinstance(b, List):
             for item in b:
                 self.addAttribute(a, item)
             return
         else:
             self._tuples.add((a, b))
         return self
-
+    
+    def contains(self, tuple: Tuple[str, Primitive]) -> bool:
+        return tuple in self._tuples
+        
     def toSimpleJSON(self):
         result: Dict[str, Any] = {"entries": list(self._tuples)}
         if self._pid and self._pid != "":
@@ -72,7 +98,10 @@ class RecordDesign:
     def __init__(self):
         self._id: Eval[str] = lambda: ""
         self._pid: Eval[str] = lambda: ""
+        # key -> lambda: value
         self._attributes: Dict[str, List[Eval[Any]]] = dict()
+        # Set of (forward_link_type, backward_link_type)
+        self._backlinks: Set[Tuple[str, str]]
 
     def setId(self, id: Eval[str]):
         self._id = id
@@ -82,14 +111,20 @@ class RecordDesign:
         self._pid = pid
         return self
 
-    def addAttribute(self, key: str, value: Eval[Any]):
-        if key not in self._attributes.keys():
-            self._attributes[key] = [value]
-            pass
-        self._attributes[key].append(value)
+    def addAttribute(self, key: str, value: Eval[Any] | BackwardLinkFor):
+        if isinstance(value, BackwardLinkFor):
+            self.addBacklink(value.get_forward_link_type(), key)
+        else:
+            if key not in self._attributes.keys():
+                self._attributes[key] = [value]
+                pass
+            self._attributes[key].append(value)
         return self
     
-    def apply(self, json: JsonType) -> PidRecord:
+    def addBacklink(self, forward_link_type: str, backward_link_type: str):
+        self._backlinks.add((forward_link_type, backward_link_type))
+    
+    def apply(self, json: JsonType) -> Tuple[PidRecord, InferenceRules]:
         """
         Applies the given JSON to this design and returns a PidRecord.
         """
@@ -103,9 +138,14 @@ class RecordDesign:
         for key, lazy_values in self._attributes.items():
             for lazy_value in lazy_values:
                 value = lazy_value()
-                if value is not None:
-                    record.addAttribute(key, value)
-        return record
+                record.addAttribute(key, value)
+        
+        rules: InferenceRules = {}
+        for relation in self._backlinks:
+            forward_link_type = relation[0]
+            backward_link_type = relation[1]
+            rules[forward_link_type, record.getId()] = Reaction(record.getId(), backward_link_type)
+        return record, rules
 
 """
 A function that executes a design must assign the current JSON to this global variable.

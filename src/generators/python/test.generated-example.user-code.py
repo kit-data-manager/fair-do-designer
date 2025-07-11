@@ -32,24 +32,21 @@ def stop_with_fail(message: str | None):
 
 # pidrecord
 RECORD_DESIGNS.append( RecordDesign()
-  .setId(lambda: '1234')
   # profile_hmc
   .addAttribute("21.T11148/076759916209e5d62bd5", lambda: '21.T11148/b9b76f887845e32d29f7')
+  # attribute: profile_hmc
   .addAttribute("21.T11148/b8457812905b83046284", lambda: [])
-  .addAttribute("21.T11148/aafd5fb4c7222e2d950a", lambda: jsonpath.findall("JSON.property", current_source_json))
-  # attribute_key
-  .addAttribute("21.11152/a3f19b32-4550-40bb-9f69-b8ffd4f6d0ea", lambda: (otherwise(jsonpath.findall("JSON.sampleIdentification.samplePurpose.samplePurposeOptions", current_source_json), lambda: stop_with_fail("No error message provided"))
-  ))
+  # attribute: profile_hmc
+  .addAttribute("21.T11148/aafd5fb4c7222e2d950a", BackwardLinkFor(''))
+  # attribute: profile_hmc
+  .addAttribute("21.T11148/2f314c8fe5fb6a0063a8", lambda: jsonpath.findall("JSON.sampleIdentification.samplePurpose", current_source_json))
+  # attribute: profile_hmc
+  .addAttribute("21.T11148/796a3ea6c9a38633fb7e", lambda: jsonpath.findall("JSON.sampleIdentification.samplePurpose.samplePurposeOptions", current_source_json))
+  # attribute: profile_hmc
+  .addAttribute("21.T11148/d0773859091aeb451528", lambda: [])
+  # attribute: profile_hmc
+  .addAttribute("21.T11148/7fdada5846281ef5d461", lambda: [])
 )
-
-# pidrecord_skipable
-if True:
-  RECORD_DESIGNS.append( RecordDesign()
-    # profile_hmc
-    .addAttribute("21.T11148/076759916209e5d62bd5", lambda: '21.T11148/b9b76f887845e32d29f7')
-    .addAttribute("21.T11148/b8457812905b83046284", lambda: [])
-  )
-
 
 #---8<---use-designs-to-create-records-from-JSON---8<---
 from execute import *
