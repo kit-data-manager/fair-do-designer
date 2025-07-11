@@ -45,9 +45,9 @@ export const attribute = {
 export const backlink_declaration = {
   init: function() {
     this.appendValueInput('ATTRIBUTE_KEY')
-    .setCheck('attribute_key')
-      .appendField('Add reverse reference to');
-    this.setOutput(true, null);
+    .setCheck(['attribute_key', 'String'])
+      .appendField('Inverse reference to attribute');
+    this.setOutput(true, 'BackwardLinkFor');
     this.setTooltip('Adds reverse references (backlinks) if another record links to this record using the given attribute key.');
     this.setHelpUrl('');
     this.setColour(225);

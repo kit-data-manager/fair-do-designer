@@ -36,7 +36,11 @@ export class RecordMappingGenerator
     }
 
     makeAddAttributeChainCall(key: string, value: string): string {
-        return `.addAttribute("${key}", lambda: ${value})\n`
+        if (value.startsWith("BackwardLinkFor(")) {
+            return `.addAttribute("${key}", ${value})\n`    
+        } else {
+            return `.addAttribute("${key}", lambda: ${value})\n`
+        }
     }
 
     makeSetIDChainCall(id: string): string {
@@ -208,6 +212,7 @@ forBlock["profile_hmc"] = function <T extends Util.FairDoCodeGenerator>(
         // Still, this information may be used to format the list in the generated code or so.
         //const isList: boolean = input.connection?.targetBlock()?.type.startsWith("lists_") || false;
         if (pid !== undefined && value && value != "") {
+            code += generator.makeLineComment(`attribute: ${block.type}`)
             code += generator.makeAddAttributeChainCall(pid, value)
         }
     }
@@ -259,11 +264,7 @@ forBlock['backlink_declaration'] = function <T extends Util.FairDoCodeGenerator>
     block: Blockly.Block,
     generator: T,
 ) {
-  // TODO: change Order.ATOMIC to the correct operator precedence strength
   const value_attribute_key = generator.valueToCode(block, 'ATTRIBUTE_KEY', Order.ATOMIC);
-
-  // TODO: Assemble python into the code variable.
-  const code = '.addBacklink(' + value_attribute_key + ')\n';
-  // TODO: Change Order.NONE to the correct operator precedence strength
+  let code = 'BackwardLinkFor(' + value_attribute_key + ')';
   return [code, Order.ATOMIC];
 }

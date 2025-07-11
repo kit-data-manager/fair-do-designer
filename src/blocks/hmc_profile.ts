@@ -82,11 +82,16 @@ export const profile_hmc: HMCBlock = {
         const details = property.representationsAndSemantics[0]
         const isRepeatable = details.repeatable == "Yes"
 
-        const typeCheck = ["JSON", "String", "Boolean", "Number"]
+        const typeCheck = ["JSON", "String", "Boolean", "Number", "BackwardLinkFor"]
         if (isRepeatable) typeCheck.push("Array")
 
         const input = this.appendValueInput(property.name)
             .appendField(property.name)
+            .appendField(
+                new FieldButton("🞋", () =>
+                    console.error("Unimplemented!"),
+                ),
+            )
             .appendField(
                 new ValidationField({
                     mandatory: details.obligation == "Mandatory",
