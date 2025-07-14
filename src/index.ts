@@ -13,7 +13,8 @@ import { save, load } from "./serialization"
 import { toolbox } from "./toolbox"
 import "./index.css"
 
-import { registerErrorsToolbox } from "./toolboxes/errors_logging"
+import * as ErrorsToolbox from "./toolboxes/errors_logging"
+import * as BacklinksToolbox from "./toolboxes/backlinks"
 
 import "json-picker-stencil"
 import "./handlers"
@@ -85,7 +86,8 @@ if (workspace) {
     })
 }
 
-registerErrorsToolbox(workspace)
+ErrorsToolbox.register(workspace)
+BacklinksToolbox.register(workspace)
 
 // Initialize all validation fields
 checkAllValidationFields()

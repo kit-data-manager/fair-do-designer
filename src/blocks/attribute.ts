@@ -41,3 +41,15 @@ export const attribute = {
   colour: 285,
   inputsInline: false,
 };
+
+export const backlink_declaration = {
+  init: function() {
+    this.appendValueInput('ATTRIBUTE_KEY')
+    .setCheck(['attribute_key', 'String'])
+      .appendField('Inverse reference to attribute');
+    this.setOutput(true, 'BackwardLinkFor');
+    this.setTooltip('Adds reverse references (backlinks) if another record links to this record using the given attribute key.');
+    this.setHelpUrl('');
+    this.setColour(225);
+  }
+} as Blockly.Block;

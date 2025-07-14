@@ -8,8 +8,9 @@ import { Order, PythonGenerator, pythonGenerator } from "blockly/python"
 import * as Blockly from "blockly/core"
 import * as HmcProfile from "../blocks/hmc_profile"
 import * as Util from "./util"
-import builderCode from "./record_builder.py"
-import conditionalsCode from "./conditionals.py"
+import builderCode from './python/main.py'
+import executionCode from './python/execute.py'
+import conditionalsCode from "./python/conditionals.py"
 
 /**
  * Specialized generator for our code.
@@ -28,22 +29,53 @@ export class RecordMappingGenerator
         Object.assign(this.forBlock, forBlock)
         this.definitions_["record-builder-code"] = builderCode
         this.definitions_["conditionals-code"] = conditionalsCode
+        this.addReservedWords("RECORD_GRAPH")
+        this.addReservedWords("RECORD_DESIGNS")
+        this.addReservedWords("INPUT")
+        this.addReservedWords("current_source_json")
     }
 
     makeAddAttributeChainCall(key: string, value: string): string {
-        return `.add("${key}", ${value})\n`
+        if (value.startsWith("BackwardLinkFor(")) {
+            return `.addAttribute("${key}", ${value})\n`    
+        } else {
+            return `.addAttribute("${key}", lambda: ${value})\n`
+        }
     }
 
     makeSetIDChainCall(id: string): string {
-        return `.setId(${id})\n`
+        if (!this.isEmptyPythonString(id)) {
+            return `.setId(lambda: ${id})\n`
+        } else {
+            return ""
+        }
     }
 
     makeLineComment(text: string): string {
         return this.prefixLines(`${text}\n`, "# ")
     }
 
-    makeSimpleJsonBuildCall(): string {
-        return this.prefixLines(".toSimpleJSON()\n", this.INDENT)
+    isEmptyPythonString(s: string): boolean {
+        return s == null || s == undefined || s.length <= 0 || s == "''" || s == "\"\"";
+    }
+
+    prefixNonemptyLines(text: string, prefix: string): string {
+        if (this.isEmptyPythonString(text)) {
+            return text
+        } else {
+            return this.prefixLines(text, prefix)
+        }
+    }
+
+    finish(code: string): string {
+        code = super.finish(code);
+        // Remove main imports
+        // They are only present to make valid python code as the files are split up.
+        let suffix: string = executionCode.split("\n")
+            .filter((value: string, _index: number, _array: Array<string>) => 
+                !value.startsWith("import main") && !value.startsWith("from main "))
+            .join("\n");
+        return code + suffix
     }
 }
 
@@ -62,13 +94,13 @@ forBlock["pidrecord"] = function <T extends Util.FairDoCodeGenerator>(
 
     const statement_record = generator.statementToCode(block, "record")
 
-    var code = generator.makeLineComment(`${block.type}`)
-    code += `records_graph.append( PidRecord()\n`
-    code += generator.prefixLines(
+    let code = generator.makeLineComment(`${block.type}`)
+    code += `RECORD_DESIGNS.append( RecordDesign()\n`
+    code += generator.prefixNonemptyLines(
         generator.makeSetIDChainCall(value_localid),
         generator.INDENT,
     )
-    code += statement_record + generator.makeSimpleJsonBuildCall() + "\n"
+    code += statement_record
     code += ")\n"
     return code
 }
@@ -92,15 +124,15 @@ forBlock["pidrecord_skipable"] = function <T extends Util.FairDoCodeGenerator>(
     const statement_record = generator.statementToCode(block, "record")
 
     const start_comment = generator.makeLineComment(`${block.type}`)
-    let code = `records_graph.append( PidRecord()\n`
-    code += generator.prefixLines(
+    let code = `RECORD_DESIGNS.append( RecordDesign()\n`
+    code += generator.prefixNonemptyLines(
         generator.makeSetIDChainCall(value_localid),
         generator.INDENT,
     )
-    code += statement_record + generator.makeSimpleJsonBuildCall() + "\n"
+    code += statement_record
     code += ")\n"
 
-    const intendedCode = generator.prefixLines(code, generator.INDENT)
+    const intendedCode = generator.prefixNonemptyLines(code, generator.INDENT)
     const outerCode = `${start_comment}if ${value_skip_condition}:\n${intendedCode}\n`
     return outerCode
 }
@@ -122,41 +154,6 @@ forBlock["attribute_key"] = function <T extends Util.FairDoCodeGenerator>(
     return code
 }
 
-forBlock["input_json"] = function <T extends Util.FairDoCodeGenerator>(
-    block: Blockly.Block,
-    generator: T,
-) {
-    const keyBlock = block.getInputTargetBlock("KEY")
-    const input = block.getFieldValue("INPUT")
-    let key = ""
-
-    if (keyBlock) {
-        key = generator.blockToCode(keyBlock)[0]
-    }
-
-    return [`${input}.getKey(${key})`, Order.ATOMIC]
-}
-
-forBlock["input_read_object"] = function <T extends Util.FairDoCodeGenerator>(
-    block: Blockly.Block,
-    generator: T,
-) {
-    const keyBlock = block.getInputTargetBlock("KEY")
-    const objBlock = block.getInputTargetBlock("OBJ")
-    let key = "null"
-    let obj = "{}"
-
-    if (keyBlock) {
-        key = generator.blockToCode(keyBlock)[0]
-    }
-
-    if (objBlock) {
-        obj = generator.blockToCode(objBlock)[0]
-    }
-
-    return [`${obj}.getKey(${key})`, Order.ATOMIC]
-}
-
 forBlock["transform_string"] = function <T extends Util.FairDoCodeGenerator>(
     block: Blockly.Block,
     generator: T,
@@ -171,17 +168,16 @@ forBlock["transform_string"] = function <T extends Util.FairDoCodeGenerator>(
     return [`transform.toString(${inText})`, Order.ATOMIC]
 }
 
+const jsonpathCall = (path: string) => `jsonpath.findall("${path}", current_source_json)`
+
 forBlock["input_jsonpath"] = function (block: Blockly.Block) {
     const value_input = block.getFieldValue("QUERY")
-    return [`jsonpath.findall("${value_input}", data)`, Order.ATOMIC]
+    return [jsonpathCall(value_input), Order.ATOMIC]
 }
 
 forBlock["input_custom_json"] = function (block: Blockly.Block) {
     const value_block = block.getInputTargetBlock("QUERY")
-    return [
-        `jsonpath.findall("${value_block?.getFieldValue("TEXT")}", data)`,
-        Order.ATOMIC,
-    ]
+    return [jsonpathCall(value_block?.getFieldValue("TEXT")), Order.ATOMIC]
 }
 
 // Type guard for HmcBlock interface
@@ -220,6 +216,7 @@ forBlock["profile_hmc"] = function <T extends Util.FairDoCodeGenerator>(
         // Still, this information may be used to format the list in the generated code or so.
         //const isList: boolean = input.connection?.targetBlock()?.type.startsWith("lists_") || false;
         if (pid !== undefined && value && value != "") {
+            code += generator.makeLineComment(`attribute: ${block.type}`)
             code += generator.makeAddAttributeChainCall(pid, value)
         }
     }
@@ -235,8 +232,8 @@ forBlock["stop_design"] = function <T extends Util.FairDoCodeGenerator>(
     if (!value_message || value_message.trim() == "") {
         value_message = '"No error message provided"'
     }
-    const code = `raise Exception("Design stopped. " + ${value_message})`
-    return [code, Order.ATOMIC]
+    const code = `stop_with_fail(${value_message})`;
+    return [code, Order.ATOMIC];
 }
 
 forBlock["log_value"] = function <T extends Util.FairDoCodeGenerator>(
@@ -262,7 +259,25 @@ forBlock["otherwise"] = function <T extends Util.FairDoCodeGenerator>(
     // TODO: change Order.ATOMIC to the correct operator precedence strength
     const value_other = generator.valueToCode(block, "OTHER", Order.ATOMIC)
 
-    const code = `otherwise(${value_value}, ${value_other})\n`
-    // TODO: Change Order.NONE to the correct operator precedence strength
-    return [code, Order.NONE]
+  const code = `otherwise(${value_value}, lambda: ${value_other})\n`;
+  // TODO: Change Order.NONE to the correct operator precedence strength
+  return [code, Order.NONE];
+}
+
+forBlock['backlink_declaration'] = function <T extends Util.FairDoCodeGenerator>(
+    block: Blockly.Block,
+    generator: T,
+) {
+  const value_attribute_key = generator.valueToCode(block, 'ATTRIBUTE_KEY', Order.ATOMIC);
+  const code = 'BackwardLinkFor(' + value_attribute_key + ')';
+  return [code, Order.ATOMIC];
+}
+
+forBlock['profile_hmc_reference_block'] = function <T extends Util.FairDoCodeGenerator>(
+    block: Blockly.Block,
+    generator: T,
+) {
+  const dropdown_attribute = block.getFieldValue('ATTRIBUTE');
+  const code = `"${dropdown_attribute}"`
+  return [code, Order.ATOMIC];
 }

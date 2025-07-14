@@ -30,11 +30,11 @@ export const toolbox = {
                 },
                 {
                     kind: "block",
-                    type: "attribute_key",
+                    type: "profile_hmc",
                 },
                 {
                     kind: "block",
-                    type: "profile_hmc",
+                    type: "attribute_key",
                 },
             ],
         },
@@ -64,6 +64,12 @@ export const toolbox = {
             name: "Checks and Errors",
             categorystyle: "procedure_category",
             custom: "ERRORS",
+        },
+        {
+            kind: "category",
+            name: "Automatic backlinks",
+            categorystyle: "procedure_category",
+            custom: "BACKLINKS",
         },
         {
             kind: "sep",

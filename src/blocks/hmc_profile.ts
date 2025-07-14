@@ -13,6 +13,8 @@ export interface HMCBlock extends Blockly.BlockSvg {
     addListBlockToEmptyInput(input: Blockly.Input): void
     // data methods
     extractPidFromProperty(propertyName: string): string | undefined
+    // blocks created from profile data
+    createAttributeReferenceBlock(): Blockly.Block
     // event handlers
     onBlockCreate(event: Blockly.Events.BlockCreate): void
     onBlockMove(event: Blockly.Events.BlockMove): void
@@ -82,7 +84,7 @@ export const profile_hmc: HMCBlock = {
         const details = property.representationsAndSemantics[0]
         const isRepeatable = details.repeatable == "Yes"
 
-        const typeCheck = ["JSON", "String", "Boolean", "Number"]
+        const typeCheck = ["JSON", "String", "Boolean", "Number", "BackwardLinkFor"]
         if (isRepeatable) typeCheck.push("Array")
 
         const input = this.appendValueInput(property.name)
@@ -137,6 +139,25 @@ export const profile_hmc: HMCBlock = {
                 connection.connect(listBlock.outputConnection)
             }
         }
+    },
+
+    createAttributeReferenceBlock() {
+        const nameIdPairs: Blockly.MenuGenerator = this.profile.properties.map((p) => {
+            return [p.name, p.identifier]
+        });
+
+        const parent = this
+        return {
+            init: function() {
+                this.appendDummyInput('CONTENT')
+                .appendField(parent.profile.name)
+                .appendField(new Blockly.FieldDropdown(nameIdPairs), 'ATTRIBUTE');
+                this.setOutput(true, ['String', 'attribute_key']);
+                this.setTooltip(`References an attribute key which appears in ${parent.profile.name}.`);
+                this.setHelpUrl('');
+                this.setColour(225);
+            }
+        } as Blockly.Block;
     },
 
     onBlockCreate(event: Blockly.Events.BlockCreate) {
@@ -233,7 +254,7 @@ export const profile_hmc: HMCBlock = {
 function extractProfileAttributeKey(block: HMCBlock): string {
     const attributeKey = block.profile.properties
         .filter((p) => p.name.toLowerCase().includes("profile"))
-        .map((p) => p.name)
+        .map((p) => p.identifier)
         .at(0)
     if (!attributeKey) {
         throw new Error("No profile property found for HmcBlock")
