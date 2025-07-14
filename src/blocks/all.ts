@@ -22,6 +22,7 @@ Blockly.Blocks["input_jsonpath"] = input_jsonpath
 Blockly.Blocks["input_custom_json"] = input_custom_json
 
 Blockly.Blocks["profile_hmc"] = profile_hmc
+Blockly.Blocks["profile_hmc_reference_block"] = profile_hmc.createAttributeReferenceBlock()
 
 Blockly.Blocks["backlink_declaration"] = backlink_declaration
 

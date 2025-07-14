@@ -269,6 +269,15 @@ forBlock['backlink_declaration'] = function <T extends Util.FairDoCodeGenerator>
     generator: T,
 ) {
   const value_attribute_key = generator.valueToCode(block, 'ATTRIBUTE_KEY', Order.ATOMIC);
-  let code = 'BackwardLinkFor(' + value_attribute_key + ')';
+  const code = 'BackwardLinkFor(' + value_attribute_key + ')';
+  return [code, Order.ATOMIC];
+}
+
+forBlock['profile_hmc_reference_block'] = function <T extends Util.FairDoCodeGenerator>(
+    block: Blockly.Block,
+    generator: T,
+) {
+  const dropdown_attribute = block.getFieldValue('ATTRIBUTE');
+  const code = `"${dropdown_attribute}"`
   return [code, Order.ATOMIC];
 }

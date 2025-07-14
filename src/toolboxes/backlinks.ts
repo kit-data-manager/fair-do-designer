@@ -8,6 +8,10 @@ export function register(workspace: WorkspaceSvg) {
                 kind: "block",
                 type: "backlink_declaration",
             },
+            {
+                kind: "block",
+                type: "profile_hmc_reference_block",
+            },
         ] as BlockInfo[]
     })
 }
