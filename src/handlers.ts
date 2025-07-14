@@ -58,5 +58,12 @@ jsonPicker.addEventListener("keyClick", (e: Event) => {
     }
 
     block.initSvg()
+    const offset = workspace.getOriginOffsetInPixels()
+    block.moveTo(
+        new Blockly.utils.Coordinate(
+            blocklyDiv.offsetWidth * 2 / 3 - offset.x,
+            blocklyDiv.offsetHeight / 3 - offset.y,
+        ),
+    )
     block.render()
 })
