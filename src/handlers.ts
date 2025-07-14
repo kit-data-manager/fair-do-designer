@@ -2,6 +2,12 @@ import * as Blockly from "blockly"
 import { WorkspaceSvg } from "blockly"
 import { KeyClickEvent } from "json-picker-stencil"
 
+import * as m1 from "./demo/json/metadata.json"
+import * as m2 from "./demo/json/metadata(1).json"
+import * as m3 from "./demo/json/metadata(2).json"
+import * as m4 from "./demo/json/metadata(3).json"
+import * as m5 from "./demo/json/metadata(4).json"
+
 const blocklyDiv = document.querySelector(
     "div#blocklyDiv",
 ) as HTMLDivElement | null
@@ -74,6 +80,9 @@ const jsonUploadButton = document.querySelector(
 const jsonResetButton = document.querySelector(
     ".jsonResetButton",
 ) as HTMLButtonElement
+const jsonUseExamplesButton = document.querySelector(
+    ".jsonUseExamplesButton",
+) as HTMLButtonElement
 const jsonFileInput = document.querySelector(
     ".jsonFileInput",
 ) as HTMLInputElement
@@ -89,6 +98,21 @@ jsonUploadButton.addEventListener("click", () => {
 jsonResetButton.addEventListener("click", async () => {
     await jsonPicker.resetFiles()
     jsonResetButton.classList.add("hidden")
+    jsonUseExamplesButton.classList.remove("hidden")
+})
+
+jsonUseExamplesButton.addEventListener("click", async () => {
+    const files = [m1, m2, m3, m4, m5]
+    await jsonPicker.addFiles(
+        files.map(
+            (f) =>
+                new Blob([JSON.stringify(f)], {
+                    type: "application/json",
+                }),
+        ),
+    )
+    jsonResetButton.classList.remove("hidden")
+    jsonUseExamplesButton.classList.add("hidden")
 })
 
 jsonFileInput.addEventListener("change", async () => {
@@ -98,6 +122,7 @@ jsonFileInput.addEventListener("change", async () => {
         await jsonPicker.addFiles([...jsonFileInput.files])
 
         jsonResetButton.classList.remove("hidden")
+        jsonUseExamplesButton.classList.add("hidden")
         jsonFileInput.disabled = false
         jsonUploadButton.disabled = false
     }
