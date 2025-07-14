@@ -1,7 +1,7 @@
 import { WorkspaceSvg } from "blockly"
 import { BlockInfo } from "blockly/core/utils/toolbox"
 
-export function registerErrorsToolbox(workspace: WorkspaceSvg) {
+export function register(workspace: WorkspaceSvg) {
     workspace.registerToolboxCategoryCallback("ERRORS", (workspace) => {
         return [
             {

@@ -34,10 +34,6 @@ export const toolbox = {
                 },
                 {
                     kind: "block",
-                    type: "backlink_declaration",
-                },
-                {
-                    kind: "block",
                     type: "attribute_key",
                 },
             ],
@@ -68,6 +64,12 @@ export const toolbox = {
             name: "Checks and Errors",
             categorystyle: "procedure_category",
             custom: "ERRORS",
+        },
+        {
+            kind: "category",
+            name: "Automatic backlinks",
+            categorystyle: "procedure_category",
+            custom: "BACKLINKS",
         },
         {
             kind: "sep",
