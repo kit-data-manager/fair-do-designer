@@ -61,9 +61,44 @@ jsonPicker.addEventListener("keyClick", (e: Event) => {
     const offset = workspace.getOriginOffsetInPixels()
     block.moveTo(
         new Blockly.utils.Coordinate(
-            blocklyDiv.offsetWidth * 2 / 3 - offset.x,
+            (blocklyDiv.offsetWidth * 2) / 3 - offset.x,
             blocklyDiv.offsetHeight / 3 - offset.y,
         ),
     )
     block.render()
+})
+
+const jsonUploadButton = document.querySelector(
+    ".jsonUploadButton",
+) as HTMLButtonElement
+const jsonResetButton = document.querySelector(
+    ".jsonResetButton",
+) as HTMLButtonElement
+const jsonFileInput = document.querySelector(
+    ".jsonFileInput",
+) as HTMLInputElement
+
+if (!jsonUploadButton || !jsonResetButton || !jsonFileInput) {
+    throw "handlers: missing json toolbar"
+}
+
+jsonUploadButton.addEventListener("click", () => {
+    jsonFileInput.click()
+})
+
+jsonResetButton.addEventListener("click", async () => {
+    await jsonPicker.resetFiles()
+    jsonResetButton.classList.add("hidden")
+})
+
+jsonFileInput.addEventListener("change", async () => {
+    if (jsonFileInput.files && jsonFileInput.files.length > 0) {
+        jsonFileInput.disabled = true
+        jsonUploadButton.disabled = true
+        await jsonPicker.addFiles([...jsonFileInput.files])
+
+        jsonResetButton.classList.remove("hidden")
+        jsonFileInput.disabled = false
+        jsonUploadButton.disabled = false
+    }
 })

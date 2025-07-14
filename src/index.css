@@ -82,7 +82,19 @@ code {
 }
 
 .jsonPickerHint {
-    padding: 16px 16px 0;
+    padding-top: 8px;
     font-size: 14px;
     opacity: .5;
+}
+
+.hidden {
+    display: none;
+}
+
+.jsonPickerToolbar {
+    padding: 16px;
+}
+
+unified-document {
+    padding-left: 16px;
 }
