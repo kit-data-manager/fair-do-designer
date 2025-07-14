@@ -88,11 +88,6 @@ export const profile_hmc: HMCBlock = {
         const input = this.appendValueInput(property.name)
             .appendField(property.name)
             .appendField(
-                new FieldButton("🞋", () =>
-                    console.error("Unimplemented!"),
-                ),
-            )
-            .appendField(
                 new ValidationField({
                     mandatory: details.obligation == "Mandatory",
                     repeatable: isRepeatable,
