@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import * as Blockly from "blockly"
 import { toolbox } from "@/lib/toolbox"
 import * as BlockDynamicConnection from "@blockly/block-dynamic-connection"
@@ -22,6 +22,7 @@ import { ValidationField } from "@/lib/fields/ValidationField"
  * @constructor
  */
 export function Workspace() {
+    const [loading, setLoading] = useState(true)
     const divRef = useRef<HTMLDivElement>(null)
     const setWorkspace = useStore(workspaceStore, (s) => s.setWorkspace)
     const unsetWorkspace = useStore(workspaceStore, (s) => s.unsetWorkspace)
@@ -47,6 +48,7 @@ export function Workspace() {
         })
 
         setWorkspace(workspace)
+        setLoading(false)
 
         workspace.addChangeListener(Blockly.Events.disableOrphans)
         workspace.addChangeListener(BlockDynamicConnection.finalizeConnections)
@@ -101,10 +103,12 @@ export function Workspace() {
     }, [setWorkspace, unsetWorkspace])
 
     return (
-        <div
-            id={"blocklyDiv"}
-            className={"h-screen w-screen"}
-            ref={divRef}
-        ></div>
+        <div id={"blocklyDiv"} className={"h-screen w-screen"} ref={divRef}>
+            {loading && (
+                <div className="flex h-full justify-center items-center text-muted-foreground">
+                    Loading...
+                </div>
+            )}
+        </div>
     )
 }
