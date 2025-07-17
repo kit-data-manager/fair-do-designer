@@ -123,5 +123,11 @@ export function Workspace() {
         }
     }, [setWorkspace, unsetWorkspace])
 
-    return <div className={"h-screen w-screen"} ref={divRef}></div>
+    return (
+        <div
+            id={"blocklyDiv"}
+            className={"h-screen w-screen"}
+            ref={divRef}
+        ></div>
+    )
 }
