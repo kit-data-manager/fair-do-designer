@@ -1,16 +1,10 @@
 import { Workspace } from "@/components/Workspace"
+import { OutputPane } from "@/components/OutputPane"
 
 export default function Home() {
     return (
         <div id="pageContainer">
-            <div id="outputPane" className="collapsed">
-                <pre id="generatedCode">
-                    <code></code>
-                </pre>
-            </div>
-            <button id="collapseOutputPaneBtn" title="Toggle output pane">
-                Show output pane
-            </button>
+            <OutputPane />
             <Workspace />
             <div className="jsonPickerWrapper">
                 <div className="jsonPickerHeader">

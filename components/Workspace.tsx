@@ -7,12 +7,20 @@ import * as BlockDynamicConnection from "@blockly/block-dynamic-connection"
 import { useStore } from "zustand/react"
 import { workspaceStore } from "@/lib/stores/workspace"
 import { blocks as profile_blocks } from "@/lib/blocks/all"
-import { RecordMappingGenerator } from "@/lib/generators/python"
 import { load, save } from "@/lib/serialization"
 import * as ErrorsToolbox from "@/lib/toolboxes/errors_logging"
 import * as BacklinksToolbox from "@/lib/toolboxes/backlinks"
 import { ValidationField } from "@/lib/fields/ValidationField"
 
+/**
+ * This component encapsulates the {@link Blockly.Workspace} and takes care of initializing it and registering any
+ * toolboxes and listeners.
+ *
+ * To get a **reference** to the Workspace, use the {@link workspaceStore}. The workspaceStore always holds a reference to the current Blockly.Workspace.
+ *
+ * This component should be on the page exactly once if the Workspace is used.
+ * @constructor
+ */
 export function Workspace() {
     const divRef = useRef<HTMLDivElement>(null)
     const setWorkspace = useStore(workspaceStore, (s) => s.setWorkspace)
@@ -43,52 +51,16 @@ export function Workspace() {
         workspace.addChangeListener(Blockly.Events.disableOrphans)
         workspace.addChangeListener(BlockDynamicConnection.finalizeConnections)
 
-        const codeGenerator = new RecordMappingGenerator(
-            "PidRecordMappingPython",
-        )
-        const codeDiv = document.getElementById("generatedCode")?.firstChild
-        // This function resets the code and output divs, shows the
-        // generated code from the workspace, and evals the code.
-        // In a real application, you probably shouldn't use `eval`.
-        const runCode = () => {
-            const code = codeGenerator.workspaceToCode(
-                workspace as Blockly.Workspace,
-            )
-            if (codeDiv) codeDiv.textContent = code
+        // Load the initial state from storage and run the code.
+        load(workspace)
 
-            //if (outputDiv) outputDiv.innerHTML = "";
-
-            //eval(code);
-        }
-
-        if (workspace) {
-            // Load the initial state from storage and run the code.
-            load(workspace)
-            runCode()
-
-            // Every time the workspace changes state, save the changes to storage.
-            workspace.addChangeListener((e: Blockly.Events.Abstract) => {
-                // UI events are things like scrolling, zooming, etc.
-                // No need to save after one of these.
-                if (e.isUiEvent) return
-                save(workspace)
-            })
-
-            // Whenever the workspace changes meaningfully, run the code again.
-            workspace.addChangeListener((e: Blockly.Events.Abstract) => {
-                // Don't run the code when the workspace finishes loading; we're
-                // already running it once when the application starts.
-                // Don't run the code during drags; we might have invalid state.
-                if (
-                    e.isUiEvent ||
-                    e.type == Blockly.Events.FINISHED_LOADING ||
-                    workspace.isDragging()
-                ) {
-                    return
-                }
-                runCode()
-            })
-        }
+        // Every time the workspace changes state, save the changes to storage.
+        workspace.addChangeListener((e: Blockly.Events.Abstract) => {
+            // UI events are things like scrolling, zooming, etc.
+            // No need to save after one of these.
+            if (e.isUiEvent) return
+            save(workspace)
+        })
 
         ErrorsToolbox.register(workspace)
         BacklinksToolbox.register(workspace)
@@ -117,9 +89,14 @@ export function Workspace() {
         // Return cleanup function for clean unmounting
         return () => {
             console.warn("Unloading workspace")
-            workspace.dispose()
             unsetWorkspace()
             clearInterval(interval)
+
+            try {
+                workspace.dispose()
+            } catch (e) {
+                console.warn("Disposing workspace failed", e)
+            }
         }
     }, [setWorkspace, unsetWorkspace])
 

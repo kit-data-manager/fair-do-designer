@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-    title: "FairDO Designer",
+    title: "Fair-DO Designer Prototype",
     description: "",
 }
 

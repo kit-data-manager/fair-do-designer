@@ -53,17 +53,12 @@ code {
 }
 
 #outputPane {
-  display: flex;
   flex-direction: column;
   width: 400px;
   flex: 0 0 400px;
   overflow: auto;
   padding: 0.5rem;
   background: rgb(247, 240, 228);
-}
-
-#outputPane.collapsed {
-  display: none;
 }
 
 #collapseOutputPaneBtn {
