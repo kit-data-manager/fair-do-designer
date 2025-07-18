@@ -137,15 +137,13 @@ forBlock["pidrecord_skipable"] = function <T extends Util.FairDoCodeGenerator>(
     code += ")\n"
 
     const intendedCode = generator.prefixNonemptyLines(code, generator.INDENT)
-    const outerCode = `${start_comment}if ${value_skip_condition}:\n${intendedCode}\n`
-    return outerCode
+    return `${start_comment}if ${value_skip_condition}:\n${intendedCode}\n`
 }
 
 forBlock["attribute_key"] = function <T extends Util.FairDoCodeGenerator>(
     block: Blockly.Block,
     generator: T,
 ) {
-    const dropdown_on_fail = block.getFieldValue("on_fail")
     // TODO: change Order.ATOMIC to the correct operator precedence strength
     const value_slot = generator.valueToCode(block, "slot", Order.ATOMIC)
     const text_pid = block.getFieldValue("pid")
@@ -289,9 +287,7 @@ forBlock["backlink_declaration"] = function <
     return [code, Order.ATOMIC]
 }
 
-forBlock["profile_hmc_reference_block"] = function <
-    T extends Util.FairDoCodeGenerator,
->(block: Blockly.Block, generator: T) {
+forBlock["profile_hmc_reference_block"] = function (block: Blockly.Block) {
     const dropdown_attribute = block.getFieldValue("ATTRIBUTE")
     const code = `"${dropdown_attribute}"`
     return [code, Order.ATOMIC]

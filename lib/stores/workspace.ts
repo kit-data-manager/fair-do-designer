@@ -7,7 +7,7 @@ interface WorkspaceStore {
     unsetWorkspace: () => void
 }
 
-export const workspaceStore = create<WorkspaceStore>()((set, get) => ({
+export const workspaceStore = create<WorkspaceStore>()((set) => ({
     workspace: undefined,
     setWorkspace(workspace: WorkspaceSvg) {
         set({ workspace })
