@@ -9,6 +9,14 @@ const nextConfig: NextConfig = {
             },
         },
     },
+    webpack(config) {
+        config.module.rules.push({
+            test: /\.py$/,
+            type: "asset/source", // Treat as raw source (string)
+        })
+        return config
+    },
+    output: "export",
 }
 
 export default nextConfig
