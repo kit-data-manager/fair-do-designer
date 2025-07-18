@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState, DragEvent } from "react"
 import * as Blockly from "blockly"
 import { toolbox } from "@/lib/toolbox"
 import * as BlockDynamicConnection from "@blockly/block-dynamic-connection"
@@ -24,6 +24,7 @@ import { ValidationField } from "@/lib/fields/ValidationField"
 export function Workspace() {
     const [loading, setLoading] = useState(true)
     const divRef = useRef<HTMLDivElement>(null)
+    const workspace = useStore(workspaceStore, (s) => s.workspace)
     const setWorkspace = useStore(workspaceStore, (s) => s.setWorkspace)
     const unsetWorkspace = useStore(workspaceStore, (s) => s.unsetWorkspace)
 
@@ -102,8 +103,52 @@ export function Workspace() {
         }
     }, [setWorkspace, unsetWorkspace])
 
+    const onDrop = useCallback(
+        (event: DragEvent<HTMLDivElement>) => {
+            if (!workspace) return
+
+            const block = workspace.newBlock("input_jsonpath")
+            const query = event.dataTransfer?.getData("text/plain")
+
+            if (!query) {
+                console.error(
+                    "Received drop event that did not include a valid text/plain data point",
+                )
+                return
+            }
+
+            if (
+                "updateQuery" in block &&
+                typeof block.updateQuery === "function"
+            ) {
+                block.updateQuery(query)
+            }
+
+            block.initSvg()
+            const offset = workspace.getOriginOffsetInPixels()
+            block.moveTo(
+                new Blockly.utils.Coordinate(
+                    event.nativeEvent.offsetX - offset.x,
+                    event.nativeEvent.offsetY - offset.y,
+                ),
+            )
+            block.render()
+        },
+        [workspace],
+    )
+
+    const onDragOver = useCallback((event: DragEvent<HTMLDivElement>) => {
+        event.preventDefault()
+    }, [])
+
     return (
-        <div id={"blocklyDiv"} className={"h-screen w-screen"} ref={divRef}>
+        <div
+            id={"blocklyDiv"}
+            className={"h-screen w-screen"}
+            ref={divRef}
+            onDrop={onDrop}
+            onDragOver={onDragOver}
+        >
             {loading && (
                 <div className="flex h-full justify-center items-center text-muted-foreground">
                     Loading...
