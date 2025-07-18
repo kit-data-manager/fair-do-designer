@@ -1,28 +1,36 @@
-# FAIR DO Designer
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-Status: Starting early design prototype(s)
+## Getting Started
 
-## Development
+First, run the development server:
 
-1. Start the dev container: `docker compose up -d`
-    - The container will be created if required.
-    - If you'd like to understand the setup, inspect the `docker-compose.yml` for details.
-    - You'll get a shell in the container where you may run `npm run` commands documented in `package.json`.
-    - Code/text editing can be done from the outside as usual.
-    - Optional for advanced use cases: Get a shell into the dev container: `bash dev.sh` (will start the container, if required)
-2. Go to http://localhost:8080
-    - Port can be modified in `docker-compose.yml`, but the webpack dev server may need to be adjusted in order to make it work completely.
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-### Useful documentation
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-- Blockly
-    - [Guide & docs](https://developers.google.com/blockly/)
-    - [A full list of pre-defined blocks can be found in the source code.](https://github.com/google/blockly/tree/develop/blocks)
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-## Findings
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-- Having the Profile on the right and the values on the left may be interesting to keep the left-to-right data flow. To do so, we can (ironically) set rtl to true for the workspace and then align all inputs to `"RIGHT"`. I will not do this now because it is additional work and not my current focus.
+## Learn More
 
-## Origin
+To learn more about Next.js, take a look at the following resources:
 
-This has been started using the [command from the Blockly documentation for a typescript setup](https://developers.google.com/blockly/guides/get-started/get-the-code): `npx @blockly/create-package app hello-world --typescript`
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

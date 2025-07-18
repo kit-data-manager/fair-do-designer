@@ -7,7 +7,7 @@ export interface InputJsonPath extends Blockly.BlockSvg {
     updateQuery(query: string): void
 }
 
-/* @ts-ignore */
+/* @ts-expect-error Object can't be cast to class */
 export const input_jsonpath: InputJsonPath = {
     init: function () {
         const hiddenQueryField = new FieldLabel("JSON")
@@ -45,7 +45,7 @@ export const input_jsonpath: InputJsonPath = {
         return this.getField("QUERY")?.getValue()
     },
 
-    loadExtraState: function (query: any) {
+    loadExtraState: function (query: unknown) {
         if (typeof query !== "string") {
             console.error("input_jsonpath extra state is not a string")
             return
@@ -53,15 +53,9 @@ export const input_jsonpath: InputJsonPath = {
 
         this.updateQuery(query)
     },
-
-    onchange: function (abstract) {
-        if ("blockId" in abstract && abstract.blockId === this.id) {
-            console.log("Change event", abstract)
-        }
-    },
 }
 
-/* @ts-ignore */
+/* @ts-expect-error Object can't be cast to class */
 export const input_custom_json: Blockly.BlockSvg = {
     init: function () {
         this.appendValueInput("QUERY")
