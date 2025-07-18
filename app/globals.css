@@ -120,7 +120,6 @@ code {
   grid-template-rows: 50px auto;
   max-height: 100vh;
   width: 800px;
-  font-family: sans-serif;
 }
 
 .jsonPickerHeader {
