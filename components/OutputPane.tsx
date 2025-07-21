@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef } from "react"
 import { RecordMappingGenerator } from "@/lib/generators/python"
 import { useStore } from "zustand/react"
 import { workspaceStore } from "@/lib/stores/workspace"
@@ -11,17 +11,12 @@ import * as Blockly from "blockly"
  * @constructor
  */
 export function OutputPane() {
-    const [open, setOpen] = useState(false)
     const workspace = useStore(workspaceStore, (s) => s.workspace)
 
     const codeBlock = useRef<HTMLElement>(null)
     const codeGenerator = useRef(
         new RecordMappingGenerator("PidRecordMappingPython"),
     )
-
-    const toggleOpen = useCallback(() => {
-        setOpen((o) => !o)
-    }, [])
 
     const generateCode = useCallback(() => {
         if (!workspace) return
@@ -48,19 +43,10 @@ export function OutputPane() {
     }, [generateCode, workspace])
 
     return (
-        <>
-            <div id="outputPane" className={`${open ? "flex" : "hidden"}`}>
-                <pre id="generatedCode">
-                    <code ref={codeBlock}></code>
-                </pre>
-            </div>
-            <button
-                id="collapseOutputPaneBtn"
-                onClick={toggleOpen}
-                title={`${open ? "Hide" : "Show"} output pane`}
-            >
-                {open ? "Hide" : "Show"} output pane
-            </button>
-        </>
+        <div className="flex-col w-[400px] flex-[0_0_400px] overflow-auto p-2">
+            <pre>
+                <code ref={codeBlock}></code>
+            </pre>
+        </div>
     )
 }

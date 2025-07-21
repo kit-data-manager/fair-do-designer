@@ -103,6 +103,20 @@ export function Workspace() {
         }
     }, [setWorkspace, unsetWorkspace])
 
+    // Resize the workspace if the surrounding div resizes
+    useEffect(() => {
+        if (workspace && divRef.current) {
+            const observer = new ResizeObserver(() => {
+                requestAnimationFrame(() => {
+                    Blockly.svgResize(workspace)
+                })
+            })
+            observer.observe(divRef.current)
+
+            return () => observer.disconnect()
+        }
+    }, [workspace])
+
     const onDrop = useCallback(
         (event: DragEvent<HTMLDivElement>) => {
             if (!workspace) return
@@ -143,8 +157,7 @@ export function Workspace() {
 
     return (
         <div
-            id={"blocklyDiv"}
-            className={"h-screen w-screen"}
+            className="h-screen"
             ref={divRef}
             onDrop={onDrop}
             onDragOver={onDragOver}

@@ -14,6 +14,7 @@
     "@kit-data-manager/json-picker": "file:kit-data-manager-json-picker-0.0.2.tgz",
     "@kit-data-manager/json-picker-react": "file:kit-data-manager-json-picker-react-0.0.2.tgz",
     "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-tabs": "^1.1.12",
     "blockly": "^12.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -21,6 +22,7 @@
     "next": "15.3.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-resizable-panels": "^3.0.3",
     "tailwind-merge": "^3.3.1",
     "zustand": "^5.0.6"
   },
