@@ -93,13 +93,13 @@ export function InputPane() {
     )
 
     return (
-        <div className="grow w-[800px] overflow-auto">
-            <div className="bg-muted p-2">
+        <div className="min-h-0 flex flex-col">
+            <div className="bg-muted p-2 flex-shrink-0">
                 <h4 className="font-bold">Data Access</h4>
             </div>
-            <div className="p-2">
-                <div className="">
-                    <div className="flex gap-2 mb-2">
+            <div className="min-h-0">
+                <div className="min-h-0 h-full p-2 flex flex-col">
+                    <div className="flex flex-wrap gap-2 mb-2">
                         <Button variant="outline" onClick={uploadFiles}>
                             Upload files
                         </Button>
@@ -119,14 +119,17 @@ export function InputPane() {
                         ref={uploadInputRef}
                         onChange={onUploadInputChange}
                     />
-                    <div className="text-sm text-muted-foreground">
-                        Hint: Use drag-and-drop to place Data Access blocks in
-                        the workspace
+                    <div className="overflow-x-auto">
+                        <div className="text-sm text-muted-foreground">
+                            Hint: Use drag-and-drop to place Data Access blocks in
+                            the workspace
+                        </div>
+                        <UnifiedDocument
+                            className={""}
+                            ref={unifiedDocument}
+                            onJsonKeyClick={onJsonKeyClick}
+                        />
                     </div>
-                    <UnifiedDocument
-                        ref={unifiedDocument}
-                        onJsonKeyClick={onJsonKeyClick}
-                    />
                 </div>
             </div>
         </div>

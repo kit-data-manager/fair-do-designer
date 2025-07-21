@@ -25,7 +25,7 @@ export default function Home() {
                 <ResizableHandle />
                 <ResizablePanel>
                     <Tabs
-                        className="overflow-auto"
+                        className="max-h-full"
                         value={tab}
                         onValueChange={setTab}
                     >
@@ -38,7 +38,7 @@ export default function Home() {
 
                         <TabsContent
                             className={
-                                "overflow-auto " +
+                                "min-h-0 max-h-full flex " +
                                 (tab === "input" ? "" : "hidden")
                             }
                             value={"input"}
