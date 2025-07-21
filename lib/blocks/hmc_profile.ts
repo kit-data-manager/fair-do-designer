@@ -21,7 +21,7 @@ export interface HMCBlock extends Blockly.BlockSvg {
     onBlockChange(event: Blockly.Events.BlockChange): void
 }
 
-/* @ts-ignore */
+/* @ts-expect-error Object can't be cast to class */
 export const profile_hmc: HMCBlock = {
     profile: HMCProfile,
     activeOptionalProperties: [],
@@ -84,7 +84,13 @@ export const profile_hmc: HMCBlock = {
         const details = property.representationsAndSemantics[0]
         const isRepeatable = details.repeatable == "Yes"
 
-        const typeCheck = ["JSON", "String", "Boolean", "Number", "BackwardLinkFor"]
+        const typeCheck = [
+            "JSON",
+            "String",
+            "Boolean",
+            "Number",
+            "BackwardLinkFor",
+        ]
         if (isRepeatable) typeCheck.push("Array")
 
         const input = this.appendValueInput(property.name)
@@ -142,22 +148,29 @@ export const profile_hmc: HMCBlock = {
     },
 
     createAttributeReferenceBlock() {
-        const nameIdPairs: Blockly.MenuGenerator = this.profile.properties.map((p) => {
-            return [p.name, p.identifier]
-        });
+        const nameIdPairs: Blockly.MenuGenerator = this.profile.properties.map(
+            (p) => {
+                return [p.name, p.identifier]
+            },
+        )
 
-        const parent = this
+        const profileName = this.profile.name
         return {
-            init: function() {
-                this.appendDummyInput('CONTENT')
-                .appendField(parent.profile.name)
-                .appendField(new Blockly.FieldDropdown(nameIdPairs), 'ATTRIBUTE');
-                this.setOutput(true, ['String', 'attribute_key']);
-                this.setTooltip(`References an attribute key which appears in ${parent.profile.name}.`);
-                this.setHelpUrl('');
-                this.setColour(225);
-            }
-        } as Blockly.Block;
+            init: function () {
+                this.appendDummyInput("CONTENT")
+                    .appendField(profileName)
+                    .appendField(
+                        new Blockly.FieldDropdown(nameIdPairs),
+                        "ATTRIBUTE",
+                    )
+                this.setOutput(true, ["String", "attribute_key"])
+                this.setTooltip(
+                    `References an attribute key which appears in ${profileName}.`,
+                )
+                this.setHelpUrl("")
+                this.setColour(225)
+            },
+        } as Blockly.Block
     },
 
     onBlockCreate(event: Blockly.Events.BlockCreate) {

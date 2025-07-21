@@ -43,7 +43,7 @@ export class ValidationField extends FieldLabel {
         if (!connectedBlock || !connectedBlock.type.startsWith("lists_"))
             return true
 
-        const checkBlock = (block: Block): boolean => {
+        const checkBlock = (block?: Block): boolean => {
             if (!block) return false
             if (
                 !block.type.startsWith("lists_") &&
@@ -54,8 +54,8 @@ export class ValidationField extends FieldLabel {
 
             // For list blocks, check all inputs recursively using functional approach
             return block.inputList
-                .map((input: any) => input.connection?.targetBlock())
-                .every((targetBlock: any) => checkBlock(targetBlock))
+                .map((input) => input.connection?.targetBlock() ?? undefined)
+                .every((targetBlock) => checkBlock(targetBlock))
         }
 
         return checkBlock(connectedBlock)

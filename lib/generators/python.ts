@@ -8,8 +8,8 @@ import { Order, PythonGenerator, pythonGenerator } from "blockly/python"
 import * as Blockly from "blockly/core"
 import * as HmcProfile from "../blocks/hmc_profile"
 import * as Util from "./util"
-import builderCode from './python/main.py'
-import executionCode from './python/execute.py'
+import builderCode from "./python/main.py"
+import executionCode from "./python/execute.py"
 import conditionalsCode from "./python/conditionals.py"
 
 /**
@@ -37,7 +37,7 @@ export class RecordMappingGenerator
 
     makeAddAttributeChainCall(key: string, value: string): string {
         if (value.startsWith("BackwardLinkFor(")) {
-            return `.addAttribute("${key}", ${value})\n`    
+            return `.addAttribute("${key}", ${value})\n`
         } else {
             return `.addAttribute("${key}", lambda: ${value})\n`
         }
@@ -56,7 +56,7 @@ export class RecordMappingGenerator
     }
 
     isEmptyPythonString(s: string): boolean {
-        return s == null || s == undefined || s.length <= 0 || s == "''" || s == "\"\"";
+        return s == null || false || s.length <= 0 || s == "''" || s == '""'
     }
 
     prefixNonemptyLines(text: string, prefix: string): string {
@@ -68,13 +68,17 @@ export class RecordMappingGenerator
     }
 
     finish(code: string): string {
-        code = super.finish(code);
+        code = super.finish(code)
         // Remove main imports
         // They are only present to make valid python code as the files are split up.
-        let suffix: string = executionCode.split("\n")
-            .filter((value: string, _index: number, _array: Array<string>) => 
-                !value.startsWith("import main") && !value.startsWith("from main "))
-            .join("\n");
+        const suffix: string = executionCode
+            .split("\n")
+            .filter(
+                (value: string) =>
+                    !value.startsWith("import main") &&
+                    !value.startsWith("from main "),
+            )
+            .join("\n")
         return code + suffix
     }
 }
@@ -133,20 +137,18 @@ forBlock["pidrecord_skipable"] = function <T extends Util.FairDoCodeGenerator>(
     code += ")\n"
 
     const intendedCode = generator.prefixNonemptyLines(code, generator.INDENT)
-    const outerCode = `${start_comment}if ${value_skip_condition}:\n${intendedCode}\n`
-    return outerCode
+    return `${start_comment}if ${value_skip_condition}:\n${intendedCode}\n`
 }
 
 forBlock["attribute_key"] = function <T extends Util.FairDoCodeGenerator>(
     block: Blockly.Block,
     generator: T,
 ) {
-    const dropdown_on_fail = block.getFieldValue("on_fail")
     // TODO: change Order.ATOMIC to the correct operator precedence strength
     const value_slot = generator.valueToCode(block, "slot", Order.ATOMIC)
     const text_pid = block.getFieldValue("pid")
 
-    var code = ""
+    let code = ""
     if (value_slot) {
         code += generator.makeLineComment(`${block.type}`)
         code += generator.makeAddAttributeChainCall(text_pid, value_slot)
@@ -168,7 +170,8 @@ forBlock["transform_string"] = function <T extends Util.FairDoCodeGenerator>(
     return [`transform.toString(${inText})`, Order.ATOMIC]
 }
 
-const jsonpathCall = (path: string) => `jsonpath.findall("${path}", current_source_json)`
+const jsonpathCall = (path: string) =>
+    `jsonpath.findall("${path}", current_source_json)`
 
 forBlock["input_jsonpath"] = function (block: Blockly.Block) {
     const value_input = block.getFieldValue("QUERY")
@@ -181,13 +184,21 @@ forBlock["input_custom_json"] = function (block: Blockly.Block) {
 }
 
 // Type guard for HmcBlock interface
-function isHmcBlock(obj: any): obj is HmcProfile.HMCBlock {
+function isHmcBlock(obj: unknown): obj is HmcProfile.HMCBlock {
     return (
-        obj &&
+        obj !== null &&
+        typeof obj === "object" &&
+        "profileAttributeKey" in obj &&
         typeof obj.profileAttributeKey === "string" &&
+        "profile" in obj &&
         typeof obj.profile === "object" &&
+        typeof obj.profile === "object" &&
+        obj.profile != undefined &&
+        "identifier" in obj.profile &&
         typeof obj.profile.identifier === "string" &&
+        "inputList" in obj &&
         Array.isArray(obj.inputList) &&
+        "extractPidFromProperty" in obj &&
         typeof obj.extractPidFromProperty === "function"
     )
 }
@@ -200,7 +211,7 @@ forBlock["profile_hmc"] = function <T extends Util.FairDoCodeGenerator>(
         throw new Error("Expected block to conform to HmcBlock interface")
     }
 
-    var code = generator.makeLineComment(`${block.type}`)
+    let code = generator.makeLineComment(`${block.type}`)
     code += generator.makeAddAttributeChainCall(
         block.profileAttributeKey,
         "'" + block.profile.identifier + "'",
@@ -232,8 +243,8 @@ forBlock["stop_design"] = function <T extends Util.FairDoCodeGenerator>(
     if (!value_message || value_message.trim() == "") {
         value_message = '"No error message provided"'
     }
-    const code = `stop_with_fail(${value_message})`;
-    return [code, Order.ATOMIC];
+    const code = `stop_with_fail(${value_message})`
+    return [code, Order.ATOMIC]
 }
 
 forBlock["log_value"] = function <T extends Util.FairDoCodeGenerator>(
@@ -259,25 +270,25 @@ forBlock["otherwise"] = function <T extends Util.FairDoCodeGenerator>(
     // TODO: change Order.ATOMIC to the correct operator precedence strength
     const value_other = generator.valueToCode(block, "OTHER", Order.ATOMIC)
 
-  const code = `otherwise(${value_value}, lambda: ${value_other})\n`;
-  // TODO: Change Order.NONE to the correct operator precedence strength
-  return [code, Order.NONE];
+    const code = `otherwise(${value_value}, lambda: ${value_other})\n`
+    // TODO: Change Order.NONE to the correct operator precedence strength
+    return [code, Order.NONE]
 }
 
-forBlock['backlink_declaration'] = function <T extends Util.FairDoCodeGenerator>(
-    block: Blockly.Block,
-    generator: T,
-) {
-  const value_attribute_key = generator.valueToCode(block, 'ATTRIBUTE_KEY', Order.ATOMIC);
-  const code = 'BackwardLinkFor(' + value_attribute_key + ')';
-  return [code, Order.ATOMIC];
+forBlock["backlink_declaration"] = function <
+    T extends Util.FairDoCodeGenerator,
+>(block: Blockly.Block, generator: T) {
+    const value_attribute_key = generator.valueToCode(
+        block,
+        "ATTRIBUTE_KEY",
+        Order.ATOMIC,
+    )
+    const code = "BackwardLinkFor(" + value_attribute_key + ")"
+    return [code, Order.ATOMIC]
 }
 
-forBlock['profile_hmc_reference_block'] = function <T extends Util.FairDoCodeGenerator>(
-    block: Blockly.Block,
-    generator: T,
-) {
-  const dropdown_attribute = block.getFieldValue('ATTRIBUTE');
-  const code = `"${dropdown_attribute}"`
-  return [code, Order.ATOMIC];
+forBlock["profile_hmc_reference_block"] = function (block: Blockly.Block) {
+    const dropdown_attribute = block.getFieldValue("ATTRIBUTE")
+    const code = `"${dropdown_attribute}"`
+    return [code, Order.ATOMIC]
 }

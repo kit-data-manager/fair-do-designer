@@ -1,7 +1,7 @@
 import { FieldLabel, Block } from "blockly"
 
 export class FieldButton extends FieldLabel {
-    callback: (block: any) => void
+    callback: (block: Block) => void
 
     constructor(label: string, callback: (block: Block) => void) {
         super(label)

@@ -1,8 +1,9 @@
 import { WorkspaceSvg } from "blockly"
-import { BlockInfo } from "blockly/core/utils/toolbox"
+// @ts-expect-error Typings not exported from package.json but working anyway
+import type { BlockInfo } from "blockly/core/utils/toolbox"
 
 export function register(workspace: WorkspaceSvg) {
-    workspace.registerToolboxCategoryCallback("BACKLINKS", (workspace) => {
+    workspace.registerToolboxCategoryCallback("BACKLINKS", () => {
         return [
             {
                 kind: "block",

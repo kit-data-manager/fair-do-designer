@@ -3,6 +3,6 @@
  * This is useful for loading Python code snippets or templates directly.
  */
 declare module "*.py" {
-  const content: string
-  export default content
+    const content: string
+    export default content
 }
