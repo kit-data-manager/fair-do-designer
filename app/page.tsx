@@ -6,7 +6,7 @@ import { InputPane } from "@/components/InputPane"
 
 export default function Home() {
     return (
-        <div id="pageContainer">
+        <div id="pageContainer" className="h-screen w-screen">
             <OutputPane />
             <Workspace />
             <InputPane />

@@ -93,7 +93,7 @@ export function InputPane() {
     )
 
     return (
-        <div className="grow w-[800px]">
+        <div className="grow w-[800px] overflow-auto">
             <div className="bg-muted p-2">
                 <h4 className="font-bold">Data Access</h4>
             </div>
