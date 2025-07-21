@@ -1,10 +1,13 @@
 "use client"
 
-import { useCallback, useEffect, useRef } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { RecordMappingGenerator } from "@/lib/generators/python"
 import { useStore } from "zustand/react"
 import { workspaceStore } from "@/lib/stores/workspace"
 import * as Blockly from "blockly"
+import { Button } from "@/components/ui/button"
+import { useCopyToClipboard } from "usehooks-ts"
+import { CheckIcon } from "lucide-react"
 
 /**
  * Runs the code generator and shows the result
@@ -12,6 +15,7 @@ import * as Blockly from "blockly"
  */
 export function OutputPane() {
     const workspace = useStore(workspaceStore, (s) => s.workspace)
+    const [, copy] = useCopyToClipboard()
 
     const codeBlock = useRef<HTMLElement>(null)
     const codeGenerator = useRef(
@@ -42,9 +46,29 @@ export function OutputPane() {
         })
     }, [generateCode, workspace])
 
+    const [copied, setCopied] = useState(false)
+    const copiedTimeoutRef = useRef<number>(null)
+    const copyCode = useCallback(() => {
+        if (codeBlock.current) {
+            if (copiedTimeoutRef.current) clearTimeout(copiedTimeoutRef.current)
+            copy(codeBlock.current.innerText).then()
+            setCopied(true)
+
+            copiedTimeoutRef.current = window.setTimeout(() => {
+                setCopied(false)
+            }, 1000)
+        }
+
+    }, [copy])
+
     return (
-        <div className="flex-col w-[400px] flex-[0_0_400px] overflow-auto p-2">
-            <pre>
+        <div className="">
+            <div className="p-2 bg-muted w-full flex flex-wrap gap-2 mb-2">
+                <Button variant="outline" onClick={copyCode}>
+                    {copied ? <><CheckIcon /> Copied</> : "Copy Code"}
+                </Button>
+            </div>
+            <pre className="overflow-auto p-2">
                 <code ref={codeBlock}></code>
             </pre>
         </div>

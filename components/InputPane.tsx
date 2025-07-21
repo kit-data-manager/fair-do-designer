@@ -93,23 +93,21 @@ export function InputPane() {
     )
 
     return (
-        <div className="min-h-0 flex flex-col">
-            <div className="bg-muted p-2 flex-shrink-0">
-                <h4 className="font-bold">Data Access</h4>
+        <div className="min-h-0 w-full justify-stretch flex flex-col">
+            <div className="p-2 bg-muted w-full flex flex-wrap gap-2 mb-2">
+                <Button variant="outline" onClick={uploadFiles}>
+                    Upload files
+                </Button>
+                <Button variant="outline" onClick={loadExampleFiles}>
+                    Add example files
+                </Button>
+                <Button variant="outline" onClick={reset}>
+                    Reset
+                </Button>
             </div>
             <div className="min-h-0">
                 <div className="min-h-0 h-full p-2 flex flex-col">
-                    <div className="flex flex-wrap gap-2 mb-2">
-                        <Button variant="outline" onClick={uploadFiles}>
-                            Upload files
-                        </Button>
-                        <Button variant="outline" onClick={loadExampleFiles}>
-                            Add example files
-                        </Button>
-                        <Button variant="outline" onClick={reset}>
-                            Reset
-                        </Button>
-                    </div>
+
 
                     <input
                         type="file"

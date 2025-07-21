@@ -10,6 +10,7 @@ import {
     ResizablePanel,
     ResizablePanelGroup,
 } from "@/components/ui/resizable"
+import { CodeIcon, DatabaseIcon } from "lucide-react"
 
 export default function Home() {
     const [tab, setTab] = useState("input")
@@ -30,9 +31,9 @@ export default function Home() {
                         onValueChange={setTab}
                     >
                         <TabsList>
-                            <TabsTrigger value={"input"}>Input</TabsTrigger>
+                            <TabsTrigger value={"input"}><DatabaseIcon /> Data Access</TabsTrigger>
                             <TabsTrigger value={"output"}>
-                                Generated Code
+                               <CodeIcon />  Generated Code
                             </TabsTrigger>
                         </TabsList>
 
