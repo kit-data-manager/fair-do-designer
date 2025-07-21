@@ -154,17 +154,18 @@ export const profile_hmc: HMCBlock = {
             },
         )
 
+        const profileName = this.profile.name
         return {
-            init: () => {
+            init: function () {
                 this.appendDummyInput("CONTENT")
-                    .appendField(this.profile.name)
+                    .appendField(profileName)
                     .appendField(
                         new Blockly.FieldDropdown(nameIdPairs),
                         "ATTRIBUTE",
                     )
                 this.setOutput(true, ["String", "attribute_key"])
                 this.setTooltip(
-                    `References an attribute key which appears in ${this.profile.name}.`,
+                    `References an attribute key which appears in ${profileName}.`,
                 )
                 this.setHelpUrl("")
                 this.setColour(225)
