@@ -54,12 +54,12 @@ export class ValidationField extends FieldLabel {
 
             // For list blocks, check all attached blocks recursively
             // Rule 1: All attached blocks must be valid
-            // Rule 2: If this field is mandatory Then at least one block must be attached
+            // Rule 2: At least one block must be attached
             // (Note: This allows empty slots, they should just be ignored in code generation)
             const listBlocks =  block.inputList
                 .map((input) => input.connection?.targetBlock() ?? undefined).filter(b => b !== undefined).filter(b => !b.isInsertionMarker())
             return listBlocks
-                .every((targetBlock) => checkBlock(targetBlock)) &&  (this.options.mandatory ? listBlocks.length > 0 : true)
+                .every((targetBlock) => checkBlock(targetBlock)) &&  listBlocks.length > 0
         }
 
         return checkBlock(connectedBlock)
