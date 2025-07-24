@@ -292,3 +292,21 @@ forBlock["profile_hmc_reference_block"] = function (block: Blockly.Block) {
     const code = `"${dropdown_attribute}"`
     return [code, Order.ATOMIC]
 }
+
+forBlock["lists_create_with"] = function <T extends Util.FairDoCodeGenerator>(block: Blockly.Block, generator: T) {
+    const values: string[] = []
+    for (const input of block.inputList) {
+        const block = input.connection?.targetBlock()
+        if (block) {
+            // TODO: Do we have to consider the operator precedence here?
+            const result = generator.blockToCode(block)
+            if (typeof result === "string") {
+                values.push(result)
+            } else {
+                values.push(result[0])
+            }
+        }
+    }
+
+    return ["[" + values.join(", ") + "]", Order.COLLECTION]
+}
