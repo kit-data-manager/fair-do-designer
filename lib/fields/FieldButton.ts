@@ -3,9 +3,15 @@ import { FieldLabel, Block } from "blockly"
 export class FieldButton extends FieldLabel {
     callback: (block: Block) => void
 
-    constructor(label: string, callback: (block: Block) => void) {
+    constructor(label: string, callback: (block: Block) => void, opts?: {tooltip?: string}) {
         super(label)
         this.callback = callback
+
+        if (opts) {
+            if (opts.tooltip) {
+                this.setTooltip(opts.tooltip)
+            }
+        }
     }
 
     initView() {

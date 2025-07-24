@@ -17,13 +17,25 @@ export const input_jsonpath: InputJsonPath = {
             .appendField("Read")
             .appendField("JSON", "DISPLAY_QUERY")
             .appendField(
-                new FieldButton("🔍", this.findQueryProperty.bind(this)),
+                new FieldButton("🔍", this.findQueryProperty.bind(this), {tooltip: "Highlight in Source Document"}),
             )
             .appendField(hiddenQueryField, "QUERY")
-        this.setTooltip("Read data from input")
+        this.setTooltip("Read value from Source Document")
         this.setHelpUrl("")
         this.setOutput(true, null)
         this.setColour(230)
+    },
+
+    customContextMenu(menu) {
+        menu.splice(1, 0, {text: "Edit Query", callback: () => {
+            const result = prompt("Enter the new Query below:", this.getField("QUERY")?.getValue() ?? "")
+                if (result) {
+                    this.updateQuery(result)
+                }
+            }, enabled: true})
+        menu.splice(1, 0, {text: "Show full Query", callback: () => {
+                 alert(this.getField("QUERY")?.getValue() ?? "Failed to get query")
+            }, enabled: true})
     },
 
     findQueryProperty() {
