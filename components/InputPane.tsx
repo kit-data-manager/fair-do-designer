@@ -94,7 +94,7 @@ export function InputPane() {
 
     return (
         <div className="min-h-0 w-full justify-stretch flex flex-col">
-            <div className="p-2 bg-muted w-full flex flex-wrap gap-2 mb-2">
+            <div className="p-2 bg-muted w-full flex flex-wrap gap-2">
                 <Button variant="outline" onClick={uploadFiles}>
                     Upload files
                 </Button>
@@ -105,7 +105,7 @@ export function InputPane() {
                     Reset
                 </Button>
             </div>
-            <div className="min-h-0">
+            <div className="min-h-0 overflow-x-auto pt-2">
                 <div className="min-h-0 h-full p-2 flex flex-col">
 
 
@@ -117,7 +117,7 @@ export function InputPane() {
                         ref={uploadInputRef}
                         onChange={onUploadInputChange}
                     />
-                    <div className="overflow-x-auto">
+                    <div className="">
                         <div className="text-sm text-muted-foreground">
                             Hint: Use drag-and-drop to place Data Access blocks in
                             the workspace

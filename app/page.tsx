@@ -50,7 +50,7 @@ export default function Home() {
 
                         <TabsContent
                             className={
-                                "overflow-auto " +
+                                "min-h-0 max-h-full flex " +
                                 (tab === "output" ? "" : "hidden")
                             }
                             value={"output"}
