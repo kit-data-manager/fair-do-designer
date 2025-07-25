@@ -17,25 +17,49 @@ export const input_jsonpath: InputJsonPath = {
             .appendField("Read")
             .appendField("JSON", "DISPLAY_QUERY")
             .appendField(
-                new FieldButton("🔍", this.findQueryProperty.bind(this), {tooltip: "Highlight in Source Document"}),
+                new FieldButton("🔍", this.findQueryProperty.bind(this), {
+                    tooltip: "Highlight in Source Document",
+                }),
             )
             .appendField(hiddenQueryField, "QUERY")
-        this.setTooltip("Read value from Source Document")
+        this.setTooltip(
+            "Read value from Source Document. Right-click for more.",
+        )
         this.setHelpUrl("")
         this.setOutput(true, null)
         this.setColour(230)
     },
 
     customContextMenu(menu) {
-        menu.splice(1, 0, {text: "Edit Query", callback: () => {
-            const result = prompt("Enter the new Query below:", this.getField("QUERY")?.getValue() ?? "")
+        menu.splice(0, 0, {
+            // @ts-expect-error Incorrectly typed
+            id: "separatorAfterCollapseBlock",
+            scopeType: Blockly.ContextMenuRegistry.ScopeType.BLOCK,
+            weight: 11, // Between the weights of the two items you want to separate.
+            separator: true,
+        })
+        menu.splice(0, 0, {
+            text: "Edit Query",
+            callback: () => {
+                const result = prompt(
+                    "⭐️ Enter the new Query below:",
+                    this.getField("QUERY")?.getValue() ?? "",
+                )
                 if (result) {
                     this.updateQuery(result)
                 }
-            }, enabled: true})
-        menu.splice(1, 0, {text: "Show full Query", callback: () => {
-                 alert(this.getField("QUERY")?.getValue() ?? "Failed to get query")
-            }, enabled: true})
+            },
+            enabled: true,
+        })
+        menu.splice(0, 0, {
+            text: "Show full Query",
+            callback: () => {
+                alert(
+                    this.getField("QUERY")?.getValue() ?? "Failed to get query",
+                )
+            },
+            enabled: true,
+        })
     },
 
     findQueryProperty() {
@@ -50,7 +74,6 @@ export const input_jsonpath: InputJsonPath = {
         this.setFieldValue(display, "DISPLAY_QUERY")
         this.setFieldValue(query, "QUERY")
         this.getField("QUERY")?.setVisible(false)
-        this.getField("DISPLAY_QUERY")?.setTooltip(query)
     },
 
     saveExtraState: function () {
@@ -78,7 +101,9 @@ export const input_custom_json: Blockly.BlockSvg = {
             )
         this.setInputsInline(true)
         this.setOutput(true, "JSON")
-        this.setTooltip("")
+        this.setTooltip(
+            "Execute a custom JSON Query against the current Source Document",
+        )
         this.setHelpUrl("")
         this.setColour(315)
     },

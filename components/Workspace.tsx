@@ -54,6 +54,12 @@ export function Workspace() {
         workspace.addChangeListener(Blockly.Events.disableOrphans)
         workspace.addChangeListener(BlockDynamicConnection.finalizeConnections)
 
+        workspace.registerButtonCallback("dataAccessToolboxHelp", () => {
+            alert(
+                "Use the Data Access tab on the right side to create Data Access blocks by clicking or drag-and-drop",
+            )
+        })
+
         // Load the initial state from storage and run the code.
         load(workspace)
 

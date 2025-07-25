@@ -44,6 +44,10 @@ export const toolbox = {
             categorystyle: "procedure_category",
             contents: [
                 {
+                    kind: "label",
+                    text: "For Expert use",
+                },
+                {
                     kind: "block",
                     type: "input_custom_json",
                     inputs: {
@@ -56,6 +60,11 @@ export const toolbox = {
                             },
                         },
                     },
+                },
+                {
+                    kind: "button",
+                    text: "Help",
+                    callbackKey: "dataAccessToolboxHelp",
                 },
             ],
         },
