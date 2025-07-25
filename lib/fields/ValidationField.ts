@@ -6,7 +6,6 @@ export interface ValidationFieldOptions {
 }
 
 export class ValidationField extends FieldLabel {
-    wrapper_: HTMLElement | null = null
     options: ValidationFieldOptions
 
     constructor(opts: ValidationFieldOptions) {
@@ -19,12 +18,10 @@ export class ValidationField extends FieldLabel {
         super.initView()
 
         this.setValidationResult(undefined)
-        this.wrapper_ = document.createElement("foreignObject")
     }
 
     protected render_() {
         super.render_()
-        if (this.wrapper_) this.textElement_?.append(this.wrapper_)
     }
 
     forceCheck() {
@@ -62,17 +59,25 @@ export class ValidationField extends FieldLabel {
     }
 
     setValidationResult(success: boolean | undefined) {
-        const required = this.options.mandatory ? "❗️" : "❔"
-        const repeatable = this.options.repeatable ? "🔢" : "1️⃣"
         const validationResult =
-            success === undefined ? "❔" : success ? "✅" : "❌"
-        this.setValue(required + repeatable + validationResult)
+            success === undefined ? "❔" : success ? "✅" : "⚠️"
+        this.setValue(validationResult)
+
+        if (success === undefined) {
+            this.setTooltip("Validation status is unknown")
+        } else if (success) {
+            this.setTooltip("Validation successful")
+        } else if (!success) {
+            this.setTooltip(
+                "Validation failed. Make sure a valid block is attached." +
+                    (this.options.mandatory
+                        ? " This property is mandatory and must be provided."
+                        : " This property is optional, so it can be deleted."),
+            )
+        }
     }
 
     dispose() {
-        if (this.wrapper_ && this.wrapper_.parentNode) {
-            this.wrapper_.parentNode.removeChild(this.wrapper_)
-        }
         super.dispose()
     }
 }

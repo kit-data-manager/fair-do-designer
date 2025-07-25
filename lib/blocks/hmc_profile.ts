@@ -93,8 +93,21 @@ export const profile_hmc: HMCBlock = {
         ]
         if (isRepeatable) typeCheck.push("Array")
 
-        const input = this.appendValueInput(property.name)
-            .appendField(property.name)
+        const input = this.appendValueInput(property.name).appendField(
+            property.name,
+        )
+
+        if (details.obligation === "Optional") {
+            input.appendField(
+                new FieldButton(
+                    "✖️",
+                    () => this.removeFieldForProperty(propertyName),
+                    { tooltip: "Click to remove this property" },
+                ),
+            )
+        }
+
+        input
             .appendField(
                 new ValidationField({
                     mandatory: details.obligation == "Mandatory",
@@ -104,14 +117,6 @@ export const profile_hmc: HMCBlock = {
             )
             .setCheck(typeCheck)
             .setAlign(1)
-
-        if (details.obligation === "Optional") {
-            input.appendField(
-                new FieldButton("X", () =>
-                    this.removeFieldForProperty(propertyName),
-                ),
-            )
-        }
     },
 
     removeFieldForProperty(propertyName: string) {
