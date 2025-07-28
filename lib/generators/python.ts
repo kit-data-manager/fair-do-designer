@@ -171,16 +171,23 @@ forBlock["transform_string"] = function <T extends Util.FairDoCodeGenerator>(
 }
 
 const jsonpathCall = (path: string) =>
-    `jsonpath.findall("${path}", current_source_json)`
+    `jsonpath.findall(${path}, current_source_json)`
 
 forBlock["input_jsonpath"] = function (block: Blockly.Block) {
     const value_input = block.getFieldValue("QUERY")
     return [jsonpathCall(value_input), Order.ATOMIC]
 }
 
-forBlock["input_custom_json"] = function (block: Blockly.Block) {
-    const value_block = block.getInputTargetBlock("QUERY")
-    return [jsonpathCall(value_block?.getFieldValue("TEXT")), Order.ATOMIC]
+forBlock["input_custom_json"] = function <T extends Util.FairDoCodeGenerator>(
+    block: Blockly.Block,
+    generator: T,
+) {
+    const value_block = generator.valueToCode(
+        block,
+        "QUERY",
+        Order.ATOMIC
+    )
+    return [jsonpathCall(value_block), Order.ATOMIC]
 }
 
 // Type guard for HmcBlock interface
