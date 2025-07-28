@@ -1,7 +1,8 @@
 import * as Blockly from "blockly"
 import { ValidationField } from "../fields/ValidationField"
 import * as HMCProfile from "./profiles/HMC.json"
-import { FieldButton } from "../fields/FieldButton"
+import { FieldImage } from "blockly"
+import { camelToTitleCase } from "../utils"
 
 export interface HMCBlock extends Blockly.BlockSvg {
     profile: typeof HMCProfile
@@ -31,7 +32,7 @@ export const profile_hmc: HMCBlock = {
         this.profileAttributeKey = extractProfileAttributeKey(this)
 
         this.appendDummyInput("0").appendField(
-            `Profile "Helmholtz KIP" with Validation`,
+            camelToTitleCase(this.profile.name),
         )
 
         for (const property of this.profile.properties) {
@@ -40,33 +41,34 @@ export const profile_hmc: HMCBlock = {
             this.addFieldForProperty(property.name)
         }
 
+        const optionalPropertiesSelector = new Blockly.FieldDropdown([
+            ["-- Add Property --", "ADD"] as [string, string],
+            ...this.profile.properties
+                .filter(
+                    (property) => property.representationsAndSemantics[0]
+                        .obligation === "Optional"
+                )
+                .map(
+                    (property) => [camelToTitleCase(property.name), property.name] as [
+                        string,
+                        string
+                    ]
+                ),
+        ]);
+        optionalPropertiesSelector.setTooltip("Adds optional properties of this profile to your record.")
+
         this.appendDummyInput("DUMMY-DROPDOWN")
             .appendField(
-                new Blockly.FieldDropdown([
-                    ["-- Add Property --", "ADD"] as [string, string],
-                    ...this.profile.properties
-                        .filter(
-                            (property) =>
-                                property.representationsAndSemantics[0]
-                                    .obligation === "Optional",
-                        )
-                        .map(
-                            (property) =>
-                                [property.name, property.name] as [
-                                    string,
-                                    string,
-                                ],
-                        ),
-                ]),
+                optionalPropertiesSelector,
                 "DROPDOWN",
             )
             .setAlign(0)
 
         this.setInputsInline(false)
-        this.setTooltip("Tooltip")
+        this.setTooltip(this.profile.name + ": " + this.profile.description)
         this.setPreviousStatement(true, null)
         this.setNextStatement(true, null)
-        this.setHelpUrl("")
+        this.setHelpUrl("https://hdl.handle.net/" + this.profile.identifier)
         this.setColour(230)
     },
 
@@ -93,8 +95,26 @@ export const profile_hmc: HMCBlock = {
         ]
         if (isRepeatable) typeCheck.push("Array")
 
+        const nameLabel = new Blockly.FieldLabel(camelToTitleCase(property.name))
+        nameLabel.setTooltip(property.name + " / " + property.identifier)
+
         const input = this.appendValueInput(property.name)
-            .appendField(property.name)
+            .appendField(nameLabel)
+
+        if (details.obligation === "Optional") {
+            const tooltip = "Click to remove this property"
+            const image = new FieldImage(
+                "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXRyYXNoMi1pY29uIGx1Y2lkZS10cmFzaC0yIj48cGF0aCBkPSJNMTAgMTF2NiIvPjxwYXRoIGQ9Ik0xNCAxMXY2Ii8+PHBhdGggZD0iTTE5IDZ2MTRhMiAyIDAgMCAxLTIgMkg3YTIgMiAwIDAgMS0yLTJWNiIvPjxwYXRoIGQ9Ik0zIDZoMTgiLz48cGF0aCBkPSJNOCA2VjRhMiAyIDAgMCAxIDItMmg0YTIgMiAwIDAgMSAyIDJ2MiIvPjwvc3ZnPg==",
+                16,
+                16,
+                tooltip,
+                () => this.removeFieldForProperty(propertyName),
+            );
+            image.setTooltip(tooltip)
+            input.appendField(image, "trash_icon")
+        }
+
+        input
             .appendField(
                 new ValidationField({
                     mandatory: details.obligation == "Mandatory",
@@ -104,14 +124,6 @@ export const profile_hmc: HMCBlock = {
             )
             .setCheck(typeCheck)
             .setAlign(1)
-
-        if (details.obligation === "Optional") {
-            input.appendField(
-                new FieldButton("X", () =>
-                    this.removeFieldForProperty(propertyName),
-                ),
-            )
-        }
     },
 
     removeFieldForProperty(propertyName: string) {

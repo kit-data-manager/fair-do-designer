@@ -1,16 +1,16 @@
-import { Block, FieldLabel } from "blockly"
+import { Block, FieldImage } from "blockly"
+import { CheckIcon, CircleDashedIcon, TriangleAlertIcon } from "@/lib/icons"
 
 export interface ValidationFieldOptions {
     mandatory?: boolean
     repeatable?: boolean
 }
 
-export class ValidationField extends FieldLabel {
-    wrapper_: HTMLElement | null = null
+export class ValidationField extends FieldImage {
     options: ValidationFieldOptions
 
     constructor(opts: ValidationFieldOptions) {
-        super("❔")
+        super(CircleDashedIcon, 16, 16)
 
         this.options = opts
     }
@@ -18,13 +18,13 @@ export class ValidationField extends FieldLabel {
     initView() {
         super.initView()
 
+        this.imageElement?.classList.add("base-icon")
+
         this.setValidationResult(undefined)
-        this.wrapper_ = document.createElement("foreignObject")
     }
 
     protected render_() {
         super.render_()
-        if (this.wrapper_) this.textElement_?.append(this.wrapper_)
     }
 
     forceCheck() {
@@ -66,17 +66,28 @@ export class ValidationField extends FieldLabel {
     }
 
     setValidationResult(success: boolean | undefined) {
-        const required = this.options.mandatory ? "❗️" : "❔"
-        const repeatable = this.options.repeatable ? "🔢" : "1️⃣"
-        const validationResult =
-            success === undefined ? "❔" : success ? "✅" : "❌"
-        this.setValue(required + repeatable + validationResult)
+        if (success === undefined) {
+            this.setValue(CircleDashedIcon)
+            this.setTooltip("Validation status is unknown")
+        } else if (success) {
+            this.imageElement?.classList.add("green-icon")
+            this.imageElement?.classList.remove("yellow-icon")
+            this.setValue(CheckIcon)
+            this.setTooltip("Validation successful")
+        } else if (!success) {
+            this.imageElement?.classList.remove("green-icon")
+            this.imageElement?.classList.add("yellow-icon")
+            this.setValue(TriangleAlertIcon)
+            this.setTooltip(
+                "Validation failed. Make sure a valid block is attached." +
+                    (this.options.mandatory
+                        ? " This property is mandatory and must be provided."
+                        : " This property is optional, so it can be deleted."),
+            )
+        }
     }
 
     dispose() {
-        if (this.wrapper_ && this.wrapper_.parentNode) {
-            this.wrapper_.parentNode.removeChild(this.wrapper_)
-        }
         super.dispose()
     }
 }
