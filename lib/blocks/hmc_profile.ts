@@ -2,6 +2,7 @@ import * as Blockly from "blockly"
 import { ValidationField } from "../fields/ValidationField"
 import * as HMCProfile from "./profiles/HMC.json"
 import { FieldImage } from "blockly"
+import { camelToTitleCase } from "../utils"
 
 export interface HMCBlock extends Blockly.BlockSvg {
     profile: typeof HMCProfile
@@ -31,7 +32,7 @@ export const profile_hmc: HMCBlock = {
         this.profileAttributeKey = extractProfileAttributeKey(this)
 
         this.appendDummyInput("0").appendField(
-            `Profile "Helmholtz KIP" with Validation`,
+            camelToTitleCase(this.profile.name),
         )
 
         for (const property of this.profile.properties) {
@@ -41,18 +42,18 @@ export const profile_hmc: HMCBlock = {
         }
 
         let optionalPropertiesSelector = new Blockly.FieldDropdown([
-                    ["-- Add Property --", "ADD"] as [string, string],
-                    ...this.profile.properties
-                        .filter(
+            ["-- Add Property --", "ADD"] as [string, string],
+            ...this.profile.properties
+                .filter(
                     (property) => property.representationsAndSemantics[0]
                         .obligation === "Optional"
-                        )
-                        .map(
+                )
+                .map(
                     (property) => [camelToTitleCase(property.name), property.name] as [
-                                    string,
+                        string,
                         string
                     ]
-                        ),
+                ),
         ]);
         optionalPropertiesSelector.setTooltip("Adds optional properties of this profile to your record.")
 
@@ -64,7 +65,7 @@ export const profile_hmc: HMCBlock = {
             .setAlign(0)
 
         this.setInputsInline(false)
-        this.setTooltip(this.profile.description)
+        this.setTooltip(this.profile.name + ": " + this.profile.description)
         this.setPreviousStatement(true, null)
         this.setNextStatement(true, null)
         this.setHelpUrl("https://hdl.handle.net/" + this.profile.identifier)
@@ -94,18 +95,20 @@ export const profile_hmc: HMCBlock = {
         ]
         if (isRepeatable) typeCheck.push("Array")
 
-        const input = this.appendValueInput(property.name).appendField(
-            property.name,
-        )
+        let nameLabel = new Blockly.FieldLabel(camelToTitleCase(property.name))
+        nameLabel.setTooltip(property.name + " / " + property.identifier)
+
+        const input = this.appendValueInput(property.name)
+            .appendField(nameLabel)
 
         if (details.obligation === "Optional") {
             const tooltip = "Click to remove this property"
             let image = new FieldImage(
-                    "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXRyYXNoMi1pY29uIGx1Y2lkZS10cmFzaC0yIj48cGF0aCBkPSJNMTAgMTF2NiIvPjxwYXRoIGQ9Ik0xNCAxMXY2Ii8+PHBhdGggZD0iTTE5IDZ2MTRhMiAyIDAgMCAxLTIgMkg3YTIgMiAwIDAgMS0yLTJWNiIvPjxwYXRoIGQ9Ik0zIDZoMTgiLz48cGF0aCBkPSJNOCA2VjRhMiAyIDAgMCAxIDItMmg0YTIgMiAwIDAgMSAyIDJ2MiIvPjwvc3ZnPg==",
-                    16,
-                    16,
+                "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXRyYXNoMi1pY29uIGx1Y2lkZS10cmFzaC0yIj48cGF0aCBkPSJNMTAgMTF2NiIvPjxwYXRoIGQ9Ik0xNCAxMXY2Ii8+PHBhdGggZD0iTTE5IDZ2MTRhMiAyIDAgMCAxLTIgMkg3YTIgMiAwIDAgMS0yLTJWNiIvPjxwYXRoIGQ9Ik0zIDZoMTgiLz48cGF0aCBkPSJNOCA2VjRhMiAyIDAgMCAxIDItMmg0YTIgMiAwIDAgMSAyIDJ2MiIvPjwvc3ZnPg==",
+                16,
+                16,
                 tooltip,
-                    () => this.removeFieldForProperty(propertyName),
+                () => this.removeFieldForProperty(propertyName),
             );
             image.setTooltip(tooltip)
             input.appendField(image, "trash_icon")
