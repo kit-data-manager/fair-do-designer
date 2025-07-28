@@ -63,10 +63,10 @@ export const profile_hmc: HMCBlock = {
             .setAlign(0)
 
         this.setInputsInline(false)
-        this.setTooltip("Tooltip")
+        this.setTooltip(this.profile.description)
         this.setPreviousStatement(true, null)
         this.setNextStatement(true, null)
-        this.setHelpUrl("")
+        this.setHelpUrl("https://hdl.handle.net/" + this.profile.identifier)
         this.setColour(230)
     },
 
