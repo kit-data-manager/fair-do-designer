@@ -41,7 +41,7 @@ export const profile_hmc: HMCBlock = {
             this.addFieldForProperty(property.name)
         }
 
-        let optionalPropertiesSelector = new Blockly.FieldDropdown([
+        const optionalPropertiesSelector = new Blockly.FieldDropdown([
             ["-- Add Property --", "ADD"] as [string, string],
             ...this.profile.properties
                 .filter(
@@ -95,7 +95,7 @@ export const profile_hmc: HMCBlock = {
         ]
         if (isRepeatable) typeCheck.push("Array")
 
-        let nameLabel = new Blockly.FieldLabel(camelToTitleCase(property.name))
+        const nameLabel = new Blockly.FieldLabel(camelToTitleCase(property.name))
         nameLabel.setTooltip(property.name + " / " + property.identifier)
 
         const input = this.appendValueInput(property.name)
@@ -103,7 +103,7 @@ export const profile_hmc: HMCBlock = {
 
         if (details.obligation === "Optional") {
             const tooltip = "Click to remove this property"
-            let image = new FieldImage(
+            const image = new FieldImage(
                 "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXRyYXNoMi1pY29uIGx1Y2lkZS10cmFzaC0yIj48cGF0aCBkPSJNMTAgMTF2NiIvPjxwYXRoIGQ9Ik0xNCAxMXY2Ii8+PHBhdGggZD0iTTE5IDZ2MTRhMiAyIDAgMCAxLTIgMkg3YTIgMiAwIDAgMS0yLTJWNiIvPjxwYXRoIGQ9Ik0zIDZoMTgiLz48cGF0aCBkPSJNOCA2VjRhMiAyIDAgMCAxIDItMmg0YTIgMiAwIDAgMSAyIDJ2MiIvPjwvc3ZnPg==",
                 16,
                 16,
