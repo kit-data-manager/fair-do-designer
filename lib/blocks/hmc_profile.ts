@@ -40,24 +40,25 @@ export const profile_hmc: HMCBlock = {
             this.addFieldForProperty(property.name)
         }
 
-        this.appendDummyInput("DUMMY-DROPDOWN")
-            .appendField(
-                new Blockly.FieldDropdown([
+        let optionalPropertiesSelector = new Blockly.FieldDropdown([
                     ["-- Add Property --", "ADD"] as [string, string],
                     ...this.profile.properties
                         .filter(
-                            (property) =>
-                                property.representationsAndSemantics[0]
-                                    .obligation === "Optional",
+                    (property) => property.representationsAndSemantics[0]
+                        .obligation === "Optional"
                         )
                         .map(
-                            (property) =>
-                                [property.name, property.name] as [
+                    (property) => [camelToTitleCase(property.name), property.name] as [
                                     string,
-                                    string,
-                                ],
+                        string
+                    ]
                         ),
-                ]),
+        ]);
+        optionalPropertiesSelector.setTooltip("Adds optional properties of this profile to your record.")
+
+        this.appendDummyInput("DUMMY-DROPDOWN")
+            .appendField(
+                optionalPropertiesSelector,
                 "DROPDOWN",
             )
             .setAlign(0)
