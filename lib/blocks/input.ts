@@ -1,6 +1,7 @@
 import * as Blockly from "blockly"
-import { FieldButton } from "../fields/FieldButton"
 import { FieldLabel } from "blockly"
+import { FileSearchIcon } from "@/lib/icons"
+import { FieldIcon } from "@/lib/fields/FieldIcon"
 
 export interface InputJsonPath extends Blockly.BlockSvg {
     findQueryProperty(): void
@@ -13,14 +14,16 @@ export const input_jsonpath: InputJsonPath = {
         const hiddenQueryField = new FieldLabel("JSON")
         hiddenQueryField.setVisible(false)
 
+        const icon = new FieldIcon(
+            FileSearchIcon,
+            this.findQueryProperty.bind(this),
+            { tooltip: "Highlight in Source Document" },
+        )
+
         this.appendDummyInput()
             .appendField("Read")
             .appendField("JSON", "DISPLAY_QUERY")
-            .appendField(
-                new FieldButton("🔍", this.findQueryProperty.bind(this), {
-                    tooltip: "Highlight in Source Document",
-                }),
-            )
+            .appendField(icon)
             .appendField(hiddenQueryField, "QUERY")
         this.setTooltip(
             "Read value from Source Document. Right-click for more.",

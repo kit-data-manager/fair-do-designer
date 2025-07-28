@@ -1,21 +1,24 @@
-import { Block, FieldLabel } from "blockly"
+import { Block, FieldImage } from "blockly"
+import { CheckIcon, CircleDashedIcon, TriangleAlertIcon } from "@/lib/icons"
 
 export interface ValidationFieldOptions {
     mandatory?: boolean
     repeatable?: boolean
 }
 
-export class ValidationField extends FieldLabel {
+export class ValidationField extends FieldImage {
     options: ValidationFieldOptions
 
     constructor(opts: ValidationFieldOptions) {
-        super("❔")
+        super(CircleDashedIcon, 16, 16)
 
         this.options = opts
     }
 
     initView() {
         super.initView()
+
+        this.imageElement?.classList.add("base-icon")
 
         this.setValidationResult(undefined)
     }
@@ -59,15 +62,18 @@ export class ValidationField extends FieldLabel {
     }
 
     setValidationResult(success: boolean | undefined) {
-        const validationResult =
-            success === undefined ? "❔" : success ? "✅" : "⚠️"
-        this.setValue(validationResult)
-
         if (success === undefined) {
+            this.setValue(CircleDashedIcon)
             this.setTooltip("Validation status is unknown")
         } else if (success) {
+            this.imageElement?.classList.add("green-icon")
+            this.imageElement?.classList.remove("yellow-icon")
+            this.setValue(CheckIcon)
             this.setTooltip("Validation successful")
         } else if (!success) {
+            this.imageElement?.classList.remove("green-icon")
+            this.imageElement?.classList.add("yellow-icon")
+            this.setValue(TriangleAlertIcon)
             this.setTooltip(
                 "Validation failed. Make sure a valid block is attached." +
                     (this.options.mandatory

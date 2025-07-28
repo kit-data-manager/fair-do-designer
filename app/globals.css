@@ -64,9 +64,25 @@ code {
   overflow: auto;
 }
 
-g > image[alt="Click to remove this property"] {
+g > image[alt="Click to remove this property"], g > image.base-icon {
   filter: invert(1);
   transform: translate(-1px, -1px);
+}
+
+g > image.blue-icon {
+  filter: invert(42%) sepia(75%) saturate(3246%) hue-rotate(204deg) brightness(100%) contrast(104%);
+}
+
+g > image.green-icon {
+  filter: invert(63%) sepia(44%) saturate(747%) hue-rotate(89deg) brightness(90%) contrast(93%);
+}
+
+g > image.yellow-icon {
+  filter: invert(82%) sepia(32%) saturate(6209%) hue-rotate(6deg) brightness(102%) contrast(94%);
+}
+
+g > image.red-icon {
+  filter: invert(35%) sepia(35%) saturate(7345%) hue-rotate(342deg) brightness(112%) contrast(88%);
 }
 
 #pageContainer {
