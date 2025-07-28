@@ -16,6 +16,7 @@ const nextConfig: NextConfig = {
         })
         return config
     },
+    basePath: process.env.BASE_PATH ?? undefined,
     output: "export",
 }
 
