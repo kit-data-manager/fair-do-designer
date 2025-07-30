@@ -18,22 +18,24 @@ export default function Home() {
     return (
         <div className="h-screen w-screen">
             <ResizablePanelGroup direction={"horizontal"}>
-                <ResizablePanel>
+                <ResizablePanel defaultSize={70}>
                     <div>
                         <Workspace />
                     </div>
                 </ResizablePanel>
                 <ResizableHandle />
-                <ResizablePanel>
+                <ResizablePanel defaultSize={30}>
                     <Tabs
                         className="max-h-full"
                         value={tab}
                         onValueChange={setTab}
                     >
                         <TabsList>
-                            <TabsTrigger value={"input"}><DatabaseIcon /> Data Access</TabsTrigger>
+                            <TabsTrigger value={"input"}>
+                                <DatabaseIcon /> Data Access
+                            </TabsTrigger>
                             <TabsTrigger value={"output"}>
-                               <CodeIcon />  Generated Code
+                                <CodeIcon /> Generated Code
                             </TabsTrigger>
                         </TabsList>
 

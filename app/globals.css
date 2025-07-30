@@ -64,6 +64,15 @@ code {
   overflow: auto;
 }
 
+g.blocklyDisabled g.blocklyLabelField text.blocklyText {
+  fill: rgb(40, 40, 40);
+}
+
+g > image[alt="Click to remove this property"] {
+  filter: invert(1);
+  transform: translate(-1px, -1px);
+}
+
 #pageContainer {
   display: flex;
   width: 100%;

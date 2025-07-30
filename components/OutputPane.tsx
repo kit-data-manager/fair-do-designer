@@ -58,16 +58,23 @@ export function OutputPane() {
                 setCopied(false)
             }, 1000)
         }
-
     }, [copy])
 
     return (
-        <div className="flex flex-col grow-0 max-w-full">
+        <div className="flex flex-col grow max-w-full">
             <div className="p-2 bg-muted w-full flex flex-wrap gap-2 shrink-0 items-center">
                 <Button variant="outline" onClick={copyCode}>
-                    {copied ? <><CheckIcon /> Copied</> : "Copy Code"}
+                    {copied ? (
+                        <>
+                            <CheckIcon /> Copied
+                        </>
+                    ) : (
+                        "Copy Code"
+                    )}
                 </Button>
-                <div className="p-1 text-muted-foreground">Language: Python</div>
+                <div className="p-1 text-muted-foreground">
+                    Language: Python
+                </div>
             </div>
             <pre className="overflow-auto p-2">
                 <code ref={codeBlock}></code>
