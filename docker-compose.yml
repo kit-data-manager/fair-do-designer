@@ -2,6 +2,9 @@ services:
   dev:
     container_name: fairdo-designer-dev
     image: node:23
+    # simulate deployment environment
+    environment:
+      BASE_PATH: "/fair-do-designer"
     ports:
       - 127.0.0.1:8080:3000
     volumes:
