@@ -23,7 +23,7 @@ export default function Home() {
                         <Workspace />
                     </div>
                 </ResizablePanel>
-                <ResizableHandle />
+                <ResizableHandle hitAreaMargins={{ fine: 5, coarse: 10 }} />
                 <ResizablePanel defaultSize={30}>
                     <Tabs
                         className="max-h-full"
