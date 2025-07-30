@@ -37,7 +37,7 @@ export function InputPane() {
     }, [])
 
     const loadExampleFiles = useCallback(async () => {
-        const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+        const basePath = process.env.NEXT_PUBLIC_BASE_PATH || ""
         const urls = [
             `${basePath}/demo/json/metadata.json`,
             `${basePath}/demo/json/metadata(1).json`,
@@ -69,8 +69,12 @@ export function InputPane() {
     const onJsonKeyClick = useCallback(
         (event: UnifiedDocumentCustomEvent<JSONKeyClickEvent>) => {
             if (!workspace) return
-            const block = workspace.newBlock("input_jsonpath")
             const query = event.detail.path
+            if (!query) {
+                console.error("Unexpected empty query", query)
+                return
+            }
+            const block = workspace.newBlock("input_jsonpath")
 
             if (
                 "updateQuery" in block &&
@@ -108,8 +112,6 @@ export function InputPane() {
             </div>
             <div className="min-h-0 overflow-x-auto pt-2">
                 <div className="min-h-0 h-full p-2 flex flex-col">
-
-
                     <input
                         type="file"
                         className="hidden"
@@ -120,8 +122,8 @@ export function InputPane() {
                     />
                     <div className="">
                         <div className="text-sm text-muted-foreground">
-                            Hint: Use drag-and-drop to place Data Access blocks in
-                            the workspace
+                            Hint: Use drag-and-drop to place Data Access blocks
+                            in the workspace
                         </div>
                         <UnifiedDocument
                             className={""}
