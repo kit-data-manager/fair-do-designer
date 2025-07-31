@@ -37,7 +37,7 @@ export function InputPane() {
     }, [])
 
     const loadExampleFiles = useCallback(async () => {
-        const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+        const basePath = process.env.NEXT_PUBLIC_BASE_PATH || ""
         const urls = [
             `${basePath}/demo/json/metadata.json`,
             `${basePath}/demo/json/metadata(1).json`,
@@ -69,8 +69,12 @@ export function InputPane() {
     const onJsonKeyClick = useCallback(
         (event: UnifiedDocumentCustomEvent<JSONKeyClickEvent>) => {
             if (!workspace) return
-            const block = workspace.newBlock("input_jsonpath")
             const query = event.detail.path
+            if (!query) {
+                console.error("Unexpected empty query", query)
+                return
+            }
+            const block = workspace.newBlock("input_jsonpath")
 
             if (
                 "updateQuery" in block &&
@@ -94,24 +98,20 @@ export function InputPane() {
     )
 
     return (
-        <div className="grow w-[800px] overflow-auto">
-            <div className="bg-muted p-2">
-                <h4 className="font-bold">Data Access</h4>
+        <div className="min-h-0 w-full justify-stretch flex flex-col">
+            <div className="p-2 bg-muted w-full flex flex-wrap gap-2">
+                <Button variant="outline" onClick={uploadFiles}>
+                    Upload files
+                </Button>
+                <Button variant="outline" onClick={loadExampleFiles}>
+                    Add example files
+                </Button>
+                <Button variant="outline" onClick={reset}>
+                    Reset
+                </Button>
             </div>
-            <div className="p-2">
-                <div className="">
-                    <div className="flex gap-2 mb-2">
-                        <Button variant="outline" onClick={uploadFiles}>
-                            Upload files
-                        </Button>
-                        <Button variant="outline" onClick={loadExampleFiles}>
-                            Add example files
-                        </Button>
-                        <Button variant="outline" onClick={reset}>
-                            Reset
-                        </Button>
-                    </div>
-
+            <div className="min-h-0 overflow-x-auto pt-2">
+                <div className="min-h-0 h-full p-2 flex flex-col">
                     <input
                         type="file"
                         className="hidden"
@@ -120,14 +120,17 @@ export function InputPane() {
                         ref={uploadInputRef}
                         onChange={onUploadInputChange}
                     />
-                    <div className="text-sm text-muted-foreground">
-                        Hint: Use drag-and-drop to place Data Access blocks in
-                        the workspace
+                    <div className="">
+                        <div className="text-sm text-muted-foreground">
+                            Hint: Use drag-and-drop to place Data Access blocks
+                            in the workspace
+                        </div>
+                        <UnifiedDocument
+                            className={""}
+                            ref={unifiedDocument}
+                            onJsonKeyClick={onJsonKeyClick}
+                        />
                     </div>
-                    <UnifiedDocument
-                        ref={unifiedDocument}
-                        onJsonKeyClick={onJsonKeyClick}
-                    />
                 </div>
             </div>
         </div>

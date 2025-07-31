@@ -5,23 +5,22 @@ import { RecordMappingGenerator } from "@/lib/generators/python"
 import { useStore } from "zustand/react"
 import { workspaceStore } from "@/lib/stores/workspace"
 import * as Blockly from "blockly"
+import { Button } from "@/components/ui/button"
+import { useCopyToClipboard } from "usehooks-ts"
+import { CheckIcon } from "lucide-react"
 
 /**
  * Runs the code generator and shows the result
  * @constructor
  */
 export function OutputPane() {
-    const [open, setOpen] = useState(false)
     const workspace = useStore(workspaceStore, (s) => s.workspace)
+    const [, copy] = useCopyToClipboard()
 
     const codeBlock = useRef<HTMLElement>(null)
     const codeGenerator = useRef(
         new RecordMappingGenerator("PidRecordMappingPython"),
     )
-
-    const toggleOpen = useCallback(() => {
-        setOpen((o) => !o)
-    }, [])
 
     const generateCode = useCallback(() => {
         if (!workspace) return
@@ -47,20 +46,39 @@ export function OutputPane() {
         })
     }, [generateCode, workspace])
 
+    const [copied, setCopied] = useState(false)
+    const copiedTimeoutRef = useRef<number>(null)
+    const copyCode = useCallback(() => {
+        if (codeBlock.current) {
+            if (copiedTimeoutRef.current) clearTimeout(copiedTimeoutRef.current)
+            copy(codeBlock.current.innerText).then()
+            setCopied(true)
+
+            copiedTimeoutRef.current = window.setTimeout(() => {
+                setCopied(false)
+            }, 1000)
+        }
+    }, [copy])
+
     return (
-        <>
-            <div id="outputPane" className={`${open ? "flex" : "hidden"}`}>
-                <pre id="generatedCode">
-                    <code ref={codeBlock}></code>
-                </pre>
+        <div className="flex flex-col grow max-w-full">
+            <div className="p-2 bg-muted w-full flex flex-wrap gap-2 shrink-0 items-center">
+                <Button variant="outline" onClick={copyCode}>
+                    {copied ? (
+                        <>
+                            <CheckIcon /> Copied
+                        </>
+                    ) : (
+                        "Copy Code"
+                    )}
+                </Button>
+                <div className="p-1 text-muted-foreground">
+                    Language: Python
+                </div>
             </div>
-            <button
-                id="collapseOutputPaneBtn"
-                onClick={toggleOpen}
-                title={`${open ? "Hide" : "Show"} output pane`}
-            >
-                {open ? "Hide" : "Show"} output pane
-            </button>
-        </>
+            <pre className="overflow-auto p-2">
+                <code ref={codeBlock}></code>
+            </pre>
+        </div>
     )
 }

@@ -92,46 +92,6 @@ g > image.red-icon {
   height: 100vh;
 }
 
-#blocklyDiv {
-  flex-basis: 100%;
-  height: 100%;
-  min-width: 600px;
-}
-
-#outputPane {
-  flex-direction: column;
-  width: 400px;
-  flex: 0 0 400px;
-  overflow: auto;
-  padding: 0.5rem;
-  background: rgb(247, 240, 228);
-}
-
-#collapseOutputPaneBtn {
-  width: 1em;
-  height: 100vh;
-  margin: auto 1px;
-  padding: 0.6em;
-  background: rgb(247, 240, 228);
-  border-radius: 0 6px 6px 0;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1em;
-  writing-mode: sideways-lr;
-  text-align: center;
-}
-
-#generatedCode {
-  height: 100vh;
-  background-color: rgb(247, 240, 228);
-}
-
-#output {
-  height: 50%;
-}
-
 .jsonPicker {
   overflow: scroll;
 }
