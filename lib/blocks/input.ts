@@ -30,7 +30,7 @@ export const input_jsonpath: InputJsonPath = {
         )
         this.setHelpUrl("")
         this.setOutput(true, null)
-        this.setColour(230)
+        this.setColour(210)
     },
 
     customContextMenu(menu) {
@@ -99,15 +99,15 @@ export const input_custom_json: Blockly.BlockSvg = {
         this.appendValueInput("QUERY")
             .setCheck("String")
             .appendField(
-                new Blockly.FieldLabelSerializable("JSON Query"),
+                new Blockly.FieldLabelSerializable("Custom Query"),
                 "NAME",
             )
         this.setInputsInline(true)
         this.setOutput(true, "JSON")
         this.setTooltip(
-            "Execute a custom JSON Query against the current Source Document",
+            "Execute a custom jsonpath query against the current Source Document",
         )
         this.setHelpUrl("")
-        this.setColour(315)
+        this.setColour(210)
     },
 }
