@@ -13,7 +13,7 @@ export const stop_design = {
             "Throws an error and stops the execution of the design. No PID will be created. Use for irreparable situations which you do not expect to happen.",
         )
         this.setHelpUrl("")
-        this.setColour(345)
+        this.setColour(360)
     },
 } as Blockly.Block
 
@@ -29,7 +29,7 @@ export const log_value = {
             "Print given information and continue. Continues in any case (no cancellation)!",
         )
         this.setHelpUrl("")
-        this.setColour(0)
+        this.setColour(160)
     },
 } as Blockly.Block
 

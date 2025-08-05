@@ -17,8 +17,8 @@ export const toolbox = {
     contents: [
         {
             kind: "category",
-            name: "Profiles",
-            categorystyle: "procedure_category",
+            name: "Records & Profiles",
+            colour: 230,
             contents: [
                 {
                     kind: "block",
@@ -40,45 +40,15 @@ export const toolbox = {
         },
         {
             kind: "category",
-            name: "Data Access",
-            categorystyle: "procedure_category",
-            contents: [
-                {
-                    kind: "label",
-                    text: "For Expert use",
-                },
-                {
-                    kind: "block",
-                    type: "input_custom_json",
-                    inputs: {
-                        QUERY: {
-                            shadow: {
-                                type: "text",
-                                fields: {
-                                    TEXT: "JSON.property",
-                                },
-                            },
-                        },
-                    },
-                },
-                {
-                    kind: "button",
-                    text: "Help",
-                    callbackKey: "dataAccessToolboxHelp",
-                },
-            ],
+            name: "Automatic backlinks",
+            colour: 120,
+            custom: "BACKLINKS",
         },
         {
             kind: "category",
             name: "Checks and Errors",
-            categorystyle: "procedure_category",
+            colour: "gray",
             custom: "ERRORS",
-        },
-        {
-            kind: "category",
-            name: "Automatic backlinks",
-            categorystyle: "procedure_category",
-            custom: "BACKLINKS",
         },
         {
             kind: "sep",
@@ -115,6 +85,10 @@ export const toolbox = {
                 {
                     kind: "block",
                     type: "logic_ternary",
+                },
+                {
+                    kind: "block",
+                    type: "otherwise",
                 },
             ],
         },
@@ -398,6 +372,10 @@ export const toolbox = {
                 },
                 {
                     kind: "block",
+                    type: "log_value",
+                },
+                {
+                    kind: "block",
                     type: "text_join",
                 },
                 {
@@ -678,6 +656,36 @@ export const toolbox = {
             name: "Functions",
             categorystyle: "procedure_category",
             custom: "PROCEDURE",
+        },
+        {
+            kind: "category",
+            name: "Data Access",
+            colour: 280,
+            contents: [
+                {
+                    kind: "label",
+                    text: "For Expert use",
+                },
+                {
+                    kind: "block",
+                    type: "input_custom_json",
+                    inputs: {
+                        QUERY: {
+                            shadow: {
+                                type: "text",
+                                fields: {
+                                    TEXT: "$.customProperty",
+                                },
+                            },
+                        },
+                    },
+                },
+                {
+                    kind: "button",
+                    text: "Help",
+                    callbackKey: "dataAccessToolboxHelp",
+                },
+            ],
         },
     ],
 }

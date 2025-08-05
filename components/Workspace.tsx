@@ -40,6 +40,7 @@ export function Workspace() {
         const workspace = Blockly.inject(divRef.current, {
             rtl: false,
             toolbox,
+            renderer: "thrasos",
             grid: { spacing: 20, length: 3, colour: "#ccc", snap: true },
             plugins: {
                 connectionPreviewer: BlockDynamicConnection.decoratePreviewer(
@@ -56,7 +57,7 @@ export function Workspace() {
 
         workspace.registerButtonCallback("dataAccessToolboxHelp", () => {
             alert(
-                "Use the Data Access tab on the right side to create Data Access blocks by clicking or drag-and-drop",
+                "Use the Data Access tab on the right side to create Data Access blocks by clicking or dragging-and-dropping JSON keys",
             )
         })
 

@@ -45,23 +45,24 @@ export const profile_hmc: HMCBlock = {
             ["-- Add Property --", "ADD"] as [string, string],
             ...this.profile.properties
                 .filter(
-                    (property) => property.representationsAndSemantics[0]
-                        .obligation === "Optional"
+                    (property) =>
+                        property.representationsAndSemantics[0].obligation ===
+                        "Optional",
                 )
                 .map(
-                    (property) => [camelToTitleCase(property.name), property.name] as [
-                        string,
-                        string
-                    ]
+                    (property) =>
+                        [camelToTitleCase(property.name), property.name] as [
+                            string,
+                            string,
+                        ],
                 ),
-        ]);
-        optionalPropertiesSelector.setTooltip("Adds optional properties of this profile to your record.")
+        ])
+        optionalPropertiesSelector.setTooltip(
+            "Adds optional properties of this profile to your record.",
+        )
 
         this.appendDummyInput("DUMMY-DROPDOWN")
-            .appendField(
-                optionalPropertiesSelector,
-                "DROPDOWN",
-            )
+            .appendField(optionalPropertiesSelector, "DROPDOWN")
             .setAlign(0)
 
         this.setInputsInline(false)
@@ -95,11 +96,14 @@ export const profile_hmc: HMCBlock = {
         ]
         if (isRepeatable) typeCheck.push("Array")
 
-        const nameLabel = new Blockly.FieldLabel(camelToTitleCase(property.name))
+        const nameLabel = new Blockly.FieldLabel(
+            camelToTitleCase(property.name),
+        )
         nameLabel.setTooltip(property.name + " / " + property.identifier)
 
-        const input = this.appendValueInput(property.name)
-            .appendField(nameLabel)
+        const input = this.appendValueInput(property.name).appendField(
+            nameLabel,
+        )
 
         if (details.obligation === "Optional") {
             const tooltip = "Click to remove this property"
@@ -109,7 +113,7 @@ export const profile_hmc: HMCBlock = {
                 16,
                 tooltip,
                 () => this.removeFieldForProperty(propertyName),
-            );
+            )
             image.setTooltip(tooltip)
             input.appendField(image, "trash_icon")
         }
@@ -180,7 +184,7 @@ export const profile_hmc: HMCBlock = {
                     `References an attribute key which appears in ${profileName}.`,
                 )
                 this.setHelpUrl("")
-                this.setColour(225)
+                this.setColour(120)
             },
         } as Blockly.Block
     },
