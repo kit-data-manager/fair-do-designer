@@ -38,7 +38,7 @@ for sender_id in RECORD_GRAPH:
         receiver.addAttribute(reaction.backward_link_type, sender_id)
 
 #---8<---send-graph-to-typed-pid-maker---8<---
-from pytypid import PIDManagementApi, SimpleRecord as ApiRecord, BatchRecordResponse
+from pytypid import SimpleRecord as ApiRecord, BatchRecordResponse
 import pytypid_generated_client
 import os
 
@@ -56,7 +56,6 @@ with pytypid_generated_client.ApiClient(configuration) as api_client:
     dryrun = False
 
     try:
-        # Create a new PID record
         api_response: BatchRecordResponse = api.create_pids(pid_record=graph_for_api, dryrun=dryrun)
 
         # Define folder where we will store the mapping from local IDs to real PIDs

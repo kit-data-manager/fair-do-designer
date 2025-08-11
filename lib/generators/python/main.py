@@ -1,7 +1,7 @@
 import sys
 from typing import Dict, Set, List, Tuple, Callable, TypeVar, Any, Sequence, Mapping
 # unused, but required by user generated code:
-import jsonpath # type: ignore
+import jsonpath # pyright: ignore[reportUnusedImport]
 
 Primitive = str | bool | int | float
 # ---Types-for-designs------------------------------------------- #
