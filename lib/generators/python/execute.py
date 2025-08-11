@@ -37,4 +37,39 @@ for sender_id in RECORD_GRAPH:
         receiver: PidRecord = RECORD_GRAPH[reaction.receiver]
         receiver.addAttribute(reaction.backward_link_type, sender_id)
 
-# TODO send record graph to typed pid maker instance
+#---8<---send-graph-to-typed-pid-maker---8<---
+from pytypid import PIDManagementApi, SimpleRecord as ApiRecord, BatchRecordResponse
+import pytypid_generated_client
+import os
+
+configuration = pytypid_generated_client.Configuration(
+    host = "http://typed-pid-maker.datamanager.kit.edu/preview"
+)
+
+with pytypid_generated_client.ApiClient(configuration) as api_client:
+    api = pytypid_generated_client.PIDManagementApi(api_client)
+    graph_for_api: List[pytypid_generated_client.PIDRecord] = []
+    for record in RECORD_GRAPH.values():
+        maybe_api_record = ApiRecord.from_dict(record.toSimpleJSON())
+        if maybe_api_record:
+            graph_for_api.append(maybe_api_record.to_record())
+    dryrun = False
+
+    try:
+        # Create a new PID record
+        api_response: BatchRecordResponse = api.create_pids(pid_record=graph_for_api, dryrun=dryrun)
+
+        # Define folder where we will store the mapping from local IDs to real PIDs
+        # This is important information for updating the graph later on
+        save_folder = os.path.dirname(os.path.abspath(__file__))
+        if not len(graph_for_api) == len(RECORD_GRAPH) \
+            or (not api_response.mapping is None and not len(graph_for_api) == len(api_response.mapping)):
+            print("Error: The number of records does not match the number of mappings.")
+        if api_response.mapping:
+            # save mapping to folder as "mappings.json"
+            with open(os.path.join(save_folder, "mappings.json"), "w") as f:
+                json.dump(api_response.mapping, f)
+        else:
+            print("Error: No mapping received from API.")
+    except Exception as e:
+        print("Exception when calling PIDManagementApi->create_pid: %s\n" % e)
