@@ -55,13 +55,13 @@ with pytypid_generated_client.ApiClient(configuration) as api_client:
     graph_for_api: List[pytypid_generated_client.PIDRecord] = []
     for record in RECORD_GRAPH.values():
         maybe_api_record = ApiRecord.from_dict(record.toSimpleJSON())
-        print("Adding record to API graph:", maybe_api_record)
         if maybe_api_record:
             graph_for_api.append(maybe_api_record.to_record())
     dryrun = False
 
     try:
         api_response: BatchRecordResponse = api.create_pids(pid_record=graph_for_api, dryrun=dryrun)
+        print("------ Successful response from API ---")
 
         # Define folder where we will store the mapping from local IDs to real PIDs
         # This is important information for updating the graph later on
@@ -75,5 +75,11 @@ with pytypid_generated_client.ApiClient(configuration) as api_client:
                 json.dump(api_response.mapping, f)
         else:
             print("Error: No mapping received from API.")
+
+        with open(os.path.join(save_folder, "api_response.json"), "w") as f:
+            json.dump(api_response.model_dump(by_alias=True), f, indent=2)
+            print("Saved mappings to", os.path.join(save_folder, "mappings.json"))
+            print("Saved API response to", os.path.join(save_folder, "api_response.json"))
+            print("Done.")
     except Exception as e:
         print("Exception when calling PIDManagementApi->create_pid: %s\n" % e)
