@@ -11,6 +11,8 @@ RECORD_GRAPH: Dict[str, PidRecord] = {}
 # Condition(forward_link_type, receiver_id) => Reaction(receiver_id, backward_link_type)
 INFERENCE_MATCHES_DB: InferenceRules = {}
 
+print("Amount of designs:", len(RECORD_DESIGNS))
+
 for design in RECORD_DESIGNS:
     while True:
         input_file = INPUT.nextInputFile()
@@ -20,9 +22,11 @@ for design in RECORD_DESIGNS:
         with open(input_file, 'r') as file:
             print("Processing input file", input_file)
             json_data: JsonType = json.load(file)
+            assert len(json_data) > 0, "JSON file is empty or not valid."
             sender: PidRecord
             inference_rules: InferenceRules
             sender, inference_rules = design.apply(json_data)
+            print("Created record:", sender.getId())
             RECORD_GRAPH[sender.getId()] = sender
             # merge rules into DB
             INFERENCE_MATCHES_DB.update(inference_rules)
@@ -51,6 +55,7 @@ with pytypid_generated_client.ApiClient(configuration) as api_client:
     graph_for_api: List[pytypid_generated_client.PIDRecord] = []
     for record in RECORD_GRAPH.values():
         maybe_api_record = ApiRecord.from_dict(record.toSimpleJSON())
+        print("Adding record to API graph:", maybe_api_record)
         if maybe_api_record:
             graph_for_api.append(maybe_api_record.to_record())
     dryrun = False
