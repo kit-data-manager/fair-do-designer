@@ -79,9 +79,14 @@ class PidRecord:
         return tuple in self._tuples
         
     def toSimpleJSON(self):
-        result: Dict[str, Any] = {"entries": list(self._tuples)}
+        result: Dict[str, Any] = {"record": [{"key": key, "value": value} for (key, value) in self._tuples]}
         if self._pid and self._pid != "":
             result["pid"] = self._pid
+        else:
+            # if no pid is set, we use the id as pid,
+            # so the Typed PID Maker can use the local identifier
+            # to connect the different records
+            result["pid"] = self._id
         return result
 
 class RecordDesign:
