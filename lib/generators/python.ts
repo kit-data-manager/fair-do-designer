@@ -101,7 +101,7 @@ forBlock["pidrecord"] = function <T extends Util.FairDoCodeGenerator>(
     let code = generator.makeLineComment(`${block.type}`)
     code += `RECORD_DESIGNS.append( RecordDesign()\n`
     code += generator.prefixNonemptyLines(
-        generator.makeSetIDChainCall(`str(${value_localid})[0]`),
+        generator.makeSetIDChainCall(`str(${value_localid}[0])`),
         generator.INDENT,
     )
     code += statement_record
