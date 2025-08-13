@@ -101,7 +101,7 @@ class RecordDesign:
         # key -> lambda: value
         self._attributes: Dict[str, List[Eval[Any]]] = dict()
         # Set of (forward_link_type, backward_link_type)
-        self._backlinks: Set[Tuple[str, str]]
+        self._backlinks: Set[Tuple[str, str]] = set()
 
     def setId(self, id: Eval[str]):
         self._id = id
