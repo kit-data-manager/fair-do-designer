@@ -1,5 +1,7 @@
 from main import *
+from main import current_source_json
 from conditionals import *
+import jsonpath
 
 #---8<---user-defined-code---8<---
 
@@ -32,23 +34,19 @@ def stop_with_fail(message: str | None):
 
 # pidrecord
 RECORD_DESIGNS.append( RecordDesign()
+  .setId(lambda: str(jsonpath.findall("$.sampleIdentification.sampleID.sampleID", current_source_json)[0]))
   # profile_hmc
   .addAttribute("21.T11148/076759916209e5d62bd5", lambda: '21.T11148/b9b76f887845e32d29f7')
   # attribute: profile_hmc
-  .addAttribute("21.T11148/b8457812905b83046284", lambda: [])
+  .addAttribute("21.T11148/076759916209e5d62bd5", lambda: '21.T11148/b9b76f887845e32d29f7')
   # attribute: profile_hmc
-  .addAttribute("21.T11148/aafd5fb4c7222e2d950a", BackwardLinkFor(''))
+  .addAttribute("21.T11148/1c699a5d1b4ad3ba4956", lambda: '21\\.T11148\\/f6b12e65934c9b0fb11a')
   # attribute: profile_hmc
-  .addAttribute("21.T11148/2f314c8fe5fb6a0063a8", lambda: jsonpath.findall("JSON.sampleIdentification.samplePurpose", current_source_json))
+  .addAttribute("21.T11148/b8457812905b83046284", lambda: 'https://example.com/does-not-have-a-url')
   # attribute: profile_hmc
-  .addAttribute("21.T11148/796a3ea6c9a38633fb7e", lambda: jsonpath.findall("JSON.sampleIdentification.samplePurpose.samplePurposeOptions", current_source_json))
+  .addAttribute("21.T11148/aafd5fb4c7222e2d950a", lambda: '1985-04-12T23:20:50.52Z')
   # attribute: profile_hmc
-  .addAttribute("21.T11148/82e2503c49209e987740", lambda: (otherwise('not?', lambda: stop_with_fail("No error message provided"))
-  ))
-  # attribute: profile_hmc
-  .addAttribute("21.T11148/d0773859091aeb451528", lambda: [])
-  # attribute: profile_hmc
-  .addAttribute("21.T11148/7fdada5846281ef5d461", lambda: [])
+  .addAttribute("21.T11148/2f314c8fe5fb6a0063a8", lambda: 'https://spdx.org/licenses/CC-BY-4.0.html')
 )
 
 #---8<---use-designs-to-create-records-from-JSON---8<---
