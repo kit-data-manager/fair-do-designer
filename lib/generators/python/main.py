@@ -1,7 +1,5 @@
 import sys
 from typing import Dict, Set, List, Tuple, Callable, TypeVar, Any, Sequence, Mapping, Self
-# unused, but required by user generated code:
-import jsonpath # pyright: ignore[reportUnusedImport]
 import json
 
 Primitive = str | bool | int | float
@@ -202,7 +200,7 @@ class Executor:
         Sends the graph of records to the Typed PID Maker API.
         This will create PIDs for the records and store the mapping from local IDs to real PIDs.
         """
-        from pytypid import SimpleRecord as ApiRecord, BatchRecordResponse
+        from pytypid import SimpleRecord as ApiRecord
         import pytypid_generated_client
         import os
 
@@ -220,7 +218,7 @@ class Executor:
             dryrun = False
 
             try:
-                api_response: BatchRecordResponse = api.create_pids(pid_record=graph_for_api, dryrun=dryrun)
+                api_response: pytypid_generated_client.BatchRecordResponse = api.create_pids(pid_record=graph_for_api, dryrun=dryrun)
                 print("------ Successful response from API ---")
 
                 # Define folder where we will store the mapping from local IDs to real PIDs

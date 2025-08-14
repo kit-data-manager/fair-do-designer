@@ -29,6 +29,7 @@ export class RecordMappingGenerator
         this.definitions_["import-main"] = "import main"
         this.definitions_["import-from-main"] = "from main import RecordDesign, Executor"
         this.definitions_["import-from-conditionals"] = "from conditionals import *"
+        this.definitions_["import-jsonpath"] = "import jsonpath"
         this.definitions_["executor"] = "EXECUTOR: Executor = Executor()"
         this.addReservedWords("EXECUTOR")
         this.addReservedWords("current_source_json")
@@ -89,7 +90,7 @@ forBlock["pidrecord"] = function <T extends Util.FairDoCodeGenerator>(
     const statement_record = generator.statementToCode(block, "record")
 
     let code = generator.makeLineComment(`${block.type}`)
-    code += `EXECUTOR.addDesign( lambda: RecordDesign()\n`
+    code += `EXECUTOR.addDesign( RecordDesign()\n`
     code += generator.prefixNonemptyLines(
         generator.makeSetIDChainCall(`str(${value_localid}[0])`),
         generator.INDENT,
@@ -118,7 +119,7 @@ forBlock["pidrecord_skipable"] = function <T extends Util.FairDoCodeGenerator>(
     const statement_record = generator.statementToCode(block, "record")
 
     const start_comment = generator.makeLineComment(`${block.type}`)
-    let code = `EXECUTOR.addDesign( lambda: RecordDesign()\n`
+    let code = `EXECUTOR.addDesign( RecordDesign()\n`
     code += generator.prefixNonemptyLines(
         generator.makeSetIDChainCall(value_localid),
         generator.INDENT,

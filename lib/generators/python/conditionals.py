@@ -23,7 +23,7 @@ def otherwise(either: Any, otherwise: Callable[[], Any]) -> Any:
     notEmptyishString = isinstance(either, str) and either.strip().lower() not in ("null", "", "()", "[]", "{}")
 
     isOk = notNone and notEmptyArray and notEmptyTuple and notEmptyishString
-    return either if isOk else otherwise() # type: ignore
+    return either if isOk else otherwise()
 
 def stop_with_fail(message: str | None) -> None:
     if message == None or message == "":
