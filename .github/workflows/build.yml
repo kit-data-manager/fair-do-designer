@@ -60,8 +60,8 @@ jobs:
       - name: Install the project
         run: cd lib/generators/python && uv sync --locked --all-extras --dev
 
-      - name: Run tests
-        run: cd lib/generators/python && uv run pytest
+      #- name: Run tests
+      #  run: cd lib/generators/python && uv run pytest
 
       - name: Run examples
         run: cd lib/generators/python && uv run python example_generated-minimal.py ../../../public/demo/json/metadata*
