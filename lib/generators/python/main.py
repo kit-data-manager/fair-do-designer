@@ -161,7 +161,7 @@ define their own functions that can access the current JSON. This is requied bec
 users may define functions and may use a "read from json" block in them. These blocks
 are using this variable to refer to the current JSON.
 """
-#current_source_json: JsonType = "{}"
+current_source_json: JsonType = "{}"
 
 class Executor:
     """
