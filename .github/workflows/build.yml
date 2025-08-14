@@ -58,14 +58,13 @@ jobs:
           enable-cache: true
 
       - name: Install the project
-        run: uv sync --locked --all-extras --dev
+        run: cd lib/generators/python && uv sync --locked --all-extras --dev
 
       - name: Run tests
-        # For example, using `pytest`
-        run: uv run pytest tests
+        run: cd lib/generators/python && uv run pytest
 
       - name: Run examples
         run: cd lib/generators/python && uv run python example_generated-minimal.py ../../../public/demo/json/metadata*
 
       - name: Run mypy
-        run: cd lib/generators/python && uv run mypy lib/generators/python
+        run: cd lib/generators/python && uv run mypy .
