@@ -1,3 +1,7 @@
+# generated files by this project
+mappings.json
+api_response.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
