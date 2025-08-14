@@ -12,14 +12,14 @@ def otherwise(either: Any, otherwise: Callable[[], Any]) -> Any:
         either = None
 
     notNone = either is not None
-    notEmptyArray = type(either) == List[Any] and len(either) > 0
-    notEmptyTuple = type(either) == Tuple[Any, Any] and len(either) > 0
-    notEmptyishString = type(either) == str and either.strip().lower() not in ("null", "", "()", "[]", "{}")
+    notEmptyArray = isinstance(either, List) and len(either) > 0
+    notEmptyTuple = isinstance(either, Tuple) and len(either) > 0
+    notEmptyishString = isinstance(either, str) and either.strip().lower() not in ("null", "", "()", "[]", "{}")
 
     isOk = notNone and notEmptyArray and notEmptyTuple and notEmptyishString
-    return either if isOk else otherwise()
+    return either if isOk else otherwise() # type: ignore
 
-def stop_with_fail(message: str | None):
+def stop_with_fail(message: str | None) -> None:
     if message == None or message == "":
         message = "No error message provided"
     raise Exception("Design stopped. " + message)

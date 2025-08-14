@@ -1,5 +1,5 @@
 import sys
-from typing import Dict, Set, List, Tuple, Callable, TypeVar, Any, Sequence, Mapping
+from typing import Dict, Set, List, Tuple, Callable, TypeVar, Any, Sequence, Mapping, Self
 # unused, but required by user generated code:
 import jsonpath # pyright: ignore[reportUnusedImport]
 import json
@@ -49,29 +49,29 @@ class PidRecord:
     Collects information about a single record
     and serializes it into a format for the Typed PID Maker.
     """
-    def __init__(self):
+    def __init__(self) -> None:
         self._id: str = ""
         self._pid: str = ""
         self._tuples: Set[Tuple[str, Primitive]] = set()
 
-    def setPid(self, pid: str):
+    def setPid(self, pid: str) -> Self:
         self._pid = pid
         return self
 
-    def setId(self, id: str):
+    def setId(self, id: str) -> Self:
         self._id = id
         return self
     
     def getId(self) -> str:
         return self._id
 
-    def addAttribute(self, a: str, b: Primitive | List[Primitive] | None):
+    def addAttribute(self, a: str, b: Primitive | List[Primitive] | None) -> Self:
         if b is None:
             return self
         if isinstance(b, List):
             for item in b:
                 self.addAttribute(a, item)
-            return
+            return self
         else:
             self._tuples.add((a, b))
         return self
@@ -79,7 +79,7 @@ class PidRecord:
     def contains(self, tuple: Tuple[str, Primitive]) -> bool:
         return tuple in self._tuples
         
-    def toSimpleJSON(self):
+    def toSimpleJSON(self) -> Dict[str, Any]:
         result: Dict[str, Any] = {"record": [{"key": key, "value": value} for (key, value) in self._tuples]}
         if self._pid and self._pid != "":
             result["pid"] = self._pid
@@ -101,7 +101,7 @@ class RecordDesign:
     "current_source_json". The given functions have to rely
     on this.
     """
-    def __init__(self):
+    def __init__(self) -> None:
         self._id: Eval[str] = lambda: ""
         self._pid: Eval[str] = lambda: ""
         # key -> lambda: value
@@ -109,15 +109,15 @@ class RecordDesign:
         # Set of (forward_link_type, backward_link_type)
         self._backlinks: Set[Tuple[str, str]] = set()
 
-    def setId(self, id: Eval[str]):
+    def setId(self, id: Eval[str]) -> Self:
         self._id = id
         return self
     
-    def setPid(self, pid: Eval[str]):
+    def setPid(self, pid: Eval[str]) -> Self:
         self._pid = pid
         return self
 
-    def addAttribute(self, key: str, value: Eval[Any] | BackwardLinkFor):
+    def addAttribute(self, key: str, value: Eval[Any] | BackwardLinkFor) -> Self:
         if isinstance(value, BackwardLinkFor):
             self.addBacklink(value.get_forward_link_type(), key)
         else:
@@ -127,8 +127,9 @@ class RecordDesign:
             self._attributes[key].append(value)
         return self
     
-    def addBacklink(self, forward_link_type: str, backward_link_type: str):
+    def addBacklink(self, forward_link_type: str, backward_link_type: str) -> Self:
         self._backlinks.add((forward_link_type, backward_link_type))
+        return self
     
     def apply(self, json: JsonType) -> Tuple[PidRecord, InferenceRules]:
         """
@@ -169,7 +170,7 @@ class Executor:
     It processes the input files, applies the designs, and sends the resulting records to the Typed PID Maker API.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.INPUT = CliInputProvider(sys.argv[1:])
         self.RECORD_DESIGNS: List[RecordDesign] = []
         self.RECORD_GRAPH: Dict[str, PidRecord] = {}
@@ -178,13 +179,14 @@ class Executor:
         # Condition(forward_link_type, receiver_id) => Reaction(receiver_id, backward_link_type)
         self.INFERENCE_MATCHES_DB: InferenceRules = {}
 
-    def addDesign(self, design: RecordDesign):
+    def addDesign(self, design: RecordDesign) -> Self:
         """
         Adds a design to the executor.
         """
         self.RECORD_DESIGNS.append(design)
+        return self
 
-    def execute(self):
+    def execute(self) -> Self:
         """
         Executes the designs and creates records from the input JSON files.
         """
@@ -193,8 +195,9 @@ class Executor:
         self._apply_inputs_to_designs()
         self._apply_inference_rules_to_records()
         self._send_graph_to_typed_pid_maker()
+        return self
 
-    def _send_graph_to_typed_pid_maker(self):
+    def _send_graph_to_typed_pid_maker(self) -> None:
         """
         Sends the graph of records to the Typed PID Maker API.
         This will create PIDs for the records and store the mapping from local IDs to real PIDs.
@@ -241,7 +244,7 @@ class Executor:
             except Exception as e:
                 print("Exception when calling PIDManagementApi->create_pid: %s\n" % e)
 
-    def _apply_inference_rules_to_records(self):
+    def _apply_inference_rules_to_records(self) -> None:
         for sender_id in self.RECORD_GRAPH:
             sender = self.RECORD_GRAPH[sender_id]
             matched_conditions = filter(lambda condition: sender.contains(condition), self.INFERENCE_MATCHES_DB.keys())
@@ -250,7 +253,7 @@ class Executor:
                 receiver: PidRecord = self.RECORD_GRAPH[reaction.receiver]
                 receiver.addAttribute(reaction.backward_link_type, sender_id)
 
-    def _apply_inputs_to_designs(self):
+    def _apply_inputs_to_designs(self) -> None:
         """
         Applies the input files to the designs and creates records.
         This will generate records and inference rules which will be stored in this classes state.
