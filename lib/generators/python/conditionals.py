@@ -1,4 +1,4 @@
-from typing import Any, List, Tuple, Callable
+from typing import Any, Callable, TypeGuard
 
 def otherwise(either: Any, otherwise: Callable[[], Any]) -> Any:
     """
@@ -11,9 +11,15 @@ def otherwise(either: Any, otherwise: Callable[[], Any]) -> Any:
     if type(either) == str and either.strip().lower() in ("null", "", "()", "[]", "{}"):
         either = None
 
+    def is_list_any(value: object) -> TypeGuard[list[Any]]:
+        return isinstance(value, list)
+    
+    def is_tuple_any(value: object) -> TypeGuard[tuple[Any, Any]]:
+        return isinstance(value, tuple)
+
     notNone = either is not None
-    notEmptyArray = isinstance(either, List) and len(either) > 0
-    notEmptyTuple = isinstance(either, Tuple) and len(either) > 0
+    notEmptyArray = is_list_any(either) and len(either) > 0
+    notEmptyTuple = is_tuple_any(either) and len(either) > 0
     notEmptyishString = isinstance(either, str) and either.strip().lower() not in ("null", "", "()", "[]", "{}")
 
     isOk = notNone and notEmptyArray and notEmptyTuple and notEmptyishString

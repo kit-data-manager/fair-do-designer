@@ -68,3 +68,6 @@ jobs:
 
       - name: Run mypy
         run: cd lib/generators/python && uv run mypy . --strict
+
+      - name: Run pyright
+        run: cd lib/generators/python && uv run pyright

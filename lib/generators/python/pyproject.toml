@@ -12,8 +12,22 @@ dependencies = [
 [dependency-groups]
 dev = [
     "mypy>=1.16.1",
+    "pyright>=1.1.403",
     "pytest>=8.4.1",
 ]
 
 [tool.uv.sources]
 pytypid = { git = "https://github.com/kit-data-manager/typid-client.git" }
+
+[tool.pyright]
+strict = [
+    "**/*.py"
+]
+include = ["./**/*.py"]
+exclude = [
+    "**/node_modules",
+    "**/__pycache__",
+    "**/*_cache",
+    "**/.venv"
+]
+ignore = []
