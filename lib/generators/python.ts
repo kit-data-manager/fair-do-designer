@@ -9,7 +9,6 @@ import * as Blockly from "blockly/core"
 import * as HmcProfile from "../blocks/hmc_profile"
 import * as Util from "./util"
 import builderCode from "./python/main.py"
-import executionCode from "./python/execute.py"
 import conditionalsCode from "./python/conditionals.py"
 
 /**
@@ -27,11 +26,11 @@ export class RecordMappingGenerator
         this.addReservedWords("math,random,Number")
         Object.assign(this.forBlock, pythonGenerator.forBlock)
         Object.assign(this.forBlock, forBlock)
-        this.definitions_["record-builder-code"] = builderCode
-        this.definitions_["conditionals-code"] = conditionalsCode
-        this.addReservedWords("RECORD_GRAPH")
-        this.addReservedWords("RECORD_DESIGNS")
-        this.addReservedWords("INPUT")
+        this.definitions_["import-main"] = "import main"
+        this.definitions_["import-from-main"] = "from main import RecordDesign, Executor"
+        this.definitions_["import-from-conditionals"] = "from conditionals import *"
+        this.definitions_["executor"] = "EXECUTOR: Executor = Executor()"
+        this.addReservedWords("EXECUTOR")
         this.addReservedWords("current_source_json")
     }
 
@@ -69,16 +68,7 @@ export class RecordMappingGenerator
 
     finish(code: string): string {
         code = super.finish(code)
-        // Remove main imports
-        // They are only present to make valid python code as the files are split up.
-        const suffix: string = executionCode
-            .split("\n")
-            .filter(
-                (value: string) =>
-                    !value.startsWith("import main") &&
-                    !value.startsWith("from main "),
-            )
-            .join("\n")
+        const suffix: string = "\nEXECUTOR.execute()\n"
         return code + suffix
     }
 }
@@ -99,7 +89,7 @@ forBlock["pidrecord"] = function <T extends Util.FairDoCodeGenerator>(
     const statement_record = generator.statementToCode(block, "record")
 
     let code = generator.makeLineComment(`${block.type}`)
-    code += `RECORD_DESIGNS.append( RecordDesign()\n`
+    code += `EXECUTOR.addDesign( lambda: RecordDesign()\n`
     code += generator.prefixNonemptyLines(
         generator.makeSetIDChainCall(`str(${value_localid}[0])`),
         generator.INDENT,
@@ -128,7 +118,7 @@ forBlock["pidrecord_skipable"] = function <T extends Util.FairDoCodeGenerator>(
     const statement_record = generator.statementToCode(block, "record")
 
     const start_comment = generator.makeLineComment(`${block.type}`)
-    let code = `RECORD_DESIGNS.append( RecordDesign()\n`
+    let code = `EXECUTOR.addDesign( lambda: RecordDesign()\n`
     code += generator.prefixNonemptyLines(
         generator.makeSetIDChainCall(value_localid),
         generator.INDENT,
