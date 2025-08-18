@@ -8,8 +8,6 @@ import { Order, PythonGenerator, pythonGenerator } from "blockly/python"
 import * as Blockly from "blockly/core"
 import * as HmcProfile from "../blocks/hmc_profile"
 import * as Util from "./util"
-import builderCode from "./python/main.py"
-import conditionalsCode from "./python/conditionals.py"
 
 /**
  * Specialized generator for our code.
@@ -27,8 +25,10 @@ export class RecordMappingGenerator
         Object.assign(this.forBlock, pythonGenerator.forBlock)
         Object.assign(this.forBlock, forBlock)
         this.definitions_["import-main"] = "import main"
-        this.definitions_["import-from-main"] = "from main import RecordDesign, Executor"
-        this.definitions_["import-from-conditionals"] = "from conditionals import *"
+        this.definitions_["import-from-main"] =
+            "from main import RecordDesign, Executor"
+        this.definitions_["import-from-conditionals"] =
+            "from conditionals import *"
         this.definitions_["import-jsonpath"] = "import jsonpath"
         this.definitions_["executor"] = "EXECUTOR: Executor = Executor()"
         this.addReservedWords("EXECUTOR")
@@ -173,11 +173,7 @@ forBlock["input_custom_json"] = function <T extends Util.FairDoCodeGenerator>(
     block: Blockly.Block,
     generator: T,
 ) {
-    const value_block = generator.valueToCode(
-        block,
-        "QUERY",
-        Order.ATOMIC
-    )
+    const value_block = generator.valueToCode(block, "QUERY", Order.ATOMIC)
     return [jsonpathCall(value_block), Order.ATOMIC]
 }
 
@@ -291,7 +287,10 @@ forBlock["profile_hmc_reference_block"] = function (block: Blockly.Block) {
     return [code, Order.ATOMIC]
 }
 
-forBlock["lists_create_with"] = function <T extends Util.FairDoCodeGenerator>(block: Blockly.Block, generator: T) {
+forBlock["lists_create_with"] = function <T extends Util.FairDoCodeGenerator>(
+    block: Blockly.Block,
+    generator: T,
+) {
     const values: string[] = []
     for (const input of block.inputList) {
         const block = input.connection?.targetBlock()
