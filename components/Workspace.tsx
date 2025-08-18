@@ -7,7 +7,7 @@ import * as BlockDynamicConnection from "@blockly/block-dynamic-connection"
 import { useStore } from "zustand/react"
 import { workspaceStore } from "@/lib/stores/workspace"
 import { blocks as profile_blocks } from "@/lib/blocks/all"
-import { load, save } from "@/lib/serialization"
+import { loadFromLocalStorage, saveToLocalStorage } from "@/lib/serialization"
 import * as ErrorsToolbox from "@/lib/toolboxes/errors_logging"
 import * as BacklinksToolbox from "@/lib/toolboxes/backlinks"
 import { ValidationField } from "@/lib/fields/ValidationField"
@@ -62,14 +62,14 @@ export function Workspace() {
         })
 
         // Load the initial state from storage and run the code.
-        load(workspace)
+        loadFromLocalStorage(workspace)
 
         // Every time the workspace changes state, save the changes to storage.
         workspace.addChangeListener((e: Blockly.Events.Abstract) => {
             // UI events are things like scrolling, zooming, etc.
             // No need to save after one of these.
             if (e.isUiEvent) return
-            save(workspace)
+            saveToLocalStorage(workspace)
         })
 
         ErrorsToolbox.register(workspace)

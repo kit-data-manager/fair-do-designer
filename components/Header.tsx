@@ -6,14 +6,21 @@ import {
     MenubarMenu,
     MenubarTrigger,
 } from "@/components/ui/menubar"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useStore } from "zustand/react"
 import { workspaceStore } from "@/lib/stores/workspace"
 import { Input } from "@/components/ui/input"
+import {
+    loadFromFile,
+    saveToDisk,
+    saveToLocalStorage,
+} from "@/lib/serialization"
 
 export function Header() {
     const designName = useStore(workspaceStore, (s) => s.designName)
     const setDesignName = useStore(workspaceStore, (s) => s.setDesignName)
+    const workspace = useStore(workspaceStore, (s) => s.workspace)
+    const fileUploadInput = useRef<HTMLInputElement>(null)
 
     const [nameInputValue, setNameInputValue] = useState(designName)
     const [editName, setEditName] = useState(false)
@@ -21,11 +28,29 @@ export function Header() {
     const confirmNameChange = useCallback(() => {
         setDesignName(nameInputValue)
         setEditName(false)
-    }, [nameInputValue, setDesignName])
+        if (workspace) saveToLocalStorage(workspace)
+    }, [nameInputValue, setDesignName, workspace])
 
     useEffect(() => {
         setNameInputValue(designName)
     }, [designName])
+
+    const doSaveToDisk = useCallback(() => {
+        if (workspace) saveToDisk(workspace)
+    }, [workspace])
+
+    const triggerLoadFromDisk = useCallback(() => {
+        if (fileUploadInput.current) {
+            fileUploadInput.current.click()
+        }
+    }, [])
+
+    const onFileUploadInputChange = useCallback(() => {
+        if (fileUploadInput.current && fileUploadInput.current.files) {
+            const file = fileUploadInput.current.files.item(0)
+            if (file && workspace) loadFromFile(file, workspace)
+        }
+    }, [workspace])
 
     return (
         <div className="h-12 flex items-center px-4 gap-3 max-w-full">
@@ -59,11 +84,23 @@ export function Header() {
                         />
                     </MenubarTrigger>
                     <MenubarContent>
-                        <MenubarItem>Load Design</MenubarItem>
-                        <MenubarItem>Save Design</MenubarItem>
+                        <MenubarItem onClick={triggerLoadFromDisk}>
+                            Load Design
+                        </MenubarItem>
+                        <MenubarItem onClick={doSaveToDisk}>
+                            Save Design
+                        </MenubarItem>
                     </MenubarContent>
                 </MenubarMenu>
             </Menubar>
+
+            <input
+                className="hidden"
+                type="file"
+                ref={fileUploadInput}
+                accept={"application/json"}
+                onChange={onFileUploadInputChange}
+            />
         </div>
     )
 }
