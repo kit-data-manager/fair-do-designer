@@ -58,7 +58,7 @@ jobs:
           enable-cache: true
 
       - name: Install the project
-        run: public/python && uv sync --locked --all-extras --dev
+        run: cd public/python && uv sync --locked --all-extras --dev
 
       - name: Run tests
         run: cd public/python && uv run pytest
