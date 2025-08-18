@@ -104,7 +104,7 @@ export function OutputPane() {
                     Language: Python
                 </div>
             </div>
-            <pre className="overflow-auto p-2">
+            <pre className="overflow-auto grow p-2">
                 <code>{code}</code>
             </pre>
         </div>
