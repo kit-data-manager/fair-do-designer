@@ -11,6 +11,7 @@ import {
     ResizablePanelGroup,
 } from "@/components/ui/resizable"
 import { CodeIcon, DatabaseIcon } from "lucide-react"
+import { Header } from "@/components/Header"
 
 export default function Home() {
     const [tab, setTab] = useState("input")
@@ -19,9 +20,8 @@ export default function Home() {
         <div className="h-screen w-screen">
             <ResizablePanelGroup direction={"horizontal"}>
                 <ResizablePanel defaultSize={70}>
-                    <div>
-                        <Workspace />
-                    </div>
+                    <Header />
+                    <Workspace />
                 </ResizablePanel>
                 <ResizableHandle hitAreaMargins={{ fine: 5, coarse: 10 }} />
                 <ResizablePanel defaultSize={30}>
