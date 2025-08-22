@@ -3,7 +3,7 @@ import { strToU8, zip } from "fflate"
 export class PythonCodeDownload {
     private staticFileCache: Record<string, string> = {}
     async downloadCodeZip(generatedCode: string) {
-        const filesToFetch = ["main.py", "conditionals.py", "pyproject.toml"]
+        const filesToFetch = ["executor.py", "conditionals.py", "pyproject.toml"]
         const promises = filesToFetch.map((name) =>
             name in this.staticFileCache
                 ? Promise.resolve(this.staticFileCache[name])

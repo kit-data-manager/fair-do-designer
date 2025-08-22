@@ -24,9 +24,9 @@ export class RecordMappingGenerator
         this.addReservedWords("math,random,Number")
         Object.assign(this.forBlock, pythonGenerator.forBlock)
         Object.assign(this.forBlock, forBlock)
-        this.definitions_["import-main"] = "import main"
+        this.definitions_["import-main"] = "import executor"
         this.definitions_["import-from-main"] =
-            "from main import RecordDesign, Executor, log"
+            "from executor import RecordDesign, Executor, log"
         this.definitions_["import-from-conditionals"] =
             "from conditionals import *"
         this.definitions_["import-jsonpath"] = "import jsonpath"
@@ -162,7 +162,7 @@ forBlock["transform_string"] = function <T extends Util.FairDoCodeGenerator>(
 }
 
 const jsonpathCall = (path: string) =>
-    `jsonpath.findall("${path}", main.current_source_json)`
+    `jsonpath.findall("${path}", executor.current_source_json)`
 
 forBlock["input_jsonpath"] = function (block: Blockly.Block) {
     const value_input = block.getFieldValue("QUERY")
