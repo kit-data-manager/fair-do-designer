@@ -26,7 +26,7 @@ export class RecordMappingGenerator
         Object.assign(this.forBlock, forBlock)
         this.definitions_["import-main"] = "import main"
         this.definitions_["import-from-main"] =
-            "from main import RecordDesign, Executor"
+            "from main import RecordDesign, Executor, log"
         this.definitions_["import-from-conditionals"] =
             "from conditionals import *"
         this.definitions_["import-jsonpath"] = "import jsonpath"

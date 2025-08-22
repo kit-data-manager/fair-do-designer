@@ -26,6 +26,9 @@ class BackwardLinkFor:
         return self._forward_link_type
 # ---------------------------------------------------------------------  #
 
+def log(value: Any, desc: Any) -> None:
+    print(desc + ": " + value)
+
 class CliInputProvider:
     """
     Example usage: python script.py file1.json my_files*.json
