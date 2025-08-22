@@ -249,7 +249,7 @@ forBlock["log_value"] = function <T extends Util.FairDoCodeGenerator>(
     // TODO: change Order.ATOMIC to the correct operator precedence strength
     const value_invar = generator.valueToCode(block, "INVAR", Order.ATOMIC)
 
-    const code = `log(${value_invar}, ${text_desc})\n`
+    const code = `log(${value_invar}, "${text_desc}")\n`
     // TODO: Change Order.NONE to the correct operator precedence strength
     return [code, Order.NONE]
 }
