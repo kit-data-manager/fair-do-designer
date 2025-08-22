@@ -162,7 +162,7 @@ forBlock["transform_string"] = function <T extends Util.FairDoCodeGenerator>(
 }
 
 const jsonpathCall = (path: string) =>
-    `jsonpath.findall("${path}", current_source_json)`
+    `jsonpath.findall("${path}", main.current_source_json)`
 
 forBlock["input_jsonpath"] = function (block: Blockly.Block) {
     const value_input = block.getFieldValue("QUERY")
