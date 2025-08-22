@@ -305,5 +305,5 @@ forBlock["lists_create_with"] = function <T extends Util.FairDoCodeGenerator>(
         }
     }
 
-    return ["[" + values.join(", ") + "]", Order.COLLECTION]
+    return ["[\n" + generator.prefixLines(values.join(", "), generator.INDENT) + "]", Order.COLLECTION]
 }
