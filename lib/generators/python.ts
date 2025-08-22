@@ -8,9 +8,6 @@ import { Order, PythonGenerator, pythonGenerator } from "blockly/python"
 import * as Blockly from "blockly/core"
 import * as HmcProfile from "../blocks/hmc_profile"
 import * as Util from "./util"
-import builderCode from "./python/main.py"
-import executionCode from "./python/execute.py"
-import conditionalsCode from "./python/conditionals.py"
 
 /**
  * Specialized generator for our code.
@@ -27,11 +24,14 @@ export class RecordMappingGenerator
         this.addReservedWords("math,random,Number")
         Object.assign(this.forBlock, pythonGenerator.forBlock)
         Object.assign(this.forBlock, forBlock)
-        this.definitions_["record-builder-code"] = builderCode
-        this.definitions_["conditionals-code"] = conditionalsCode
-        this.addReservedWords("RECORD_GRAPH")
-        this.addReservedWords("RECORD_DESIGNS")
-        this.addReservedWords("INPUT")
+        this.definitions_["import-main"] = "import executor"
+        this.definitions_["import-from-main"] =
+            "from executor import RecordDesign, Executor, log"
+        this.definitions_["import-from-conditionals"] =
+            "from conditionals import *"
+        this.definitions_["import-jsonpath"] = "import jsonpath"
+        this.definitions_["executor"] = "EXECUTOR: Executor = Executor()"
+        this.addReservedWords("EXECUTOR")
         this.addReservedWords("current_source_json")
     }
 
@@ -69,16 +69,7 @@ export class RecordMappingGenerator
 
     finish(code: string): string {
         code = super.finish(code)
-        // Remove main imports
-        // They are only present to make valid python code as the files are split up.
-        const suffix: string = executionCode
-            .split("\n")
-            .filter(
-                (value: string) =>
-                    !value.startsWith("import main") &&
-                    !value.startsWith("from main "),
-            )
-            .join("\n")
+        const suffix: string = "\nEXECUTOR.execute()\n"
         return code + suffix
     }
 }
@@ -99,9 +90,9 @@ forBlock["pidrecord"] = function <T extends Util.FairDoCodeGenerator>(
     const statement_record = generator.statementToCode(block, "record")
 
     let code = generator.makeLineComment(`${block.type}`)
-    code += `RECORD_DESIGNS.append( RecordDesign()\n`
+    code += `EXECUTOR.addDesign( RecordDesign()\n`
     code += generator.prefixNonemptyLines(
-        generator.makeSetIDChainCall(value_localid),
+        generator.makeSetIDChainCall(`str(${value_localid}[0])`),
         generator.INDENT,
     )
     code += statement_record
@@ -128,7 +119,7 @@ forBlock["pidrecord_skipable"] = function <T extends Util.FairDoCodeGenerator>(
     const statement_record = generator.statementToCode(block, "record")
 
     const start_comment = generator.makeLineComment(`${block.type}`)
-    let code = `RECORD_DESIGNS.append( RecordDesign()\n`
+    let code = `EXECUTOR.addDesign( RecordDesign()\n`
     code += generator.prefixNonemptyLines(
         generator.makeSetIDChainCall(value_localid),
         generator.INDENT,
@@ -171,7 +162,7 @@ forBlock["transform_string"] = function <T extends Util.FairDoCodeGenerator>(
 }
 
 const jsonpathCall = (path: string) =>
-    `jsonpath.findall(${path}, current_source_json)`
+    `jsonpath.findall("${path}", executor.current_source_json)`
 
 forBlock["input_jsonpath"] = function (block: Blockly.Block) {
     const value_input = block.getFieldValue("QUERY")
@@ -182,11 +173,7 @@ forBlock["input_custom_json"] = function <T extends Util.FairDoCodeGenerator>(
     block: Blockly.Block,
     generator: T,
 ) {
-    const value_block = generator.valueToCode(
-        block,
-        "QUERY",
-        Order.ATOMIC
-    )
+    const value_block = generator.valueToCode(block, "QUERY", Order.ATOMIC)
     return [jsonpathCall(value_block), Order.ATOMIC]
 }
 
@@ -262,7 +249,7 @@ forBlock["log_value"] = function <T extends Util.FairDoCodeGenerator>(
     // TODO: change Order.ATOMIC to the correct operator precedence strength
     const value_invar = generator.valueToCode(block, "INVAR", Order.ATOMIC)
 
-    const code = `log(${value_invar}, ${text_desc})\n`
+    const code = `log(${value_invar}, "${text_desc}")\n`
     // TODO: Change Order.NONE to the correct operator precedence strength
     return [code, Order.NONE]
 }
@@ -300,7 +287,10 @@ forBlock["profile_hmc_reference_block"] = function (block: Blockly.Block) {
     return [code, Order.ATOMIC]
 }
 
-forBlock["lists_create_with"] = function <T extends Util.FairDoCodeGenerator>(block: Blockly.Block, generator: T) {
+forBlock["lists_create_with"] = function <T extends Util.FairDoCodeGenerator>(
+    block: Blockly.Block,
+    generator: T,
+) {
     const values: string[] = []
     for (const input of block.inputList) {
         const block = input.connection?.targetBlock()
@@ -315,5 +305,5 @@ forBlock["lists_create_with"] = function <T extends Util.FairDoCodeGenerator>(bl
         }
     }
 
-    return ["[" + values.join(", ") + "]", Order.COLLECTION]
+    return ["[\n" + generator.prefixLines(values.join(", "), generator.INDENT) + "]", Order.COLLECTION]
 }

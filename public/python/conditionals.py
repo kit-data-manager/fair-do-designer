@@ -1,4 +1,4 @@
-from typing import Any, List, Tuple, Callable
+from typing import Any, Callable, TypeGuard
 
 def otherwise(either: Any, otherwise: Callable[[], Any]) -> Any:
     """
@@ -11,15 +11,21 @@ def otherwise(either: Any, otherwise: Callable[[], Any]) -> Any:
     if type(either) == str and either.strip().lower() in ("null", "", "()", "[]", "{}"):
         either = None
 
-    notNone = either is not None
-    notEmptyArray = type(either) == List[Any] and len(either) > 0
-    notEmptyTuple = type(either) == Tuple[Any, Any] and len(either) > 0
-    notEmptyishString = type(either) == str and either.strip().lower() not in ("null", "", "()", "[]", "{}")
+    def is_list_any(value: object) -> TypeGuard[list[Any]]:
+        return isinstance(value, list)
+    
+    def is_tuple_any(value: object) -> TypeGuard[tuple[Any, Any]]:
+        return isinstance(value, tuple)
 
-    isOk = notNone and notEmptyArray and notEmptyTuple and notEmptyishString
+    isNone = either is None
+    isEmptyArray = is_list_any(either) and len(either) < 0
+    isEmptyTuple = is_tuple_any(either) and len(either) < 0
+    isEmptyishString = isinstance(either, str) and either.strip().lower() in ("null", "", "()", "[]", "{}")
+
+    isOk = not isNone and not isEmptyArray and not isEmptyTuple and not isEmptyishString
     return either if isOk else otherwise()
 
-def stop_with_fail(message: str | None):
+def stop_with_fail(message: str | None) -> None:
     if message == None or message == "":
         message = "No error message provided"
     raise Exception("Design stopped. " + message)

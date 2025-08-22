@@ -24,9 +24,9 @@ export default function Home() {
                     </div>
                 </ResizablePanel>
                 <ResizableHandle hitAreaMargins={{ fine: 5, coarse: 10 }} />
-                <ResizablePanel defaultSize={30}>
+                <ResizablePanel defaultSize={30} className={"flex flex-col"}>
                     <Tabs
-                        className="max-h-full"
+                        className="max-h-full grow"
                         value={tab}
                         onValueChange={setTab}
                     >
@@ -52,7 +52,7 @@ export default function Home() {
 
                         <TabsContent
                             className={
-                                "min-h-0 max-h-full flex " +
+                                "min-h-0 max-h-full flex grow " +
                                 (tab === "output" ? "" : "hidden")
                             }
                             value={"output"}
