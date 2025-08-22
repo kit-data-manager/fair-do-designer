@@ -17,12 +17,12 @@ def otherwise(either: Any, otherwise: Callable[[], Any]) -> Any:
     def is_tuple_any(value: object) -> TypeGuard[tuple[Any, Any]]:
         return isinstance(value, tuple)
 
-    notNone = either is not None
-    notEmptyArray = is_list_any(either) and len(either) > 0
-    notEmptyTuple = is_tuple_any(either) and len(either) > 0
-    notEmptyishString = isinstance(either, str) and either.strip().lower() not in ("null", "", "()", "[]", "{}")
+    isNone = either is None
+    isEmptyArray = is_list_any(either) and len(either) < 0
+    isEmptyTuple = is_tuple_any(either) and len(either) < 0
+    isEmptyishString = isinstance(either, str) and either.strip().lower() in ("null", "", "()", "[]", "{}")
 
-    isOk = notNone and notEmptyArray and notEmptyTuple and notEmptyishString
+    isOk = not isNone and not isEmptyArray and not isEmptyTuple and not isEmptyishString
     return either if isOk else otherwise()
 
 def stop_with_fail(message: str | None) -> None:
