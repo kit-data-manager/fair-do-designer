@@ -7,7 +7,7 @@ export class PythonCodeDownload {
         const promises = filesToFetch.map((name) =>
             name in this.staticFileCache
                 ? Promise.resolve(this.staticFileCache[name])
-                : fetch("/python/" + name).then((res) => res.text()),
+                : fetch(process.env.NEXT_PUBLIC_BASE_PATH + "/python/" + name).then((res) => res.text()),
         )
 
         const fetchedFile = await Promise.all(promises)
