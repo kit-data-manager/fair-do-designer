@@ -1,5 +1,5 @@
-import main
-from main import RecordDesign, Executor
+import executor as executor
+from executor import RecordDesign, Executor
 import jsonpath
 from conditionals import *
 
@@ -8,7 +8,7 @@ EXECUTOR: Executor = Executor()
 
 # pidrecord
 EXECUTOR.addDesign( RecordDesign()
-  .setId(lambda: str(jsonpath.findall("$.sampleIdentification.sampleID.sampleID", main.current_source_json)[0]))
+  .setId(lambda: str(jsonpath.findall("$.sampleIdentification.sampleID.sampleID", executor.current_source_json)[0]))
   # profile_hmc
   .addAttribute("21.T11148/076759916209e5d62bd5", lambda: '21.T11148/b9b76f887845e32d29f7')
   # attribute: profile_hmc

@@ -1,4 +1,4 @@
-from main import RecordDesign
+from executor import RecordDesign
 
 class TestRecordDesign:
     def test_maps_to_correct_id(self) -> None:
