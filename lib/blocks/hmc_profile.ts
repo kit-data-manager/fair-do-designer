@@ -4,11 +4,16 @@ import * as HMCProfile from "./profiles/HMC.json"
 import { FieldImage } from "blockly"
 import { camelToTitleCase } from "../utils"
 
+const KNOWN_PROFILE_SELF_REFERENCES = [
+    "21.T11148/076759916209e5d62bd5",
+]
+
 export interface HMCBlock extends Blockly.BlockSvg {
     profile: typeof HMCProfile
     activeOptionalProperties: string[]
     profileAttributeKey: string
     // block methods
+    addImplicitDummyField(propertyName: string, value: string): void
     addFieldForProperty(propertyName: string): void
     removeFieldForProperty(propertyName: string): void
     addListBlockToEmptyInput(input: Blockly.Input): void
@@ -38,7 +43,14 @@ export const profile_hmc: HMCBlock = {
         for (const property of this.profile.properties) {
             const details = property.representationsAndSemantics[0]
             if (details.obligation !== "Mandatory") continue // Skip optional properties by default
-            this.addFieldForProperty(property.name)
+            const isSelfReference =
+                property.name.trim().toLowerCase().replaceAll(' ', '') === "KernelInformationProfile".toLowerCase()
+                || KNOWN_PROFILE_SELF_REFERENCES.includes(property.identifier)
+            if (!isSelfReference) {
+                this.addFieldForProperty(property.name)
+            } else {
+                this.addImplicitDummyField(property.name, this.profile.identifier)
+            }
         }
 
         const optionalPropertiesSelector = new Blockly.FieldDropdown([
@@ -76,6 +88,27 @@ export const profile_hmc: HMCBlock = {
     extractPidFromProperty(propertyName: string): string | undefined {
         return this.profile.properties.find((p) => p.name === propertyName)
             ?.identifier
+    },
+
+    addImplicitDummyField(propertyName: string, value: string) {
+        const nameLabel = new Blockly.FieldLabel(camelToTitleCase(propertyName))
+        nameLabel.setTooltip(propertyName + " / " + value)
+        
+        const hiddenConstField = new Blockly.FieldLabel("CONST")
+        
+        this.appendDummyInput(propertyName)
+        .appendField(nameLabel)
+        .appendField(hiddenConstField, value)
+        .appendField(
+            new ValidationField({
+                mandatory: true,
+                repeatable: false,
+            }),
+            `val-${propertyName}`,
+        )
+        .setAlign(Blockly.inputs.Align.RIGHT)
+        
+        hiddenConstField.setVisible(false)
     },
 
     addFieldForProperty(propertyName) {
