@@ -64,6 +64,17 @@ code {
   overflow: auto;
 }
 
+.blocklyToolbox {
+    background-color: var(--background);
+    border-right: 1px solid var(--border);
+    padding-top: 12px;
+}
+
+.blocklyFlyoutBackground {
+    fill: var(--background);
+    transform: translateY(1px);
+}
+
 g.blocklyDisabled g.blocklyLabelField text.blocklyText {
   fill: rgb(40, 40, 40);
 }
