@@ -1,0 +1,4 @@
+html.dark .blocklyMainBackground {
+    fill-opacity: .3;
+    stroke: none;
+}

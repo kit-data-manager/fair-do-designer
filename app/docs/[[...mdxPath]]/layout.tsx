@@ -5,6 +5,7 @@ import "nextra-theme-docs/style.css"
 import { PropsWithChildren } from "react"
 import { FrameIcon } from "lucide-react"
 import "../../globals.css"
+import "./docs.css"
 
 export const metadata = {
     // Define your metadata here

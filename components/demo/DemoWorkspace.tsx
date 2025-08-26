@@ -7,6 +7,8 @@ import { blocks as profile_blocks } from "@/lib/blocks/all"
 import { WorkspaceSvg } from "blockly"
 import { cn } from "@/lib/utils"
 import { OctagonAlert } from "lucide-react"
+import "@/lib/theme"
+import { useTheme } from "next-themes"
 
 /**
  * Demo Workspace that displays blocks passed as props to this component. Use for documentation purposes only.
@@ -25,6 +27,7 @@ export function DemoWorkspace({
         undefined,
     )
     const [error, setError] = useState<unknown>(undefined)
+    const theme = useTheme()
 
     useEffect(() => {
         try {
@@ -39,6 +42,7 @@ export function DemoWorkspace({
             const workspace = Blockly.inject(divRef.current, {
                 rtl: false,
                 renderer: "thrasos",
+                theme: theme.resolvedTheme === "dark" ? "docs-dark" : undefined,
                 grid: { spacing: 20, length: 3, colour: "#ccc", snap: true },
                 plugins: {
                     connectionPreviewer:
@@ -84,7 +88,7 @@ export function DemoWorkspace({
         } catch (e) {
             setError(e)
         }
-    }, [blocks, setWorkspace])
+    }, [blocks, setWorkspace, theme.resolvedTheme])
 
     // Resize the workspace if the surrounding div resizes
     useEffect(() => {
@@ -115,7 +119,7 @@ export function DemoWorkspace({
     return (
         <div
             className={cn(
-                "h-16 rounded-lg overflow-hidden pointer-events-none",
+                "h-16 rounded-lg overflow-hidden pointer-events-none my-2",
                 className,
             )}
             ref={divRef}
