@@ -205,7 +205,8 @@ forBlock["profile_hmc"] = function <T extends Util.FairDoCodeGenerator>(
         throw new Error("Expected block to conform to HmcBlock interface")
     }
 
-    let code = generator.makeLineComment(`${block.type}`)
+    let code = generator.makeLineComment(`## ${block.type} ##`)
+    code += generator.makeLineComment(`attribute: Self-Reference`)
     code += generator.makeAddAttributeChainCall(
         block.profileAttributeKey,
         "'" + block.profile.identifier + "'",
@@ -221,7 +222,7 @@ forBlock["profile_hmc"] = function <T extends Util.FairDoCodeGenerator>(
         // Still, this information may be used to format the list in the generated code or so.
         //const isList: boolean = input.connection?.targetBlock()?.type.startsWith("lists_") || false;
         if (pid !== undefined && value && value != "") {
-            code += generator.makeLineComment(`attribute: ${block.type}`)
+            code += generator.makeLineComment(`attribute: ${input.name}`)
             code += generator.makeAddAttributeChainCall(pid, value)
         }
     }
