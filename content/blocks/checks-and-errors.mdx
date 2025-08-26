@@ -1,10 +1,28 @@
+import {DemoWorkspace} from "../../components/demo/DemoWorkspace"
+
 # Checks and Errors
 
 Blocks in this category are used to help with checking the validity of your data and your design.
 
 ## Stop with error
 
-![Overview](../img/blocks/checks-and-errors/stop-with-error.png)
+<DemoWorkspace className={"h-12"} blocks={[{
+    "type": "stop_design",
+    x: 10,
+    y: 10,
+    "id": "uu:|C(`Q+9Kr?pp@^R(s",
+    "inputs": {
+        "MESSAGE": {
+            "block": {
+                "type": "text",
+                "id": "o`Lc{t`dQ^Um|R;_B3xY",
+                "fields": {
+                    "TEXT": "Error description"
+                }
+            }
+        }
+    }
+}]}/>
 
 The **Stop with error** block will immediately stop the generator and return an error. The error can be specified by plugging a string block into the input.
 
@@ -12,17 +30,56 @@ The **Stop with error** block will immediately stop the generator and return an 
 
 In conjunction with the **Otherwise** block, the **Stop with error** block can be used to abort the generator when a value is undefined. See the example below:
 
-![Overview](../img/blocks/checks-and-errors/stop-example.png)
+<DemoWorkspace blocks={[{
+    "type": "otherwise",
+    "id": "{4B+GfzT!.bj?xYV*zAg",
+    "x": 10,
+    "y": 10,
+    "inputs": {
+        "VALUE": {
+            "block": {
+                "type": "input_jsonpath",
+                "id": "Nvwl%PgD=]s|1,|Zy{AI",
+                "extraState": "$.sampleIdentification.importantAspect"
+            }
+        },
+        "OTHER": {
+            "block": {
+                "type": "stop_design",
+                "id": "uu:|C(`Q+9Kr?pp@^R(s",
+                "inputs": {
+                    "MESSAGE": {
+                        "block": {
+                            "type": "text",
+                            "id": "o`Lc{t`dQ^Um|R;_B3xY",
+                            "fields": {
+                                "TEXT": "importantAspect is undefined!"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}]}/>
 
 ## Print
 
-![Overview](../img/blocks/checks-and-errors/print.png)
+<DemoWorkspace className={"h-12"} blocks={[{
+    "type": "log_value",
+    x: 10,
+    y: 10,
+    "id": "uu:|C(`Q+9Kr?pp@^R(s",
+    "fields": {
+        "DESC": "Message"
+    }
+}]}/>
 
 The **Print** block will print the value of the text input to the console. Optionally, a string block can be plugged into the input to specify the text to print.
 
 ## Otherwise
 
-![Overview](../img/blocks/checks-and-errors/otherwise.png)
+<DemoWorkspace blocks={[{type: "otherwise", id: "0", x: 10, y: 10}]}/>
 
 The **Otherwise** block is used to handle possibly undefined values. When the value in the first input is undefined, the value in the second input is returned.
 The generated code can be compared to the following pseudocode:
@@ -37,6 +94,60 @@ def otherwise(a, b):
 
 Examples:
 
-![Overview](../img/blocks/checks-and-errors/stop-example.png)
+<DemoWorkspace blocks={[{
+    "type": "otherwise",
+    "id": "{4B+GfzT!.bj?xYV*zAg",
+    "x": 10,
+    "y": 10,
+    "inputs": {
+        "VALUE": {
+            "block": {
+                "type": "input_jsonpath",
+                "id": "Nvwl%PgD=]s|1,|Zy{AI",
+                "extraState": "$.sampleIdentification.importantAspect"
+            }
+        },
+        "OTHER": {
+            "block": {
+                "type": "stop_design",
+                "id": "uu:|C(`Q+9Kr?pp@^R(s",
+                "inputs": {
+                    "MESSAGE": {
+                        "block": {
+                            "type": "text",
+                            "id": "o`Lc{t`dQ^Um|R;_B3xY",
+                            "fields": {
+                                "TEXT": "importantAspect is undefined!"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}]}/>
 
-![Overview](../img/blocks/checks-and-errors/otherwise-example.png)
+<DemoWorkspace className="mt-2" blocks={[{
+    "type": "otherwise",
+    "id": "{4B+GfzT!.bj?xYV*zAg",
+    "x": 10,
+    "y": 10,
+    "inputs": {
+        "VALUE": {
+            "block": {
+                "type": "input_jsonpath",
+                "id": "Nvwl%PgD=]s|1,|Zy{AI",
+                "extraState": "$.sampleIdentification.sampleLicense"
+            }
+        },
+        "OTHER": {
+            "block": {
+                "type": "text",
+                "id": "o`Lc{t`dQ^Um|R;_B3xY",
+                "fields": {
+                    "TEXT": "MIT License"
+                }
+            }
+        }
+    }
+}]}/>

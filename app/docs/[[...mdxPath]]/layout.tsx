@@ -4,6 +4,7 @@ import { getPageMap } from "nextra/page-map"
 import "nextra-theme-docs/style.css"
 import { PropsWithChildren } from "react"
 import { FrameIcon } from "lucide-react"
+import "../../globals.css"
 
 export const metadata = {
     // Define your metadata here
