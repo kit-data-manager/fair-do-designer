@@ -1,0 +1,42 @@
+# Checks and Errors
+
+Blocks in this category are used to help with checking the validity of your data and your design.
+
+## Stop with error
+
+![Overview](../img/blocks/checks-and-errors/stop-with-error.png)
+
+The **Stop with error** block will immediately stop the generator and return an error. The error can be specified by plugging a string block into the input.
+
+### Aborting on undefined values
+
+In conjunction with the **Otherwise** block, the **Stop with error** block can be used to abort the generator when a value is undefined. See the example below:
+
+![Overview](../img/blocks/checks-and-errors/stop-example.png)
+
+## Print
+
+![Overview](../img/blocks/checks-and-errors/print.png)
+
+The **Print** block will print the value of the text input to the console. Optionally, a string block can be plugged into the input to specify the text to print.
+
+## Otherwise
+
+![Overview](../img/blocks/checks-and-errors/otherwise.png)
+
+The **Otherwise** block is used to handle possibly undefined values. When the value in the first input is undefined, the value in the second input is returned.
+The generated code can be compared to the following pseudocode:
+
+```python
+def otherwise(a, b):
+    if a is None:
+        return b
+    else:
+        return a
+```
+
+Examples:
+
+![Overview](../img/blocks/checks-and-errors/stop-example.png)
+
+![Overview](../img/blocks/checks-and-errors/otherwise-example.png)
