@@ -15,6 +15,7 @@ import {
     saveToDisk,
     saveToLocalStorage,
 } from "@/lib/serialization"
+import Link from "next/link"
 
 export function Header() {
     const designName = useStore(workspaceStore, (s) => s.designName)
@@ -90,6 +91,22 @@ export function Header() {
                         <MenubarItem onClick={doSaveToDisk}>
                             Save Design
                         </MenubarItem>
+                    </MenubarContent>
+                </MenubarMenu>
+                <MenubarMenu>
+                    <MenubarTrigger>
+                        Help
+                        <ChevronDown
+                            className={"size-4 ml-1 text-muted-foreground"}
+                        />
+                    </MenubarTrigger>
+                    <MenubarContent>
+                        <Link href={"/docs"}>
+                            <MenubarItem>Documentation</MenubarItem>
+                        </Link>
+                        <Link href={"/docs/getting-started"}>
+                            <MenubarItem>Getting Started</MenubarItem>
+                        </Link>
                     </MenubarContent>
                 </MenubarMenu>
             </Menubar>
