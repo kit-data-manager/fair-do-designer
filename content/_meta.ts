@@ -5,6 +5,11 @@ const meta: MetaRecord = {
     "getting-started": "Getting Started",
     blocks: "Block Manual",
     advanced: "Advanced Guides",
+    openDesigner: {
+        type: "page",
+        href: "/",
+        title: "Go to Designer",
+    },
 }
 
 export default meta
