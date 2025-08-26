@@ -43,9 +43,7 @@ export const profile_hmc: HMCBlock = {
         for (const property of this.profile.properties) {
             const details = property.representationsAndSemantics[0]
             if (details.obligation !== "Mandatory") continue // Skip optional properties by default
-            const isSelfReference =
-                property.name.trim().toLowerCase().replaceAll(' ', '') === "KernelInformationProfile".toLowerCase()
-                || KNOWN_PROFILE_SELF_REFERENCES.includes(property.identifier)
+            const isSelfReference = (property.identifier === this.profileAttributeKey)
             if (!isSelfReference) {
                 this.addFieldForProperty(property.name)
             } else {
@@ -93,12 +91,9 @@ export const profile_hmc: HMCBlock = {
     addImplicitDummyField(propertyName: string, value: string) {
         const nameLabel = new Blockly.FieldLabel(camelToTitleCase(propertyName))
         nameLabel.setTooltip(propertyName + " / " + value)
-        
-        const hiddenConstField = new Blockly.FieldLabel("CONST")
-        
+                
         this.appendDummyInput(propertyName)
-        .appendField(nameLabel)
-        .appendField(hiddenConstField, value)
+        .appendField(nameLabel, value)
         .appendField(
             new ValidationField({
                 mandatory: true,
@@ -107,8 +102,6 @@ export const profile_hmc: HMCBlock = {
             `val-${propertyName}`,
         )
         .setAlign(Blockly.inputs.Align.RIGHT)
-        
-        hiddenConstField.setVisible(false)
     },
 
     addFieldForProperty(propertyName) {
