@@ -215,12 +215,7 @@ forBlock["profile_hmc"] = function <T extends Util.FairDoCodeGenerator>(
     for (const input of block.inputList) {
         const name = input.name
         const pid = block.extractPidFromProperty(name)
-        // TODO: change Order.ATOMIC to the correct operator precedence strength
         const value = generator.valueToCode(block, name, Order.ATOMIC)
-        // If we want to check if the result is technically a python list, we can do it this way.
-        // We currently simply push this further down to the python code itself.
-        // Still, this information may be used to format the list in the generated code or so.
-        //const isList: boolean = input.connection?.targetBlock()?.type.startsWith("lists_") || false;
         if (pid !== undefined && value && value != "") {
             code += generator.makeLineComment(`attribute: ${input.name}`)
             code += generator.makeAddAttributeChainCall(pid, value)

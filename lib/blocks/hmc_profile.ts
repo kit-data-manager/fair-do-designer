@@ -4,10 +4,6 @@ import * as HMCProfile from "./profiles/HMC.json"
 import { FieldImage } from "blockly"
 import { camelToTitleCase } from "../utils"
 
-const KNOWN_PROFILE_SELF_REFERENCES = [
-    "21.T11148/076759916209e5d62bd5",
-]
-
 export interface HMCBlock extends Blockly.BlockSvg {
     profile: typeof HMCProfile
     activeOptionalProperties: string[]
