@@ -85,7 +85,9 @@ export const profile_hmc: HMCBlock = {
     },
 
     addImplicitDummyField(propertyName: string, value: string) {
-        const nameLabel = new Blockly.FieldLabel(camelToTitleCase(propertyName))
+        const nameLabel = new Blockly.FieldLabel(
+            camelToTitleCase(propertyName) + " (constant)"
+        )
         nameLabel.setTooltip(propertyName + " / " + value)
                 
         this.appendDummyInput(propertyName)
