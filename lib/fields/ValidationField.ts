@@ -36,7 +36,7 @@ export class ValidationField extends FieldImage {
         )
     }
 
-    checkForArrayBlocks(): boolean {
+    private checkForArrayBlocks(): boolean {
         // If a list is attached, check if it has all inputs attached.
         // The List may have nested lists, so we need to check recursively.
         const connectedBlock = this.getParentInput().connection?.targetBlock()
@@ -89,5 +89,23 @@ export class ValidationField extends FieldImage {
 
     dispose() {
         super.dispose()
+    }
+}
+
+export class StaticValidationField extends ValidationField {
+    protected status: boolean | undefined = undefined
+
+    constructor(status: boolean | undefined) {
+        super({})
+        this.status = status
+    }
+    
+    initView(): void {
+        super.initView()
+        this.setValidationResult(this.status)
+    }
+
+    forceCheck(): void {
+        this.setValidationResult(this.status)
     }
 }
