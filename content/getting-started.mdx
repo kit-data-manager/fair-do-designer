@@ -6,13 +6,17 @@ First, let's try to get an overview of the workflow and the most important funct
 
 ![Overview of the workflow](./img/getting-started/overview.drawio.png)
 
-The idea of the user interface is to pull-in information from your documents (right sidebar) and to combine it with declarative blocks from the left sidebar.
+The idea of the user interface is to pull-in information from your documents (right sidebar) and to combine it with declarative "blocks" from the left sidebar.
 
-> **Note**
->
-> Only well-connected blocks are considered. Other blocks may be visibly ignored until properly connected:
-> ![In this image, the upper block will be considered, the one at the bottom will currently be ignored.](./img/getting-started/ignored-blocks.png)
-> In this image, the upper block will be considered, the one at the bottom will currently be ignored.
+The FAIR DO Designer uses a visual way to express the design of records using blocks,
+similar to programming-learning tools like “Scratch” or other visual programming tools.
+Only well-connected blocks will be used in the design.
+Other blocks will be visibly ignored until properly connected.
+The visual difference is shown in the following figure:
+<DemoWorkspace className="h-[5.5em]" blocks={[
+  { type: "log_value", id: "0", x: 10, y: 10, "fields": {"DESC": "properly connected, used block"} },
+  { type: "log_value", id: "1", x: 10, y: 50, enabled: false, "fields": {"DESC": "improperly connected, ignored block"} }
+]} />
 
 To delete a block, click on it to select it, then press the "delete" key on your keyboard.
 Alternatively, you can drag it to the trash bin on the bottom right of the canvas.
