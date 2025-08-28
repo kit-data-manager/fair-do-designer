@@ -6,7 +6,7 @@ First, let's try to get an overview of the workflow and the most important funct
 
 ![Overview of the workflow](./img/getting-started/overview.drawio.png)
 
-The idea of the user interface is to pull-in information from your documents (right sidebar) and to combine it with declarative "blocks" from the left sidebar.
+The idea of the user interface is to pull-in information from your documents (right sidebar) and to combine it with declarative “blocks” from the left sidebar.
 
 The FAIR DO Designer uses a visual way to express the design of records using blocks,
 similar to programming-learning tools like “Scratch” or other visual programming tools.
@@ -63,7 +63,7 @@ A profile may or may not allow adding further profiles and attributes.
 Profile and record blocks can be found in the according category in the left sidebar,
 similar to all other blocks (except for the ones from your documents):
 
-![The left sidebar with the "Records & Profiles" menu open.](./img/getting-started/select-record-and-profile.png)
+![The left sidebar with the “Records & Profiles” menu open.](./img/getting-started/select-record-and-profile.png)
 
 ## Step 3: Connect all required fields
 
@@ -71,7 +71,7 @@ The usual procedure to add required fields is to extract them from your document
 
 1. Drag an attribute from the right sidebar into the canvas.
     Alternatively, you can simply click on it.
-    In both cases, a new "Read" block will appear on the canvas.
+    In both cases, a new “Read” block will appear on the canvas.
     Such a block represents this attribute in any document.
 
     > **Note**:
@@ -81,7 +81,7 @@ The usual procedure to add required fields is to extract them from your document
     If the value is not in the correct format
     or needs other pre-processing,
     you can use the block from the left sidebar to create a processing chain.
-    In the following sub-sections,
+    In the following subsections,
     we provide some recipes for common use cases.
 
 ### Example: Applying complex transformations with placeholder functions
@@ -93,7 +93,7 @@ You will then need to implement this function later in the generated code base.
 
 1. Add a function:
     On the left sidebar,
-    click on the category "Functions"
+    click on the category “Functions”
     and drag a function with a return-value-slot on your canvas.
     Give it a proper name.
     It should look like this:
@@ -106,33 +106,34 @@ You will then need to implement this function later in the generated code base.
         fields: {"NAME": "convert_my_value"}
     }]} />
 2. Give the function an input parameter for the attribute you want to convert.
-    In the step before, ou might have noticed the little gear button on the top left?
-    Clicking on it, it will open a small menu to add input parameters.
-    This is how it should look like in the end.
+    In the step before, you might have noticed the little gear button on the top left?
+    Click on it.
+    A small menu will appear where you can add input parameters.
+    The figure below shows how it could look like in the end.
+    Consider giving the input a better name, though.
 
     ![The open menu to add input parameters for a function.](./img/getting-started/function-inputs.png)
-
-    Consider giving it a better name, though.
 3. (Optional) Add more parameters for the conversion, if needed.
-    To do so, simply add more inputs as in the step before.
+    To do so, add more inputs as in the step before.
 4. (Optional but recommended) Add an example return value.
-    To do so, simply add a value block with a constant value to the function's return slot.
-    To find such blocks, use the categories in the left sidebar.
-5. (Optional but recommended) Add example input-output-pairs to the documentation.
+    To do so, add a value block with a constant value to the function's return slot.
+    Use the categories in the left sidebar to find such blocks.
+5. (Optional but recommended) Add documentation.
     Next to the gear button, there is a button with a question mark.
-    Klicking it will open a text field,
-    which you can use to describe the purpose and examples for this function.
-    Use this to document the purpose and intended functionality.
+    Click on it to open a text field,
+    and use it to describe the purpose and examples for this function.
     It will help for the implementation later,
-    also if you plan to use AI for code generation.
+    not only (but also) if you plan to use AI for code generation.
+    The next section shows a figure with an example.
 6. Apply the function to your attribute block(s).
     In the left sidebar,
-    inside the "Functions" category,
+    inside the “Functions” category,
     there is now a block with your chosen name
-    (e.g. "convert_my_value").
-    You can add this block,
+    (e.g., “convert_my_value”).
+    Drag this block to the canvas,
     attach your attribute block,
     and then attach the result to the profile attribute to assign it.
+    The figure in the next section shows an example.
 
 ### Example: Applying transformations with block functions
 
@@ -140,18 +141,21 @@ The previous section describes how to create empty functions to transform a valu
 Of course, it is possible to use blocks for the transformation
 and therefore generate the code without any further code required.
 Note that this can be visually verbose in some cases.
+A simple example is shown in the figure below.
+
+![A simple function implemented in blocks. It replaces all dots in a string with a dash.](./img/getting-started/function-example-implementation-simple.png)
 
 For this, you may need to access your functions inputs.
-These are available as blocks in the "Variables" category.
-Note it is required to add the inputs to the function first.
+In the figure above, it is the block with the “my_value” label on it.
+These are available as blocks in the “Variables” category.
+Note it is required to add the inputs to the function first,
+before they appear in this category.
 
 A result can be very complex or a simple shortcut for recurring patterns,
 like in the following example:
 
-![A simple function implemented in blocks. It replaces all dots in a string with a dash.](./img/getting-started/function-example-implementation-simple.png)
-
 Note how it is a standalone block,
-and then applied to the "preparationDate" block to put it into the profile.
+and then applied to the “preparationDate” block to put it into the profile.
 
 ### Example: Add additional, basic information using a text block
 
@@ -159,7 +163,7 @@ Assume your data is missing some basic information,
 like the license of your data.
 You can add such information as a string and provide it to your record:
 
-1. In the left sidebar, open the "Text" category and click or drag a text block onto the canvas.
+1. In the left sidebar, open the “Text” category and click or drag a text block onto the canvas.
     Attach the field to the license attribute in the profile and insert a value into its text field, like this:
     <DemoWorkspace className="h-[4em]" blocks={[{ type: "text", id: "0", x: 10, y: 10, fields: {"TEXT": "Apache-2.0"} }]} />
 
@@ -186,6 +190,5 @@ You can save your work to a file using the menu at the top.
 ## Step 6: Export the design as python code
 
 At the right sidebar, there is a tab called “Generated Code”.
-From there, you can view the code which depends on your design.
+From there, you can view the code which represents your design.
 To retrieve a full python project, click the download button in this tab.
-
