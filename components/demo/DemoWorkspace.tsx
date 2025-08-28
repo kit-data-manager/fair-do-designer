@@ -11,7 +11,7 @@ import "@/lib/theme"
 import { useTheme } from "next-themes"
 
 /**
- * Demo Workspace that displays blocks passed as props to this component. Use for documentation purposes only.
+ * Demo Workspace that displays blocks passed as props to this component. Use for documentation only.
  * @constructor
  */
 export function DemoWorkspace({
@@ -92,7 +92,7 @@ export function DemoWorkspace({
         } catch (e) {
             setError(e)
         }
-    }, [blocks, setWorkspace, theme.resolvedTheme])
+    }, [blocks, setWorkspace, theme.resolvedTheme, variables])
 
     // Resize the workspace if the surrounding div resizes
     useEffect(() => {
