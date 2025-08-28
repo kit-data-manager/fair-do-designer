@@ -1,4 +1,7 @@
 import type { NextConfig } from "next"
+import nextra from "nextra"
+
+const withNextra = nextra({ contentDirBasePath: "/docs" })
 
 const basePath = process.env.BASE_PATH ?? undefined
 const nextConfig: NextConfig = {
@@ -7,6 +10,9 @@ const nextConfig: NextConfig = {
     env: {
         NEXT_PUBLIC_BASE_PATH: basePath,
     },
+    images: {
+        unoptimized: true,
+    },
 }
 
-export default nextConfig
+export default withNextra(nextConfig)

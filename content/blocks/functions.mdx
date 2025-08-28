@@ -1,0 +1,311 @@
+import { DemoWorkspace } from "../../components/demo/DemoWorkspace"
+
+
+# Functions
+
+Function blocks allow defining custom procedures within your design. These functions will be translated into code just as expected.
+
+Functions can return up to one value and can receive a fixed number of arguments. To customize the arguments to the function, click the gear icon on the function block. The arguments can then be accessed with the **Variables** toolbox on the left.
+
+> [!tip]
+>
+>
+> Give your functions a meaningful name and description to easily recall their purpose later in the design process. A description can be provided using the question mark button on the block.
+
+Function block without return value:
+
+<DemoWorkspace className="h-22" blocks={[{
+    type: "procedures_defnoreturn",
+    id: "y=Z${u?#2XR]pc*qDrP^",
+    x: 10,
+    y: 10,
+    extraState: {
+        params: [],
+    },
+    icons: {
+        comment: {
+            text: "Returns the sum of two even numbers",
+            pinned: false,
+            height: 80,
+            width: 160,
+        },
+    },
+    fields: { NAME: "example" }
+}]} />
+
+Function block with return value:
+<DemoWorkspace className="h-24" blocks={[{
+    type: "procedures_defreturn",
+    id: "y=Z${u?#2XR]pc*qDrP^",
+    x: 10,
+    y: 10,
+    extraState: {
+        params: [],
+    },
+    icons: {
+        comment: {
+            text: "Returns the sum of two even numbers",
+            pinned: false,
+            height: 80,
+            width: 160,
+        },
+    },
+    fields: { NAME: "example" }
+}]} />
+
+## Example
+
+<DemoWorkspace className="h-[17em]" blocks={[{
+    type: "procedures_defreturn",
+    id: "y=Z${u?#2XR]pc*qDrP^",
+    x: 10,
+    y: 10,
+    extraState: {
+        params: [
+            { name: "x", id: "pp}~R!+=A^Q58!AIc+Q#" },
+            { name: "y", id: "`T9$4R^sZr;9^N.Q5^lj" },
+        ],
+    },
+    icons: {
+        comment: {
+            text: "Returns the sum of two even numbers",
+            pinned: false,
+            height: 80,
+            width: 160,
+        },
+    },
+    fields: { NAME: "add even" },
+    inputs: {
+        STACK: {
+            block: {
+                type: "controls_if",
+                id: "{x29aUI!@dkm!9ZPIv?j",
+                inputs: {
+                    IF0: {
+                        block: {
+                            type: "math_number_property",
+                            id: "8]R`^ip|Cseu9RhZH`L%",
+                            extraState:
+                                '<mutation divisor_input="false"></mutation>',
+                            fields: { PROPERTY: "ODD" },
+                            inputs: {
+                                NUMBER_TO_CHECK: {
+                                    shadow: {
+                                        type: "math_number",
+                                        id: "|S{;b}?r$v6;_,Q_M@^H",
+                                        fields: { NUM: 0 },
+                                    },
+                                    block: {
+                                        type: "variables_get",
+                                        id: "F~;#GJ/5l,L);(i0e((0",
+                                        fields: {
+                                            VAR: {
+                                                id: "pp}~R!+=A^Q58!AIc+Q#",
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    DO0: {
+                        block: {
+                            type: "variables_set",
+                            id: "8u0M[jd[_J$2|d}x44*G",
+                            fields: {
+                                VAR: {
+                                    id: "pp}~R!+=A^Q58!AIc+Q#",
+                                },
+                            },
+                            inputs: {
+                                VALUE: {
+                                    block: {
+                                        type: "math_arithmetic",
+                                        id: "gtx:xG$_05[%.1)A94?/",
+                                        fields: { OP: "ADD" },
+                                        inputs: {
+                                            A: {
+                                                shadow: {
+                                                    type: "math_number",
+                                                    id: "L#8g1R_:$eE2[v$s4J~w",
+                                                    fields: {
+                                                        NUM: 1,
+                                                    },
+                                                },
+                                                block: {
+                                                    type: "variables_get",
+                                                    id: "?}xQZ;~_8Uuu|RA:H}RZ",
+                                                    fields: {
+                                                        VAR: {
+                                                            id: "pp}~R!+=A^Q58!AIc+Q#",
+                                                        },
+                                                    },
+                                                },
+                                            },
+                                            B: {
+                                                shadow: {
+                                                    type: "math_number",
+                                                    id: "QfY5m=!g2EtgGxDC!1Oi",
+                                                    fields: {
+                                                        NUM: 1,
+                                                    },
+                                                },
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                next: {
+                    block: {
+                        type: "controls_if",
+                        id: "qLlk!Q$plr8L5(Y6:+}V",
+                        inputs: {
+                            IF0: {
+                                block: {
+                                    type: "math_number_property",
+                                    id: "W/h2bDE!_k%@;iAb_Hby",
+                                    extraState:
+                                        '<mutation divisor_input="false"></mutation>',
+                                    fields: { PROPERTY: "ODD" },
+                                    inputs: {
+                                        NUMBER_TO_CHECK: {
+                                            shadow: {
+                                                type: "math_number",
+                                                id: "y87,m)V;(Aidu.S6XT(T",
+                                                fields: {
+                                                    NUM: 0,
+                                                },
+                                            },
+                                            block: {
+                                                type: "variables_get",
+                                                id: "`30b*Z#@:+YYKJeC-QZ0",
+                                                fields: {
+                                                    VAR: {
+                                                        id: "`T9$4R^sZr;9^N.Q5^lj",
+                                                    },
+                                                },
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                            DO0: {
+                                block: {
+                                    type: "variables_set",
+                                    id: "dlFOSM9X;kpEJI#UB_ad",
+                                    fields: {
+                                        VAR: {
+                                            id: "`T9$4R^sZr;9^N.Q5^lj",
+                                        },
+                                    },
+                                    inputs: {
+                                        VALUE: {
+                                            block: {
+                                                type: "math_arithmetic",
+                                                id: "*;Qds)|{(2:${d@7dise",
+                                                fields: {
+                                                    OP: "ADD",
+                                                },
+                                                inputs: {
+                                                    A: {
+                                                        shadow: {
+                                                            type: "math_number",
+                                                            id: "L#8g1R_:$eE2[v$s4J~w",
+                                                            fields: {
+                                                                NUM: 1,
+                                                            },
+                                                        },
+                                                        block: {
+                                                            type: "variables_get",
+                                                            id: "7UV$)xj1]q_aP|fs-yJH",
+                                                            fields: {
+                                                                VAR: {
+                                                                    id: "`T9$4R^sZr;9^N.Q5^lj",
+                                                                },
+                                                            },
+                                                        },
+                                                    },
+                                                    B: {
+                                                        shadow: {
+                                                            type: "math_number",
+                                                            id: "Chv*07M:eNSC=Wi+!L}P",
+                                                            fields: {
+                                                                NUM: 1,
+                                                            },
+                                                        },
+                                                    },
+                                                },
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        RETURN: {
+            block: {
+                type: "math_arithmetic",
+                id: "q/G$T)fY=GnOAqO%4)6$",
+                fields: { OP: "ADD" },
+                inputs: {
+                    A: {
+                        shadow: {
+                            type: "math_number",
+                            id: "#UX|MnkU1D3V`8!*JDsH",
+                            fields: { NUM: 1 },
+                        },
+                        block: {
+                            type: "variables_get",
+                            id: "}ST/_@=KhO]SNbm3:pcJ",
+                            fields: {
+                                VAR: {
+                                    id: "pp}~R!+=A^Q58!AIc+Q#",
+                                },
+                            },
+                        },
+                    },
+                    B: {
+                        shadow: {
+                            type: "math_number",
+                            id: "knt?_ii2%AYq+Ud-!5}L",
+                            fields: { NUM: 1 },
+                        },
+                        block: {
+                            type: "variables_get",
+                            id: "pr|qUlvjrS0[x6YJyD*Q",
+                            fields: {
+                                VAR: {
+                                    id: "`T9$4R^sZr;9^N.Q5^lj",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    },
+}]} />
+
+The function definition above will result in the following code:
+
+```python filename="generated.py"
+# Returns the sum of two even numbers
+def add_even(x, y):
+  if x % 2 == 1:
+    x = x + 1
+  if y % 2 == 1:
+    y = y + 1
+  return x + y
+```
+
+Complex functions are hard to implement using visual programming and should be implemented directly in code. For this, just leave the function empty in the design and implement its functionality later on in the exported code.
+
+## Advanced usage
+
+Take a look at the [Transformations](/docs/advanced/transformations) guide for some more advanced uses of functions.

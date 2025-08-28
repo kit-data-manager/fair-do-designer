@@ -1,0 +1,16 @@
+.blocklyMainBackground {
+    stroke: none;
+}
+
+html.dark .blocklyMainBackground {
+    fill-opacity: .3;
+}
+
+kbd {
+    background-color: var(--muted);
+    color: var(--foreground);
+    border: 0.13em solid var(--border);
+    border-radius: 0.3em;
+    padding: 0 0.2em;
+    font-family: geist, sans-serif;
+}

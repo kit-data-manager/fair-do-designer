@@ -1,0 +1,64 @@
+import { DemoWorkspace } from "../../components/demo/DemoWorkspace"
+
+# Data Access
+
+Blocks in this category are used to read information from a data source. For more information on this topic, take a look at the [Data Queries](/docs/data-queries) page.
+
+## Read Block
+
+<DemoWorkspace className="h-22" blocks={[{ type: "input_jsonpath", id: "0", x: 10, y: 10, extraState: "$.exampleProperty" }, { type: "input_jsonpath", id: "0", x: 10, y: 50, extraState: "$.someArray[2]" }]} />
+
+The **Read** block can be obtained from the **Data Access** tab on the right of the designer. It is used to read data from a data source.
+
+You can use right-click on the block to read or edit the query.
+
+> [!tip]
+>
+> More information on the [Querying Data](/docs/data-queries) page.
+
+## Advanced Queries
+
+<DemoWorkspace className="h-36" blocks={[{ type: "input_custom_json", id: "0", x: 10, y: 10, inputs: { QUERY: {block: {type: "text", fields: {TEXT: "$.staticAttribute"}}} } },{
+    type: "input_custom_json",
+    x: 10,
+    y: 60,
+    id: "N]Q(8#rB[yoLNim6.y5M",
+    fields: { NAME: "Custom Query" },
+    inputs: {
+        QUERY: {
+            block: {
+                type: "text_join",
+                id: "QJRpd6ku(9.+h.(0y(7;",
+                extraState: {
+                    itemCount: 2,
+                },
+                inputs: {
+                    ADD0: {
+                        block: {
+                            type: "text",
+                            id: "H8Ebc|!]x8oDn4#x%]BA",
+                            fields: {
+                                TEXT: "$.",
+                            },
+                        },
+                    },
+                    ADD1: {
+                        block: {
+                            type: "variables_get",
+                            id: "K|~FP_DZT6^J$sde[2Rl",
+                            fields: {
+                                VAR: {
+                                    id: "Ahqn)B290wIV;:TgF.!)",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    },
+}]} variables={[{ name: "dynamicAttribute", id: "Ahqn)B290wIV;:TgF.!)" }]} />
+
+The **Custom Query** block takes a text block as its only input. The text block should return a valid query string that will be run against the data source. In most cases, this should be a valid JSON path query. Refer to [Data Queries](/docs/data-queries) for more information.
+
+For more complicated querying logic you can also use an [empty placeholder function](/docs/advanced/transformations#applying-complex-transformations-with-placeholder-functions) as the argument to **Custom Query**.
