@@ -17,8 +17,10 @@ import { useTheme } from "next-themes"
 export function DemoWorkspace({
     className,
     blocks,
+    variables,
 }: {
     blocks: Record<string, unknown>[]
+    variables?: Record<string, unknown>[]
     className?: string
 }) {
     const [loading, setLoading] = useState(true)
@@ -71,6 +73,7 @@ export function DemoWorkspace({
                         languageVersion: 0,
                         blocks: blocks,
                     },
+                    variables,
                 },
                 workspace,
             )
@@ -84,6 +87,7 @@ export function DemoWorkspace({
                 } catch (e) {
                     console.warn("Disposing workspace failed", e)
                 }
+                if (divRef.current) divRef.current.innerHTML = ""
             }
         } catch (e) {
             setError(e)
