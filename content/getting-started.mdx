@@ -192,7 +192,48 @@ You can add such information as a string and provide it to your record:
     Attach the field to the license attribute in the profile and insert a value into its text field, like this:
     <DemoWorkspace className="h-[4em]" blocks={[{ type: "text", id: "0", x: 10, y: 10, fields: {"TEXT": "Apache-2.0"} }]} />
 
-## Step 4 (optional): Add optional attributes
+## Step 4: Find an identifier for your record
+
+Did you notice there is an “ID” input at the record block?
+In theory, this input is not required.
+But in order to connect FAIR DOs later,
+we need at least some pseudo-PID for our records.
+
+<DemoWorkspace className="h-[8em]" blocks={[
+    { type: "pidrecord", id: "record", x: 10, y: 10 }
+]} />
+
+
+1. Find an appropriate identifier in your metadata (in the right sidebar)
+and drag the block on the canvas.
+
+    If there is no unique identifier in your metadata,
+    you can create one using other pieces of information.
+    For example by combining
+    a creation date,
+    a title,
+    and a creating person or machine.
+    You can find blocks to calculate and combine information in the left sidebar.
+    All tricks learned in Step 3 are valid, except for constant blocks.
+
+    > **Note**:
+    > The ID must be unique to your FAIR DO!
+    > Therefore, the ID must depend on your input documents.
+    > A constant ID will never make sense,
+    > as all your FAIR DOs then can't be distinguished!
+2. Attach your identifier to the “ID” input.
+
+In a simple, ideal case, it could look like this:
+
+<DemoWorkspace className="h-[8em]" blocks={[{
+    type: "pidrecord",
+    id: "record",
+    x: 10,
+    y: 10,
+    "inputs": {"local-id": {block: { type: "input_jsonpath", id: "0", x: 10, y: 10, extraState: "$.sampleID" }}}
+}]} />
+
+## Step 5 (optional): Add optional attributes
 
 Each profile block has a drop-down menu at the bottom.
 It allows you to add further optional attributes.
@@ -202,7 +243,7 @@ as well as information which will be useful for selecting data for certain tasks
 Except from that they can be deleted,
 they work the same as required fields (see Step 3).
 
-## Step 5: Save your design
+## Step 6: Save your design
 
 Your work will be saved in the local storage of your browser.
 While this can be convenient, it is not a permanent storage.
@@ -212,7 +253,7 @@ You can save your work to a file using the menu at the top.
 > Before you save, consider giving your design a proper name.
 > You can do this using the title left to the menu bar (see the overview image at the top of this document).
 
-## Step 6: Export the design as python code
+## Step 7: Export the design as python code
 
 At the right sidebar, there is a tab called “Generated Code”.
 From there, you can view the code which represents your design.
