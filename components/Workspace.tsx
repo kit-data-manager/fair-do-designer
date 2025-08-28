@@ -11,6 +11,7 @@ import { loadFromLocalStorage, saveToLocalStorage } from "@/lib/serialization"
 import * as ErrorsToolbox from "@/lib/toolboxes/errors_logging"
 import * as BacklinksToolbox from "@/lib/toolboxes/backlinks"
 import { ValidationField } from "@/lib/fields/ValidationField"
+import { useRouter } from "next/navigation"
 
 /**
  * This component encapsulates the {@link Blockly.Workspace} and takes care of initializing it and registering any
@@ -27,6 +28,7 @@ export function Workspace() {
     const workspace = useStore(workspaceStore, (s) => s.workspace)
     const setWorkspace = useStore(workspaceStore, (s) => s.setWorkspace)
     const unsetWorkspace = useStore(workspaceStore, (s) => s.unsetWorkspace)
+    const router = useRouter()
 
     useEffect(() => {
         if (!divRef.current) {
@@ -56,9 +58,7 @@ export function Workspace() {
         workspace.addChangeListener(BlockDynamicConnection.finalizeConnections)
 
         workspace.registerButtonCallback("dataAccessToolboxHelp", () => {
-            alert(
-                "Use the Data Access tab on the right side to create Data Access blocks by clicking or dragging-and-dropping JSON keys",
-            )
+            router.push("/docs/blocks/data-access#advanced-queries")
         })
 
         // Load the initial state from storage and run the code.
