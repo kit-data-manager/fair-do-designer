@@ -7,7 +7,7 @@ html.dark .blocklyMainBackground {
 }
 
 kbd {
-    background-color:var(--muted);
+    background-color: var(--muted);
     color: var(--foreground);
     border: 0.13em solid var(--border);
     border-radius: 0.3em;

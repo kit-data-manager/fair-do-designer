@@ -119,7 +119,7 @@ export function DemoWorkspace({
     return (
         <div
             className={cn(
-                "h-16 rounded-lg overflow-hidden pointer-events-none my-2",
+                "h-16 rounded-lg overflow-hidden pointer-events-none my-2 border border-border",
                 className,
             )}
             ref={divRef}
