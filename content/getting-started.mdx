@@ -55,13 +55,38 @@ A design can create one or multiple records from a single file.
 It depends on the amount of record blocks being added.
 They look like this:
 
-<DemoWorkspace className="h-[8em]" blocks={[{ type: "pidrecord", id: "profile", x: 10, y: 10 }]} />
+<DemoWorkspace className="h-[8em]" blocks={[
+    { type: "pidrecord", id: "record", x: 10, y: 10 }
+]} />
 
-The record can then be filled with a profile or additional attributes.
-A profile may or may not allow adding further profiles and attributes.
+Records need to get filled with profiles or single / additional attributes.
+The following figure shows their blocks:
 
-Profile and record blocks can be found in the according category in the left sidebar,
-similar to all other blocks (except for the ones from your documents):
+<DemoWorkspace className="h-[23em]" blocks={[
+    { type: "profile_hmc", id: "profile", x: 10, y: 10 },
+    { type: "attribute_key", id: "attr", x: 10, y: 290 }
+]} />
+
+Records and profiles (and additional attributes) can be combined
+like shown in the following figure.
+A profile may or may not allow adding further profiles and attributes at the bottom.
+
+<DemoWorkspace className="h-[20em]" blocks={[
+    {
+        type: "pidrecord",
+        id: "record",
+        x: 10,
+        y: 10,
+        inputs: {
+            "record": {block: { type: "profile_hmc", id: "profile", x: 300, y: 10 }}
+        }
+    }
+]} />
+
+Find a record and a profile block
+in the category with the same name in the left sidebar.
+Drag them on the canvas,
+then plug them together as in the figure above.
 
 ![The left sidebar with the “Records & Profiles” menu open.](./img/getting-started/select-record-and-profile.png)
 
