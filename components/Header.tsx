@@ -17,6 +17,7 @@ import {
 } from "@/lib/serialization"
 import { RecordMappingGenerator } from "@/lib/generators/python"
 import { PythonCodeDownload } from "@/lib/python_code_download"
+import { useCopyToClipboard } from "usehooks-ts"
 
 export function Header() {
     const designName = useStore(workspaceStore, (s) => s.designName)
@@ -26,6 +27,8 @@ export function Header() {
 
     const [nameInputValue, setNameInputValue] = useState(designName)
     const [editName, setEditName] = useState(false)
+
+    const [, copy] = useCopyToClipboard()
 
     const confirmNameChange = useCallback(() => {
         setDesignName(nameInputValue)
@@ -63,6 +66,11 @@ export function Header() {
         const code = codeGenerator.current.workspaceToCode(workspace)
         codeDownloader.current.downloadCodeZip(code).then()
     }, [workspace])
+
+    const copyCodeSnippet = useCallback(() => {
+        const code = codeGenerator.current.workspaceToCode(workspace)
+        copy(code).then()
+    }, [copy, workspace])
 
     return (
         <div className="h-12 flex items-center px-4 gap-3 max-w-full">
@@ -112,6 +120,9 @@ export function Header() {
                         />
                     </MenubarTrigger>
                     <MenubarContent>
+                        <MenubarItem onClick={copyCodeSnippet}>
+                            Copy Generated Snippet
+                        </MenubarItem>
                         <MenubarItem onClick={exportCode}>
                             Export Code
                         </MenubarItem>
