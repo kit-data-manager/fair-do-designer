@@ -6,6 +6,7 @@
 
 import * as Blockly from "blockly/core"
 import { workspaceStore } from "@/lib/stores/workspace"
+import { LastUsedFile, lastUsedFilesStore } from "@/lib/stores/last-used-files"
 
 const storageKey = "fairdoWorkspace"
 const version = 1
@@ -14,6 +15,7 @@ interface WorkspaceData {
     version: number
     name: string
     data: Record<string, unknown>
+    lastUsedFiles?: LastUsedFile[]
 }
 
 /**
@@ -24,8 +26,9 @@ interface WorkspaceData {
 function save(workspace: Blockly.Workspace): WorkspaceData {
     const data = Blockly.serialization.workspaces.save(workspace)
     const name = workspaceStore.getState().designName
+    const lastUsedFiles = lastUsedFilesStore.getState().files
 
-    return { version, name, data }
+    return { version, name, data, lastUsedFiles }
 }
 
 /**
@@ -72,6 +75,9 @@ const load = function (
             undefined,
         )
         workspaceStore.getState().setDesignName(workspaceData.name)
+        if (workspaceData.lastUsedFiles) {
+            lastUsedFilesStore.getState().setFiles(workspaceData.lastUsedFiles)
+        }
         Blockly.Events.enable()
     } catch (error) {
         console.error("Error loading workspace:", error)
