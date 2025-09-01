@@ -15,6 +15,8 @@ import {
     saveToDisk,
     saveToLocalStorage,
 } from "@/lib/serialization"
+import { RecordMappingGenerator } from "@/lib/generators/python"
+import { PythonCodeDownload } from "@/lib/python_code_download"
 
 export function Header() {
     const designName = useStore(workspaceStore, (s) => s.designName)
@@ -50,6 +52,16 @@ export function Header() {
             const file = fileUploadInput.current.files.item(0)
             if (file && workspace) loadFromFile(file, workspace)
         }
+    }, [workspace])
+
+    const codeGenerator = useRef(
+        new RecordMappingGenerator("PidRecordMappingPython"),
+    )
+    const codeDownloader = useRef(new PythonCodeDownload())
+
+    const exportCode = useCallback(() => {
+        const code = codeGenerator.current.workspaceToCode(workspace)
+        codeDownloader.current.downloadCodeZip(code).then()
     }, [workspace])
 
     return (
@@ -89,6 +101,19 @@ export function Header() {
                         </MenubarItem>
                         <MenubarItem onClick={doSaveToDisk}>
                             Save Design
+                        </MenubarItem>
+                    </MenubarContent>
+                </MenubarMenu>
+                <MenubarMenu>
+                    <MenubarTrigger>
+                        Code
+                        <ChevronDown
+                            className={"size-4 ml-1 text-muted-foreground"}
+                        />
+                    </MenubarTrigger>
+                    <MenubarContent>
+                        <MenubarItem onClick={exportCode}>
+                            Export Code
                         </MenubarItem>
                     </MenubarContent>
                 </MenubarMenu>
