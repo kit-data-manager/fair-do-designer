@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react"
 import * as Blockly from "blockly"
 import * as BlockDynamicConnection from "@blockly/block-dynamic-connection"
-import { blocks as profile_blocks } from "@/lib/blocks/all"
 import { WorkspaceSvg } from "blockly"
 import { cn } from "@/lib/utils"
 import { OctagonAlert } from "lucide-react"
@@ -37,9 +36,6 @@ export function DemoWorkspace({
                 console.error("Failed to mount workspace: divRef empty")
                 return
             }
-
-            Blockly.common.defineBlocks(profile_blocks)
-            BlockDynamicConnection.overrideOldBlockDefinitions()
 
             const workspace = Blockly.inject(divRef.current, {
                 rtl: false,
