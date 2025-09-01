@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils"
 import { OctagonAlert } from "lucide-react"
 import "@/lib/theme"
 import { useTheme } from "next-themes"
+import "@/lib/blocks/all"
 
 /**
  * Demo Workspace that displays blocks passed as props to this component. Use for documentation only.

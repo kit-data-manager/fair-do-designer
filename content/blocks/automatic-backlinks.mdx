@@ -1,0 +1,40 @@
+import {DemoWorkspace} from "../../components/demo/DemoWorkspace";
+
+# Automatic Backlinks
+
+Blocks in this category are used to automatically create links between related FAIR-DO Records.
+
+> [!important]
+>
+> See the [Connecting FAIR-DOs Guide](/docs/advanced/connecting-fair-dos) for more information.
+
+## Inverse reference to attribute
+
+<DemoWorkspace className="h-12" blocks={[{"type":"backlink_declaration","id":"V]S|q{b-W+MBylN]JWW4","x":10,"y":10}]} />
+
+This block is used to automatically create backlinks to another FAIR-DO Record that has linked to this record. This block expects the PID of the attribute to be linked to as input.
+
+The attribute PID can be provided as text, but should be provided using the [Attribute PID](#attribute-pid) block.
+
+### Example
+
+<DemoWorkspace className="h-12" blocks={[{"type":"backlink_declaration","id":"V]S|q{b-W+MBylN]JWW4","x":10,"y":10, inputs: { ATTRIBUTE_KEY: { block: {"type":"profile_hmc_reference_block","id":"V]S|q{b-W+MBylN]JWW4","fields":{"ATTRIBUTE":"21.T11148/1c699a5d1b4ad3ba4956"}} } } }]} />
+
+This example will automatically return a backlink to any record referencing the current record from the `digitalObjectType` attribute. The following output is generated:
+
+```python
+BackwardLinkFor("21.T11148/1c699a5d1b4ad3ba4956")
+```
+
+## Attribute PID
+
+<DemoWorkspace className="h-12" blocks={[{"type":"profile_hmc_reference_block","id":"V]S|q{b-W+MBylN]JWW4","x":10,"y":10,"fields":{"ATTRIBUTE":"21.T11148/1c699a5d1b4ad3ba4956"}}]} />
+
+This block returns the PID of the selected attribute. The block is linked to a fixed FAIR-DO Profile which is denoted by its name. The block shown above returns attribute PIDs for the HelmholtzKIP FAIR-DO Profile.
+Use the dropdown menu on the block to select the attribute you want to retrieve the PID for.
+
+The block above returns/generates the following output:
+
+```python
+"21.T11148/1c699a5d1b4ad3ba4956"
+```
