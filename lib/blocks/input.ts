@@ -2,6 +2,7 @@ import * as Blockly from "blockly"
 import { FieldLabel } from "blockly"
 import { FileSearchIcon } from "@/lib/icons"
 import { FieldIcon } from "@/lib/fields/FieldIcon"
+import { addBasePath } from "next/dist/client/add-base-path"
 
 export interface InputJsonPath extends Blockly.BlockSvg {
     findQueryProperty(): void
@@ -28,7 +29,7 @@ export const input_jsonpath: InputJsonPath = {
         this.setTooltip(
             "Read value from Source Document. Right-click for more.",
         )
-        this.setHelpUrl("")
+        this.setHelpUrl(addBasePath("/docs/blocks/data-access#read-block"))
         this.setOutput(true, null)
         this.setColour(210)
     },
@@ -107,7 +108,9 @@ export const input_custom_json: Blockly.BlockSvg = {
         this.setTooltip(
             "Execute a custom jsonpath query against the current Source Document",
         )
-        this.setHelpUrl("")
+        this.setHelpUrl(
+            addBasePath("/docs/blocks/data-access#advanced-queries"),
+        )
         this.setColour(210)
     },
 }

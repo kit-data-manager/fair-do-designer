@@ -3,6 +3,7 @@ import { ValidationField } from "../fields/ValidationField"
 import * as HMCProfile from "./profiles/HMC.json"
 import { FieldImage } from "blockly"
 import { camelToTitleCase } from "../utils"
+import { addBasePath } from "next/dist/client/add-base-path"
 
 export interface HMCBlock extends Blockly.BlockSvg {
     profile: typeof HMCProfile
@@ -183,7 +184,11 @@ export const profile_hmc: HMCBlock = {
                 this.setTooltip(
                     `References an attribute key which appears in ${profileName}.`,
                 )
-                this.setHelpUrl("")
+                this.setHelpUrl(
+                    addBasePath(
+                        "/docs/blocks/automatic-backlinks#attribute-pid",
+                    ),
+                )
                 this.setColour(120)
             },
         } as Blockly.Block

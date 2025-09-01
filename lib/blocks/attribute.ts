@@ -1,4 +1,5 @@
 import * as Blockly from "blockly/core"
+import { addBasePath } from "next/dist/client/add-base-path"
 
 export const attribute = {
     type: "attribute_key",
@@ -51,7 +52,11 @@ export const backlink_declaration = {
         this.setTooltip(
             "Adds reverse references (backlinks) if another record links to this record using the given attribute key.",
         )
-        this.setHelpUrl("")
+        this.setHelpUrl(
+            addBasePath(
+                "/docs/blocks/automatic-backlinks#inverse-reference-to-attribute",
+            ),
+        )
         this.setColour(120)
     },
 } as Blockly.Block
