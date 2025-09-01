@@ -108,7 +108,7 @@ export function Workspace() {
                 console.warn("Disposing workspace failed", e)
             }
         }
-    }, [setWorkspace, unsetWorkspace])
+    }, [router, setWorkspace, unsetWorkspace])
 
     // Resize the workspace if the surrounding div resizes
     useEffect(() => {
@@ -164,7 +164,7 @@ export function Workspace() {
 
     return (
         <div
-            className="h-screen"
+            className="grow"
             ref={divRef}
             onDrop={onDrop}
             onDragOver={onDragOver}
