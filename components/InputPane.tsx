@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { UnifiedDocument } from "@kit-data-manager/json-picker-react"
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useRef, useState } from "react"
 import * as Blockly from "blockly"
 import { useStore } from "zustand/react"
 import { workspaceStore } from "@/lib/stores/workspace"
@@ -125,10 +125,6 @@ export function InputPane() {
         },
         [workspace],
     )
-
-    useEffect(() => {
-        console.log(lastUsedFiles)
-    }, [lastUsedFiles])
 
     return (
         <div className="min-h-0 w-full justify-stretch flex flex-col">
