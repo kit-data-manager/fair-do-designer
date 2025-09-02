@@ -70,7 +70,7 @@ export const profile_hmc: HMCBlock = {
         this.setTooltip(this.profile.name + ": " + this.profile.description)
         this.setPreviousStatement(true, null)
         this.setNextStatement(true, null)
-        this.setHelpUrl("https://hdl.handle.net/" + this.profile.identifier)
+        this.setHelpUrl(addBasePath("/docs/blocks/profile"))
         this.setColour(230)
     },
 

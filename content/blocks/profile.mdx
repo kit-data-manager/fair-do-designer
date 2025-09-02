@@ -2,7 +2,15 @@ import { DemoWorkspace } from "../../components/demo/DemoWorkspace"
 
 # Profiles
 
-<DemoWorkspace className="h-[10lh]" blocks={[
+> [!note]
+>
+> Profiles are defined in external registries,
+> which contain additional helpful information.
+> For the builtin profiles, this information is linked here:
+>
+> - [HelmholtzKIP](https://hdl.handle.net/21.T11148/b9b76f887845e32d29f7)
+
+<DemoWorkspace className="h-[11lh]" blocks={[
     { type: "profile_hmc", id: "profile", x: 10, y: 10 }
 ]} />
 
@@ -61,6 +69,11 @@ Only optional attributes can be removed from the block.
 A profile may allow adding additional attributes or profiles
 in the same record, below or above itself.
 Note that we do not support proper validation for such cases (yet).
+
+While profiles are sets of attributes,
+an additional attribute is a single attribute you can add.
+This may be in addition to other profiles or other attributes.
+Otherwise, the concept is the same as for profiles.
 
 > [!tip]
 > 

@@ -4,8 +4,7 @@ import { addBasePath } from "next/dist/client/add-base-path"
 export const attribute = {
     type: "attribute_key",
     tooltip: "asdf",
-    helpUrl:
-        "https://dtr-test.pidconsortium.net/#objects/21.T11148/b9b76f887845e32d29f7",
+    helpUrl: addBasePath("/docs/blocks/profile#additional-attributes-and-multiple-profiles"),
     message0: "%1 On failure %2 %3 %4 %5",
     args0: [
         {
