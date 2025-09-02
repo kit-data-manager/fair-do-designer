@@ -27,7 +27,7 @@ const navbar = (
                 <FrameIcon
                     style={{ width: "20px", height: "20px", flexShrink: 0 }}
                 />
-                Fair-DO Designer Docs
+                FAIR DO Designer Docs
             </span>
         }
         // ... Your additional navbar options

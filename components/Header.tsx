@@ -56,7 +56,7 @@ export function Header() {
     return (
         <div className="h-12 flex items-center px-4 gap-3 max-w-full">
             <FrameIcon className="size-5 shrink-0" />
-            <div className="font-bold text-nowrap">Fair-DO Designer</div>
+            <div className="font-bold text-nowrap">FAIR DO Designer</div>
             {editName ? (
                 <Input
                     className="w-60"
