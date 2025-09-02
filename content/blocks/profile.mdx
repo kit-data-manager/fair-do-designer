@@ -1,3 +1,77 @@
+import { DemoWorkspace } from "../../components/demo/DemoWorkspace"
+
 # Profile
 
-The profile block.
+<DemoWorkspace className="h-[10lh]" blocks={[
+    { type: "profile_hmc", id: "profile", x: 10, y: 10 }
+]} />
+
+Profiles are a set of mandatory and optional attributes
+and associated information for each attribute,
+like cardinality.
+You can get this block from the “Records & Profiles” category
+in the left sidebar.
+
+The main task when using the FAIR DO Designer is
+to connect your provided information with attributes of a profile.
+A profile in turn needs to exist in a record block.
+This is shown in the figure below.
+
+<DemoWorkspace className="h-[13lh]" blocks={[
+    {
+        type: "pidrecord",
+        id: "record",
+        x: 10,
+        y: 10,
+        inputs: {
+            "record": {block: { type: "profile_hmc", id: "profile", x: 300, y: 10 }}
+        }
+    }
+]} />
+
+## Cardinality
+
+Some attributes allow adding multiple values.
+By default, there will be an empty List block attached to them.
+You can also get a list block using the "Lists" category.
+
+<DemoWorkspace className="h-[3.5lh]" blocks={[
+    { type: "lists_create_with", id: "list", x: 10, y: 10 }
+]} />
+
+## Validation
+
+Not everything can be checked before applying a design with real data.
+Still, we do some basic validation using the available information.
+To the right of each attribute,
+there is an icon indicating the validation status for this attribute.
+Use your mouse to hover over it and understand the meaning of the error,
+as well as possible details.
+
+## Mandatory and optional attributes
+
+All attributes listed by default are mandatory.
+At the bottom of a block is a dropdown menu to add optional attributes,
+which then get appended below the menu.
+
+Only optional attributes can be removed from the block.
+
+## Additional attributes and multiple profiles
+
+A profile may allow adding additional attributes or profiles
+in the same record, below or above itself.
+Note that we do not support proper validation for such cases (yet).
+
+> [!tip]
+> 
+> **Example**: Assume two profiles,
+> both requiring the same “dateCreated” attribute type.
+> Setting the value on profile A will be enough,
+> but profile block B will still complain
+> that no value is attached.
+> In this case, the warning can be safely ignored.
+> If the values are not the same,
+> this will lead to two different “dateCreated” values,
+> which is disallowed by most profiles.
+
+This is therefore currently being considered a feature for advanced users.
