@@ -135,14 +135,15 @@ forBlock["attribute_key"] = function <T extends Util.FairDoCodeGenerator>(
     block: Blockly.Block,
     generator: T,
 ) {
-    // TODO: change Order.ATOMIC to the correct operator precedence strength
-    const value_slot = generator.valueToCode(block, "slot", Order.ATOMIC)
-    const text_pid = block.getFieldValue("pid")
+    const value_key = generator.valueToCode(block, 'KEY', Order.ATOMIC);
+    const value_value = generator.valueToCode(block, 'VALUE', Order.ATOMIC);
 
     let code = ""
-    if (value_slot) {
+    let isSomething = (thing: string | null | undefined) => 
+        thing && thing.length > 0 && thing !== "''";
+    if (isSomething(value_key) && isSomething(value_value)) {
         code += generator.makeLineComment(`${block.type}`)
-        code += generator.makeAddAttributeChainCall(text_pid, value_slot)
+        code += generator.makeAddAttributeChainCall(value_key, value_value)
     }
     return code
 }
