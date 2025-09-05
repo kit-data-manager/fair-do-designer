@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { UnifiedDocument } from "@kit-data-manager/json-picker-react"
-import { useCallback, useRef } from "react"
+import { useCallback, useRef, useState } from "react"
 import * as Blockly from "blockly"
 import { useStore } from "zustand/react"
 import { workspaceStore } from "@/lib/stores/workspace"
@@ -10,10 +10,20 @@ import type {
     JSONKeyClickEvent,
     UnifiedDocumentCustomEvent,
 } from "@kit-data-manager/json-picker"
+import { lastUsedFilesStore } from "@/lib/stores/last-used-files"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { InfoIcon } from "lucide-react"
 
 export function InputPane() {
     const unifiedDocument = useRef<HTMLUnifiedDocumentElement>(null)
     const uploadInputRef = useRef<HTMLInputElement>(null)
+    const addToUsedFiles = useStore(lastUsedFilesStore, (s) => s.appendToFiles)
+    const setUsedFiles = useStore(lastUsedFilesStore, (s) => s.setFiles)
+    const clearUsedFiles = useStore(lastUsedFilesStore, (s) => s.clearFiles)
+    const lastUsedFiles = useStore(lastUsedFilesStore, (s) => s.files)
+
+    // True if user files or example files have been loaded
+    const [somethingLoaded, setSomethingLoaded] = useState(false)
 
     const workspace = useStore(workspaceStore, (s) => s.workspace)
 
@@ -29,12 +39,29 @@ export function InputPane() {
                 uploadInputRef.current.files &&
                 uploadInputRef.current.files.length > 0
             ) {
+                if (somethingLoaded) {
+                    addToUsedFiles(
+                        [...uploadInputRef.current.files].map((f) => ({
+                            name: f.name,
+                            path: f.webkitRelativePath,
+                        })),
+                    )
+                } else {
+                    setUsedFiles(
+                        [...uploadInputRef.current.files].map((f) => ({
+                            name: f.name,
+                            path: f.webkitRelativePath,
+                        })),
+                    )
+                }
+
+                setSomethingLoaded(true)
                 unifiedDocument.current
                     .addFiles([...uploadInputRef.current.files])
                     .catch(console.error)
             }
         }
-    }, [])
+    }, [addToUsedFiles, setUsedFiles, somethingLoaded])
 
     const loadExampleFiles = useCallback(async () => {
         const basePath = process.env.NEXT_PUBLIC_BASE_PATH || ""
@@ -58,13 +85,15 @@ export function InputPane() {
 
         if (!unifiedDocument.current) return
         unifiedDocument.current.addFiles(blobs).catch(console.error)
+        setSomethingLoaded(true)
     }, [])
 
     const reset = useCallback(() => {
         if (unifiedDocument.current) {
+            clearUsedFiles()
             unifiedDocument.current.resetFiles().then()
         }
-    }, [])
+    }, [clearUsedFiles])
 
     const onJsonKeyClick = useCallback(
         (event: UnifiedDocumentCustomEvent<JSONKeyClickEvent>) => {
@@ -110,7 +139,7 @@ export function InputPane() {
                     Reset
                 </Button>
             </div>
-            <div className="min-h-0 overflow-x-auto pt-2">
+            <div className="min-h-0 overflow-x-auto">
                 <div className="min-h-0 h-full p-2 flex flex-col">
                     <input
                         type="file"
@@ -120,13 +149,28 @@ export function InputPane() {
                         ref={uploadInputRef}
                         onChange={onUploadInputChange}
                     />
-                    <div className="">
-                        <div className="text-sm text-muted-foreground">
-                            Hint: Use drag-and-drop to place Data Access blocks
-                            in the workspace
-                        </div>
+                    {!somethingLoaded && lastUsedFiles.length > 0 && (
+                        <Alert className="mb-2">
+                            <InfoIcon />
+                            <AlertTitle className="flex items-start justify-between">
+                                The following files were previously used with
+                                this design
+                            </AlertTitle>
+                            <AlertDescription>
+                                {lastUsedFiles.map((file) => (
+                                    <div
+                                        key={file.path + file.name}
+                                        className="text-sm max-w-full truncate"
+                                    >
+                                        {file.path}
+                                        {file.name}
+                                    </div>
+                                ))}
+                            </AlertDescription>
+                        </Alert>
+                    )}
+                    <div>
                         <UnifiedDocument
-                            className={""}
                             ref={unifiedDocument}
                             onJsonKeyClick={onJsonKeyClick}
                         />
