@@ -139,7 +139,7 @@ forBlock["attribute_key"] = function <T extends Util.FairDoCodeGenerator>(
     const value_value = generator.valueToCode(block, 'VALUE', Order.ATOMIC);
 
     let code = ""
-    let isSomething = (thing: string | null | undefined) => 
+    const isSomething = (thing: string | null | undefined) => 
         thing && thing.length > 0 && thing !== "''";
     if (isSomething(value_key) && isSomething(value_value)) {
         code += generator.makeLineComment(`${block.type}`)
