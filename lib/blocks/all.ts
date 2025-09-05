@@ -15,7 +15,6 @@ import * as BlockDynamicConnection from "@blockly/block-dynamic-connection"
 export const blocks = Blockly.common.createBlockDefinitionsFromJsonArray([
     pidrecord,
     pidrecord_skipable,
-    attribute,
     transform_string,
 ])
 
@@ -26,6 +25,7 @@ Blockly.Blocks["profile_hmc"] = profile_hmc
 Blockly.Blocks["profile_hmc_reference_block"] =
     profile_hmc.createAttributeReferenceBlock()
 
+Blockly.Blocks["attribute_key"] = attribute
 Blockly.Blocks["backlink_declaration"] = backlink_declaration
 
 Blockly.Blocks["stop_design"] = stop_design

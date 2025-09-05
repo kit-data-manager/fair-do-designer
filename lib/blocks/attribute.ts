@@ -1,61 +1,99 @@
 import * as Blockly from "blockly/core"
 import { addBasePath } from "next/dist/client/add-base-path"
+import { ValidationField } from "../fields/ValidationField";
 
-export const attribute = {
-    type: "attribute_key",
-    tooltip: "asdf",
-    helpUrl: addBasePath("/docs/blocks/profile#additional-attributes-and-multiple-profiles"),
-    message0: "%1 On failure %2 %3 %4 %5",
-    args0: [
-        {
-            type: "field_label_serializable",
-            text: "digitalObjectLocation",
-            name: "name",
-        },
-        {
-            type: "field_dropdown",
-            name: "on_fail",
-            options: [
-                ["stop", "fail-stop"],
-                ["continue silent", "fail-continue"],
-                ["continue with warning", "fail-warn"],
-            ],
-        },
-        {
-            type: "input_value",
-            name: "slot",
-            check: "String",
-        },
-        {
-            type: "field_input",
-            name: "pid",
-            text: "21.11152/a3f19b32-4550-40bb-9f69-b8ffd4f6d0ea",
-        },
-        {
-            type: "input_dummy",
-            name: "NAME",
-        },
-    ],
-    previousStatement: ["attribute_key", "profile"],
-    nextStatement: ["attribute_key", "profile"],
-    colour: 230,
-    inputsInline: false,
+export interface StandaloneAttribute extends Blockly.BlockSvg {
+  // event handlers
+  onBlockMove(event: Blockly.Events.BlockMove): void
 }
 
+/* @ts-expect-error Object can't be cast to class */
+export const attribute: StandaloneAttribute = {
+  init: function init() {
+    const allowedValueTypes = [
+      "JSON",
+      "String",
+      "Boolean",
+      "Number",
+      "BackwardLinkFor",
+    ]
+
+    this.appendValueInput('KEY')
+      .setCheck('String')
+      .appendField('Attribute-PID');
+    this.appendValueInput('VALUE')
+      .appendField(
+        new Blockly.FieldLabelSerializable('with value'),
+        'VALUE'
+      )
+      .appendField(
+        new ValidationField({
+          // not bound to a profile
+          mandatory: false,
+          // same reason. To repeat it, clone the block.
+          repeatable: false,
+        }),
+        "validationfield"
+      )
+      .setCheck(allowedValueTypes)
+      .setAlign(1);
+    const allowedStatementTypes = ["profile_hmc", "attribute_key"]
+    this.setPreviousStatement(true, allowedStatementTypes);
+    this.setNextStatement(true, allowedStatementTypes);
+    this.setTooltip('Additional Attribute, independent of profiles.');
+    this.setHelpUrl(addBasePath("/docs/blocks/profile#additional-attributes-and-multiple-profiles"));
+    this.setColour(225);
+  },
+
+  onBlockMove(event: Blockly.Events.BlockMove) {
+    if (
+      event.newParentId === this.id &&
+      event.reason?.includes("connect")
+    ) {
+      setTimeout(() => {
+        if (!event.newInputName) return
+        const field = this.getField("validationfield")
+        if (field instanceof ValidationField) {
+          field.forceCheck()
+        }
+      }, 100)
+    }
+
+    if (
+      event.oldParentId === this.id &&
+      event.reason?.includes("disconnect")
+    ) {
+      setTimeout(() => {
+        if (!event.oldInputName) return
+        const field = this.getField("validationfield")
+        if (field instanceof ValidationField) {
+          field.forceCheck()
+        }
+      }, 100)
+    }
+  },
+
+  onchange: function onchange(abstract) {
+    if (abstract instanceof Blockly.Events.BlockMove) {
+      this.onBlockMove(abstract)
+    }
+  },
+};
+
 export const backlink_declaration = {
-    init: function () {
-        this.appendValueInput("ATTRIBUTE_KEY")
-            .setCheck(["attribute_key", "String"])
-            .appendField("Inverse reference to attribute")
-        this.setOutput(true, "BackwardLinkFor")
-        this.setTooltip(
-            "Adds reverse references (backlinks) if another record links to this record using the given attribute key.",
-        )
-        this.setHelpUrl(
-            addBasePath(
-                "/docs/blocks/automatic-backlinks#inverse-reference-to-attribute",
-            ),
-        )
-        this.setColour(120)
-    },
-} as Blockly.Block
+  init: function () {
+    this.appendValueInput("ATTRIBUTE_KEY")
+      .setCheck(["attribute_key", "String"])
+      .appendField("Inverse reference to attribute")
+    this.setOutput(true, "BackwardLinkFor")
+    this.setTooltip(
+      "Adds reverse references (backlinks) if another record links to this record using the given attribute key.",
+    )
+    this.setHelpUrl(
+      addBasePath(
+        "/docs/blocks/automatic-backlinks#inverse-reference-to-attribute",
+      ),
+    )
+    this.setColour(120)
+  },
+} as Blockly.Block;
