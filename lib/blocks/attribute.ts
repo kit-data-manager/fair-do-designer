@@ -1,10 +1,10 @@
 import * as Blockly from "blockly/core"
+import { addBasePath } from "next/dist/client/add-base-path"
 
 export const attribute = {
     type: "attribute_key",
     tooltip: "asdf",
-    helpUrl:
-        "https://dtr-test.pidconsortium.net/#objects/21.T11148/b9b76f887845e32d29f7",
+    helpUrl: addBasePath("/docs/blocks/profile#additional-attributes-and-multiple-profiles"),
     message0: "%1 On failure %2 %3 %4 %5",
     args0: [
         {
@@ -51,7 +51,11 @@ export const backlink_declaration = {
         this.setTooltip(
             "Adds reverse references (backlinks) if another record links to this record using the given attribute key.",
         )
-        this.setHelpUrl("")
+        this.setHelpUrl(
+            addBasePath(
+                "/docs/blocks/automatic-backlinks#inverse-reference-to-attribute",
+            ),
+        )
         this.setColour(120)
     },
 } as Blockly.Block

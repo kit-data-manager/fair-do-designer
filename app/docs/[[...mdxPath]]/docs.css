@@ -1,0 +1,44 @@
+.blocklyMainBackground {
+    stroke: none;
+}
+
+html.dark .blocklyMainBackground {
+    fill-opacity: .3;
+}
+
+kbd {
+    background-color: var(--muted);
+    color: var(--foreground);
+    border: 0.13em solid var(--border);
+    border-radius: 0.3em;
+    padding: 0 0.2em;
+    font-family: geist, sans-serif;
+}
+
+.big-enum {
+    margin-top: 1.25em;
+}
+
+.big-enum ol {
+    counter-reset: big-counter;
+    list-style: none;
+    margin: 0 0 0 1em;
+}
+
+.big-enum li {
+    counter-increment: big-counter;
+}
+
+.big-enum li::before {
+    content: counter(big-counter);
+    background: var(--primary);
+    color: var(--primary-foreground);
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 100%;
+    margin-right: .6em;
+    padding: .2em;
+    height: 1.5em;
+    width: 1.5em;
+}

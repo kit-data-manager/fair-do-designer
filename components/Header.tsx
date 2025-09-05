@@ -15,6 +15,7 @@ import {
     saveToDisk,
     saveToLocalStorage,
 } from "@/lib/serialization"
+import Link from "next/link"
 import { RecordMappingGenerator } from "@/lib/generators/python"
 import { PythonCodeDownload } from "@/lib/python_code_download"
 import { useCopyToClipboard } from "usehooks-ts"
@@ -75,7 +76,7 @@ export function Header() {
     return (
         <div className="h-12 flex items-center px-4 gap-3 max-w-full">
             <FrameIcon className="size-5 shrink-0" />
-            <div className="font-bold text-nowrap">Fair-DO Designer</div>
+            <div className="font-bold text-nowrap">FAIR DO Designer</div>
             {editName ? (
                 <Input
                     className="w-60"
@@ -126,6 +127,22 @@ export function Header() {
                         <MenubarItem onClick={exportCode}>
                             Export Code
                         </MenubarItem>
+                    </MenubarContent>
+                </MenubarMenu>
+                <MenubarMenu>
+                    <MenubarTrigger>
+                        Help
+                        <ChevronDown
+                            className={"size-4 ml-1 text-muted-foreground"}
+                        />
+                    </MenubarTrigger>
+                    <MenubarContent>
+                        <Link href={"/docs"}>
+                            <MenubarItem>Documentation</MenubarItem>
+                        </Link>
+                        <Link href={"/docs/getting-started"}>
+                            <MenubarItem>Getting Started</MenubarItem>
+                        </Link>
                     </MenubarContent>
                 </MenubarMenu>
             </Menubar>

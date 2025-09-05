@@ -19,7 +19,7 @@ export default function Home() {
     return (
         <div className="h-screen w-screen">
             <ResizablePanelGroup direction={"horizontal"}>
-                <ResizablePanel defaultSize={70}>
+                <ResizablePanel defaultSize={70} className={"flex flex-col"}>
                     <Header />
                     <Workspace />
                 </ResizablePanel>

@@ -1,0 +1,62 @@
+import { DemoWorkspace } from "../../components/demo/DemoWorkspace"
+
+# Records
+
+PID records store all information assigned
+to profiles and attributes
+within the FAIR DO Designer.
+
+<DemoWorkspace className="h-[5lh]" blocks={[
+    {
+        type: "pidrecord",
+        id: "record",
+        x: 10,
+        y: 10
+    }
+]} />
+
+The block therefore has a slot to attach profiles,
+as well as additional attributes,
+to represent this visually.
+
+Depending on the blocks attached, it may or may not be possible to stack more of them together.
+
+## Using multiple record blocks
+
+The purpose of record blocks is not purely visual:
+It is possible to add multiple record blocks.
+For example, adding three record blocks means
+that processing a single JSON document
+will create up to three FAIR DOs,
+each with their own PID.
+
+## The Local ID slot
+
+If you assign a value to this slot,
+you can use this value to reference it.
+It will later be replaced by the created PID.
+
+> [!important]
+>
+> This only works if
+> the value is **exactly** the same as the Local ID.
+> It will **not** work if you wrap the value.
+> For example:
+> `"{"type", "my_complex_value", "reference": $my_local_id}"`.
+
+## The “Skip If” slot
+
+There are variants of the record block which have an additional slot:
+
+<DemoWorkspace className="h-[6lh]" blocks={[
+    {
+        type: "pidrecord_skipable",
+        id: "record",
+        x: 10,
+        y: 10
+    }
+]} />
+
+You can attach a boolean block to this slot if you want to skip a record.
+If the boolean is `false`, the record will be ignored.
+The default is `true`.

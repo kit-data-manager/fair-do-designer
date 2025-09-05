@@ -1,8 +1,10 @@
+import { addBasePath } from "next/dist/client/add-base-path"
+
 export const pidrecord = {
     type: "pidrecord",
     tooltip:
         "Defines a PID record, which holds a set of attributes and profiles.",
-    helpUrl: "",
+    helpUrl: addBasePath("/docs/blocks/records"),
     message0: "PID Record %1 %2 Local ID (pseudo-pid) %3 %4",
     args0: [
         {
@@ -32,7 +34,7 @@ export const pidrecord_skipable = {
     type: "pidrecord_skipable",
     tooltip:
         "Defines a PID record, which holds a set of attributes and profiles. It can be skipped based on a condition.",
-    helpUrl: "",
+    helpUrl: addBasePath("/docs/blocks/records"),
     message0: "PID Record %1 %2 Local ID (pseudo-pid) %3 %4 Skip if %5",
     args0: [
         {

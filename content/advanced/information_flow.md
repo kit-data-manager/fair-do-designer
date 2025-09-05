@@ -1,4 +1,4 @@
-# Information Flow in the FAIR DO Designer
+# Information Flow
 
 ## The flow within a single design
 
