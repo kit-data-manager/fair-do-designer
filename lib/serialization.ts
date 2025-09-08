@@ -68,16 +68,23 @@ const load = function (
 
     // Don't emit events during loading.
     Blockly.Events.disable()
-    Blockly.serialization.workspaces.load(
-        workspaceData.data,
-        workspace,
-        undefined,
-    )
+
+    try {
+        Blockly.serialization.workspaces.load(
+            workspaceData.data,
+            workspace,
+            undefined,
+        )
+    } catch (e) {
+        throw e
+    } finally {
+        Blockly.Events.enable()
+    }
+
     workspaceStore.getState().setDesignName(workspaceData.name)
     if (workspaceData.lastUsedFiles) {
         lastUsedFilesStore.getState().setFiles(workspaceData.lastUsedFiles)
     }
-    Blockly.Events.enable()
 }
 
 /**
