@@ -7,7 +7,7 @@
     "build": "next build --turbopack",
     "start": "npx serve@latest out",
     "lint": "next lint",
-    "postbuild": "pagefind --site out --glob docs/**/*.{html} --output-path public/_pagefind"
+    "postbuild": "pagefind --site out --glob docs/**/*.{html} --output-path out/_pagefind"
   },
   "dependencies": {
     "@blockly/block-dynamic-connection": "^0.8.1",
