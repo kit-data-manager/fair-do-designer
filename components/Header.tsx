@@ -19,6 +19,7 @@ import Link from "next/link"
 import { RecordMappingGenerator } from "@/lib/generators/python"
 import { PythonCodeDownload } from "@/lib/python_code_download"
 import { useCopyToClipboard } from "usehooks-ts"
+import { ThemeToggle } from "@/components/ThemeToggle"
 
 export function Header() {
     const designName = useStore(workspaceStore, (s) => s.designName)
@@ -74,7 +75,7 @@ export function Header() {
     }, [copy, workspace])
 
     return (
-        <div className="h-12 flex items-center px-4 gap-3 max-w-full">
+        <div className="h-12 flex items-center pl-4 pr-2 gap-3 max-w-full">
             <FrameIcon className="size-5 shrink-0" />
             <div className="font-bold text-nowrap">FAIR DO Designer</div>
             {editName ? (
@@ -146,6 +147,10 @@ export function Header() {
                     </MenubarContent>
                 </MenubarMenu>
             </Menubar>
+
+            <div className="grow" />
+
+            <ThemeToggle />
 
             <input
                 className="hidden"
