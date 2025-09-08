@@ -1,4 +1,10 @@
-import { ChevronDown, FrameIcon, SquarePenIcon } from "lucide-react"
+import {
+    ChevronDown,
+    FrameIcon,
+    RedoIcon,
+    SquarePenIcon,
+    UndoIcon,
+} from "lucide-react"
 import {
     Menubar,
     MenubarContent,
@@ -19,6 +25,7 @@ import Link from "next/link"
 import { RecordMappingGenerator } from "@/lib/generators/python"
 import { PythonCodeDownload } from "@/lib/python_code_download"
 import { useCopyToClipboard } from "usehooks-ts"
+import { Button } from "@/components/ui/button"
 
 export function Header() {
     const designName = useStore(workspaceStore, (s) => s.designName)
@@ -73,6 +80,14 @@ export function Header() {
         copy(code).then()
     }, [copy, workspace])
 
+    const undo = useCallback(() => {
+        workspace?.undo(false)
+    }, [workspace])
+
+    const redo = useCallback(() => {
+        workspace?.undo(true)
+    }, [workspace])
+
     return (
         <div className="h-12 flex items-center px-4 gap-3 max-w-full">
             <FrameIcon className="size-5 shrink-0" />
@@ -97,6 +112,15 @@ export function Header() {
             )}
 
             <Menubar>
+                <div className="flex justify-center items-center mr-1">
+                    <Button size="menubar" variant="ghost" onClick={undo}>
+                        <UndoIcon />
+                    </Button>
+                    <Button size="menubar" variant="ghost" onClick={redo}>
+                        <RedoIcon />
+                    </Button>
+                </div>
+
                 <MenubarMenu>
                     <MenubarTrigger>
                         File
