@@ -128,32 +128,38 @@ export function Workspace() {
         (event: DragEvent<HTMLDivElement>) => {
             if (!workspace) return
 
-            const block = workspace.newBlock("input_jsonpath")
-            const query = event.dataTransfer?.getData("text/plain")
+            Blockly.Events.setGroup(true)
 
-            if (!query) {
-                console.error(
-                    "Received drop event that did not include a valid text/plain data point",
+            try {
+                const block = workspace.newBlock("input_jsonpath")
+                const query = event.dataTransfer?.getData("text/plain")
+
+                if (!query) {
+                    console.error(
+                        "Received drop event that did not include a valid text/plain data point",
+                    )
+                    return
+                }
+
+                if (
+                    "updateQuery" in block &&
+                    typeof block.updateQuery === "function"
+                ) {
+                    block.updateQuery(query)
+                }
+
+                block.initSvg()
+                const offset = workspace.getOriginOffsetInPixels()
+                block.moveTo(
+                    new Blockly.utils.Coordinate(
+                        event.nativeEvent.offsetX - offset.x,
+                        event.nativeEvent.offsetY - offset.y,
+                    ),
                 )
-                return
+                block.render()
+            } finally {
+                Blockly.Events.setGroup(false)
             }
-
-            if (
-                "updateQuery" in block &&
-                typeof block.updateQuery === "function"
-            ) {
-                block.updateQuery(query)
-            }
-
-            block.initSvg()
-            const offset = workspace.getOriginOffsetInPixels()
-            block.moveTo(
-                new Blockly.utils.Coordinate(
-                    event.nativeEvent.offsetX - offset.x,
-                    event.nativeEvent.offsetY - offset.y,
-                ),
-            )
-            block.render()
         },
         [workspace],
     )

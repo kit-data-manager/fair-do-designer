@@ -56,10 +56,14 @@ export class ValidationField extends FieldImage {
             // Rule 1: All attached blocks must be valid
             // Rule 2: At least one block must be attached
             // (Note: This allows empty slots, they should just be ignored in code generation)
-            const listBlocks =  block.inputList
-                .map((input) => input.connection?.targetBlock() ?? undefined).filter(b => b !== undefined).filter(b => !b.isInsertionMarker())
-            return listBlocks
-                .every((targetBlock) => checkBlock(targetBlock)) &&  listBlocks.length > 0
+            const listBlocks = block.inputList
+                .map((input) => input.connection?.targetBlock() ?? undefined)
+                .filter((b) => b !== undefined)
+                .filter((b) => !b.isInsertionMarker())
+            return (
+                listBlocks.every((targetBlock) => checkBlock(targetBlock)) &&
+                listBlocks.length > 0
+            )
         }
 
         return checkBlock(connectedBlock)
@@ -67,17 +71,17 @@ export class ValidationField extends FieldImage {
 
     setValidationResult(success: boolean | undefined) {
         if (success === undefined) {
-            this.setValue(CircleDashedIcon)
+            this.setValue(CircleDashedIcon, false)
             this.setTooltip("Validation status is unknown")
         } else if (success) {
             this.imageElement?.classList.add("green-icon")
             this.imageElement?.classList.remove("yellow-icon")
-            this.setValue(CheckIcon)
+            this.setValue(CheckIcon, false)
             this.setTooltip("Validation successful")
         } else if (!success) {
             this.imageElement?.classList.remove("green-icon")
             this.imageElement?.classList.add("yellow-icon")
-            this.setValue(TriangleAlertIcon)
+            this.setValue(TriangleAlertIcon, false)
             this.setTooltip(
                 "Validation failed. Make sure a valid block is attached." +
                     (this.options.mandatory
@@ -99,7 +103,7 @@ export class StaticValidationField extends ValidationField {
         super({})
         this.status = status
     }
-    
+
     initView(): void {
         super.initView()
         this.setValidationResult(this.status)
