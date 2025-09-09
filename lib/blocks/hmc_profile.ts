@@ -94,7 +94,7 @@ export const profile_hmc: HMCBlock = {
         this.appendDummyInput(propertyName)
         .appendField(nameLabel, value)
         .appendField(
-            new ValidationField({customCheck: () => true}),
+            new ValidationField({customCheck: async () => true}),
             `val-${propertyName}`,
         )
         .setAlign(Blockly.inputs.Align.RIGHT)

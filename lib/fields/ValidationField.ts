@@ -4,11 +4,16 @@ import { CheckIcon, CircleDashedIcon, TriangleAlertIcon } from "@/lib/icons"
 export interface ValidationFieldOptions {
     mandatory?: boolean
     repeatable?: boolean
-    customCheck?: (workspace: Workspace, conn: Connection | null) => boolean | undefined
+    customCheck?: (
+        workspace: Workspace,
+        conn: Connection | null,
+        currentValue: boolean | undefined
+    ) => Promise<boolean | undefined>
 }
 
 export class ValidationField extends FieldImage {
     options: ValidationFieldOptions
+    success: boolean | undefined
 
     constructor(opts: ValidationFieldOptions) {
         super(CircleDashedIcon, 16, 16)
@@ -34,8 +39,10 @@ export class ValidationField extends FieldImage {
         if (hasCustomCheck) {
             const workspace = this.getSourceBlock()?.workspace
             if (!workspace) { return false }
-            const customCheckResult = this.options.customCheck?.(workspace, connection)
-            this.setValidationResult(customCheckResult)
+            const customCheckResult = this.options.customCheck?.(workspace, connection, this.success)
+                .then((res) => {
+                    this.setValidationResult(res)
+                })
             return
         } else {
             const connected =
@@ -76,6 +83,7 @@ export class ValidationField extends FieldImage {
     }
 
     setValidationResult(success: boolean | undefined) {
+        this.success = success;
         if (success === undefined) {
             this.setValue(CircleDashedIcon)
             this.setTooltip("Validation status is unknown")

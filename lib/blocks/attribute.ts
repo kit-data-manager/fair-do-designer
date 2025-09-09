@@ -5,6 +5,7 @@ import { RecordMappingGenerator } from "../generators/python";
 import { pythonGenerator } from "blockly/python";
 
 export interface StandaloneAttribute extends Blockly.BlockSvg {
+  lastvalue: string | undefined,
   keyValidationIndicatorName: string,
   valueValidationIndicatorName: string,
   // event handlers
@@ -13,6 +14,7 @@ export interface StandaloneAttribute extends Blockly.BlockSvg {
 
 /* @ts-expect-error Object can't be cast to class */
 export const attribute: StandaloneAttribute = {
+  lastvalue: undefined,
   keyValidationIndicatorName: "KEY_VALIDATION",
   valueValidationIndicatorName: "VAL_VALIDATION",
   init: function init() {
@@ -31,9 +33,10 @@ export const attribute: StandaloneAttribute = {
         new ValidationField({
           mandatory: true,
           repeatable: false,
-          customCheck: (
+          customCheck: async (
             workspace: Blockly.Workspace,
-            conn: Blockly.Connection | null
+            conn: Blockly.Connection | null,
+            currentValue: boolean | undefined
           ) => {
             if (!conn) return false;
             if (!conn.isConnected()) return false;
@@ -44,14 +47,28 @@ export const attribute: StandaloneAttribute = {
             let code = g.blockToCode(connectedBlock);
             // remove python-like string quotes
             if (Array.isArray(code)) {
-              code[0] = code[0].replace(/^['"]|['"]$/g, '');
+              code = code[0].replace(/^['"]|['"]$/g, '');
             } else if (typeof code === 'string') {
               code = code.replace(/^['"]|['"]$/g, '');
             } else {
               return false;
             }
+            if (code == this.lastvalue) {
+              return currentValue;
+            }
+            this.lastvalue = code;
             // check if code matches regex for PIDs
-            const isPid: boolean = code.length > 0 && /^[0-9,A-Z,a-z]+\.[0-9,A-Z,a-z]+.*\/[!-~]+$/.test(code[0]);
+            const isPid: boolean = /^[0-9,A-Z,a-z]+\.[0-9,A-Z,a-z]+.*\/[!-~]+$/.test(code);
+            if (!isPid) { return false; }
+            let isResolveablePid: boolean = false;
+            try {
+              await fetch(`https://hdl.handle.net/${code}`, { redirect: "follow" })
+                .then(async (response) => {
+                  await response.json().then((data) => isResolveablePid = true);
+                });
+            } catch (e) {
+              return false;
+            }
             return isPid;
           }
         }),
