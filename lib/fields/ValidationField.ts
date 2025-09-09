@@ -1,9 +1,10 @@
-import { Block, FieldImage } from "blockly"
+import { Block, Connection, FieldImage } from "blockly"
 import { CheckIcon, CircleDashedIcon, TriangleAlertIcon } from "@/lib/icons"
 
 export interface ValidationFieldOptions {
     mandatory?: boolean
     repeatable?: boolean
+    customCheck?: (conn: Connection | null) => boolean | undefined
 }
 
 export class ValidationField extends FieldImage {
@@ -29,11 +30,18 @@ export class ValidationField extends FieldImage {
 
     forceCheck() {
         const connection = this.getParentInput().connection
-        const connected =
-            connection?.isConnected() && this.checkForArrayBlocks()
-        this.setValidationResult(
-            connected && !connection?.targetBlock()?.isInsertionMarker(),
-        )
+        const hasCustomCheck: boolean = this.options.customCheck !== undefined
+        if (hasCustomCheck) {
+            const customCheckResult = this.options.customCheck?.(connection)
+            this.setValidationResult(customCheckResult)
+            return
+        } else {
+            const connected =
+                connection?.isConnected() && this.checkForArrayBlocks()
+            this.setValidationResult(
+                connected && !connection?.targetBlock()?.isInsertionMarker(),
+            )
+        }
     }
 
     private checkForArrayBlocks(): boolean {
@@ -89,23 +97,5 @@ export class ValidationField extends FieldImage {
 
     dispose() {
         super.dispose()
-    }
-}
-
-export class StaticValidationField extends ValidationField {
-    protected status: boolean | undefined = undefined
-
-    constructor(status: boolean | undefined) {
-        super({})
-        this.status = status
-    }
-    
-    initView(): void {
-        super.initView()
-        this.setValidationResult(this.status)
-    }
-
-    forceCheck(): void {
-        this.setValidationResult(this.status)
     }
 }
