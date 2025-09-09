@@ -66,20 +66,9 @@ const load = function (
         throw `Unsupported save file version: ${workspaceData.version}`
     }
 
-    // Don't emit events during loading.
-    Blockly.Events.disable()
-
-    try {
-        Blockly.serialization.workspaces.load(
-            workspaceData.data,
-            workspace,
-            undefined,
-        )
-    } catch (e) {
-        throw e
-    } finally {
-        Blockly.Events.enable()
-    }
+    Blockly.serialization.workspaces.load(workspaceData.data, workspace, {
+        recordUndo: true,
+    })
 
     workspaceStore.getState().setDesignName(workspaceData.name)
     if (workspaceData.lastUsedFiles) {
