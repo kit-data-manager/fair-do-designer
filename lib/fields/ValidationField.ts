@@ -1,10 +1,10 @@
-import { Block, Connection, FieldImage } from "blockly"
+import { Block, Connection, FieldImage, Workspace } from "blockly"
 import { CheckIcon, CircleDashedIcon, TriangleAlertIcon } from "@/lib/icons"
 
 export interface ValidationFieldOptions {
     mandatory?: boolean
     repeatable?: boolean
-    customCheck?: (conn: Connection | null) => boolean | undefined
+    customCheck?: (workspace: Workspace, conn: Connection | null) => boolean | undefined
 }
 
 export class ValidationField extends FieldImage {
@@ -32,7 +32,9 @@ export class ValidationField extends FieldImage {
         const connection = this.getParentInput().connection
         const hasCustomCheck: boolean = this.options.customCheck !== undefined
         if (hasCustomCheck) {
-            const customCheckResult = this.options.customCheck?.(connection)
+            const workspace = this.getSourceBlock()?.workspace
+            if (!workspace) { return false }
+            const customCheckResult = this.options.customCheck?.(workspace, connection)
             this.setValidationResult(customCheckResult)
             return
         } else {
