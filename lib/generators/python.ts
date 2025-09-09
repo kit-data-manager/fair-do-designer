@@ -37,9 +37,9 @@ export class RecordMappingGenerator
 
     makeAddAttributeChainCall(key: string, value: string): string {
         if (value.startsWith("BackwardLinkFor(")) {
-            return `.addAttribute("${key}", ${value})\n`
+            return `.addAttribute(${key}, ${value})\n`
         } else {
-            return `.addAttribute("${key}", lambda: ${value})\n`
+            return `.addAttribute(${key}, lambda: ${value})\n`
         }
     }
 
@@ -209,7 +209,7 @@ forBlock["profile_hmc"] = function <T extends Util.FairDoCodeGenerator>(
     let code = generator.makeLineComment(`## ${block.type} ##`)
     code += generator.makeLineComment(`attribute: Self-Reference`)
     code += generator.makeAddAttributeChainCall(
-        block.profileAttributeKey,
+        `"${block.profileAttributeKey}"`,
         "'" + block.profile.identifier + "'",
     )
 
@@ -219,7 +219,7 @@ forBlock["profile_hmc"] = function <T extends Util.FairDoCodeGenerator>(
         const value = generator.valueToCode(block, name, Order.ATOMIC)
         if (pid !== undefined && value && value != "") {
             code += generator.makeLineComment(`attribute: ${input.name}`)
-            code += generator.makeAddAttributeChainCall(pid, value)
+            code += generator.makeAddAttributeChainCall(`"${pid}"`, value)
         }
     }
     return code
