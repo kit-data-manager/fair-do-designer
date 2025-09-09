@@ -1,13 +1,14 @@
 services:
   dev:
     container_name: fairdo-designer-dev
-    image: node:23
+    build: ./docker  # we do not need context, so I chose a directory with small size
     # simulate deployment environment
     environment:
       BASE_PATH: "/fair-do-designer"
     ports:
       - 127.0.0.1:8080:3000
+    # Make repo available as mount
     volumes:
       - .:/app
     working_dir: /app
-    command: sh -c "npm ci && npm run build && npm run dev"
+    command: sh -c "pipx run pre-commit install && npm ci && npm run build && npm run dev"

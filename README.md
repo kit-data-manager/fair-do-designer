@@ -1,20 +1,29 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+## Development
 
-First, run the development server:
+One way is to use the compose file to run a development container:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+podman compose up -d
+# if you use docker:
+# docker compose up -d
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+You can then use vscode to attach to the container.
+The dev server is available at http://localhost:8080/fair-do-designer.
+The container comes pre-installed with required tooling like node/npm and uv.
+
+Otherwise, use these manual steps (install required tooling manually in beforehand):
+
+- `pipx run pre-commit install` to enable all pre-commit hooks.
+- `npm ci && npm run build && npm run dev` to install dependencies for npm and run the service.
+
+### Python setup
+
+We use `uv`, which handles the setup properly if you execute a command.
+For the commands, refer to `.github/workflows/build.yml`.
+It includes a sync step which can normally be skipped, as it should be executed implicitly.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 

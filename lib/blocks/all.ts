@@ -9,13 +9,11 @@ import { stop_design, log_value, otherwise } from "./error_handling"
 
 import * as Blockly from "blockly/core"
 import { input_custom_json, input_jsonpath } from "./input"
-import { transform_string } from "./transform"
 import * as BlockDynamicConnection from "@blockly/block-dynamic-connection"
 
 export const blocks = Blockly.common.createBlockDefinitionsFromJsonArray([
     pidrecord,
     pidrecord_skipable,
-    transform_string,
 ])
 
 Blockly.Blocks["input_jsonpath"] = input_jsonpath
