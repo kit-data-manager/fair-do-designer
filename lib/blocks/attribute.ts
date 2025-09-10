@@ -6,7 +6,7 @@ import {
 } from "../fields/ValidationField"
 import { RecordMappingGenerator } from "../generators/python"
 
-const handleCache = new Map<string, boolean>()
+const handleCache = new Map<string, boolean | string>()
 
 export interface StandaloneAttribute extends Blockly.BlockSvg {
     keyValidationIndicatorName: string
@@ -144,7 +144,7 @@ const attributePIDCheckFunction: ValidationFieldOptions["customCheck"] = async (
     // check if code matches regex for PIDs
     const isPid: boolean = /^[0-9A-Za-z]+\.[0-9A-Za-z]+.*\/[!-~]+$/.test(code)
     if (!isPid) {
-        return false
+        return `The attached block does not return a valid PID: ${code}`
     }
     if (handleCache.has(code)) return handleCache.get(code)!
 
@@ -159,8 +159,9 @@ const attributePIDCheckFunction: ValidationFieldOptions["customCheck"] = async (
             handleCache.set(code, true)
             return true
         } else if (response.status === 404) {
-            handleCache.set(code, false)
-            return false
+            const msg = `The provided PID could not be resolved: ${code}`
+            handleCache.set(code, msg)
+            return msg
         } else {
             console.warn(
                 "PID could not be resolved due to unknown error",
@@ -170,8 +171,10 @@ const attributePIDCheckFunction: ValidationFieldOptions["customCheck"] = async (
         }
     } catch (e) {
         console.log(`PID ${code} could not be resolved`, e)
-        handleCache.set(code, false)
-        return false
+
+        const msg = "PID could not be resolved due to an error."
+        handleCache.set(code, msg)
+        return msg
     }
 }
 

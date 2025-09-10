@@ -7,12 +7,11 @@ export interface ValidationFieldOptions {
     customCheck?: (
         workspace: Workspace,
         conn: Connection | null,
-    ) => Promise<boolean>
+    ) => Promise<boolean | string>
 }
 
 export class ValidationField extends FieldImage {
     options: ValidationFieldOptions
-    success: boolean | undefined
 
     constructor(opts: ValidationFieldOptions) {
         super(CircleDashedIcon, 16, 16)
@@ -34,14 +33,13 @@ export class ValidationField extends FieldImage {
 
     forceCheck() {
         const connection = this.getParentInput().connection
-        const hasCustomCheck: boolean = this.options.customCheck !== undefined
-        if (hasCustomCheck) {
+        if (this.options.customCheck !== undefined) {
             const workspace = this.getSourceBlock()?.workspace
             if (!workspace) {
                 return
             }
 
-            this.options.customCheck?.(workspace, connection).then((res) => {
+            this.options.customCheck(workspace, connection).then((res) => {
                 this.setValidationResult(res)
             })
         } else {
@@ -86,25 +84,28 @@ export class ValidationField extends FieldImage {
         return checkBlock(connectedBlock)
     }
 
-    setValidationResult(success: boolean | undefined) {
-        this.success = success
+    setValidationResult(success: string | boolean | undefined) {
         if (success === undefined) {
+            this.imageElement?.classList.remove("green-icon")
+            this.imageElement?.classList.remove("yellow-icon")
             this.setValue(CircleDashedIcon)
             this.setTooltip("Validation status is unknown")
-        } else if (success) {
+        } else if (success === true) {
             this.imageElement?.classList.add("green-icon")
             this.imageElement?.classList.remove("yellow-icon")
             this.setValue(CheckIcon)
             this.setTooltip("Validation successful")
-        } else if (!success) {
+        } else if (!success || typeof success === "string") {
             this.imageElement?.classList.remove("green-icon")
             this.imageElement?.classList.add("yellow-icon")
             this.setValue(TriangleAlertIcon)
             this.setTooltip(
-                "Validation failed. Make sure a valid block is attached." +
-                    (this.options.mandatory
-                        ? " This property is mandatory and must be provided."
-                        : " This property is optional, so it can be deleted."),
+                typeof success === "string"
+                    ? success
+                    : "Validation failed. Make sure a valid block is attached." +
+                          (this.options.mandatory
+                              ? " This property is mandatory and must be provided."
+                              : " This property is optional, so it can be deleted."),
             )
         }
     }
