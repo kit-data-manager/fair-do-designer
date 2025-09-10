@@ -1,45 +1,181 @@
 import * as Blockly from "blockly/core"
 import { addBasePath } from "next/dist/client/add-base-path"
+import {
+    ValidationField,
+    ValidationFieldOptions,
+} from "../fields/ValidationField"
+import { RecordMappingGenerator } from "../generators/python"
 
-export const attribute = {
-    type: "attribute_key",
-    tooltip: "asdf",
-    helpUrl: addBasePath("/docs/blocks/profile#additional-attributes-and-multiple-profiles"),
-    message0: "%1 On failure %2 %3 %4 %5",
-    args0: [
-        {
-            type: "field_label_serializable",
-            text: "digitalObjectLocation",
-            name: "name",
-        },
-        {
-            type: "field_dropdown",
-            name: "on_fail",
-            options: [
-                ["stop", "fail-stop"],
-                ["continue silent", "fail-continue"],
-                ["continue with warning", "fail-warn"],
-            ],
-        },
-        {
-            type: "input_value",
-            name: "slot",
-            check: "String",
-        },
-        {
-            type: "field_input",
-            name: "pid",
-            text: "21.11152/a3f19b32-4550-40bb-9f69-b8ffd4f6d0ea",
-        },
-        {
-            type: "input_dummy",
-            name: "NAME",
-        },
-    ],
-    previousStatement: ["attribute_key", "profile"],
-    nextStatement: ["attribute_key", "profile"],
-    colour: 230,
-    inputsInline: false,
+const handleCache = new Map<string, boolean | string>()
+
+export interface StandaloneAttribute extends Blockly.BlockSvg {
+    keyValidationIndicatorName: string
+    valueValidationIndicatorName: string
+    // event handlers
+    onBlockMove(event: Blockly.Events.BlockMove): void
+}
+
+/* @ts-expect-error Object can't be cast to class */
+export const attribute: StandaloneAttribute = {
+    keyValidationIndicatorName: "KEY_VALIDATION",
+    valueValidationIndicatorName: "VAL_VALIDATION",
+    init: function init() {
+        const allowedValueTypes = [
+            "JSON",
+            "String",
+            "Boolean",
+            "Number",
+            "BackwardLinkFor",
+        ]
+
+        this.appendValueInput("KEY")
+            .setCheck("String")
+            .appendField("Attribute-PID")
+            .appendField(
+                new ValidationField({
+                    mandatory: true,
+                    repeatable: false,
+                    customCheck: attributePIDCheckFunction,
+                }),
+                this.keyValidationIndicatorName,
+            )
+        this.appendValueInput("VALUE")
+            .appendField(
+                new Blockly.FieldLabelSerializable("with value"),
+                "VALUE",
+            )
+            .appendField(
+                new ValidationField({
+                    // not bound to a profile
+                    mandatory: false,
+                    // same reason. To repeat it, clone the block.
+                    repeatable: false,
+                }),
+                this.valueValidationIndicatorName,
+            )
+            .setCheck(allowedValueTypes)
+            .setAlign(1)
+        const allowedStatementTypes = ["profile_hmc", "attribute_key"]
+        this.setPreviousStatement(true, allowedStatementTypes)
+        this.setNextStatement(true, allowedStatementTypes)
+        this.setTooltip("Additional Attribute, independent of profiles.")
+        this.setHelpUrl(
+            addBasePath(
+                "/docs/blocks/profile#additional-attributes-and-multiple-profiles",
+            ),
+        )
+        this.setColour(225)
+    },
+
+    onBlockMove(event: Blockly.Events.BlockMove) {
+        if (
+            event.newParentId === this.id &&
+            event.reason?.includes("connect")
+        ) {
+            setTimeout(() => {
+                if (event.newInputName === "KEY") {
+                    const field = this.getField(this.keyValidationIndicatorName)
+                    if (field instanceof ValidationField) {
+                        field.forceCheck()
+                    }
+                }
+                if (event.newInputName === "VALUE") {
+                    const field = this.getField(
+                        this.valueValidationIndicatorName,
+                    )
+                    if (field instanceof ValidationField) {
+                        field.forceCheck()
+                    }
+                }
+            }, 100)
+        }
+
+        if (
+            event.oldParentId === this.id &&
+            event.reason?.includes("disconnect")
+        ) {
+            setTimeout(() => {
+                if (event.oldInputName === "KEY") {
+                    const field = this.getField(this.keyValidationIndicatorName)
+                    if (field instanceof ValidationField) {
+                        field.forceCheck()
+                    }
+                }
+                if (event.oldInputName === "VALUE") {
+                    const field = this.getField(
+                        this.valueValidationIndicatorName,
+                    )
+                    if (field instanceof ValidationField) {
+                        field.forceCheck()
+                    }
+                }
+            }, 100)
+        }
+    },
+
+    onchange: function onchange(abstract) {
+        if (abstract instanceof Blockly.Events.BlockMove) {
+            this.onBlockMove(abstract)
+        }
+    },
+}
+
+const attributePIDCheckFunction: ValidationFieldOptions["customCheck"] = async (
+    workspace,
+    conn,
+) => {
+    if (!conn) return false
+    if (!conn.isConnected()) return false
+    if (conn.targetBlock()?.isInsertionMarker()) return false
+
+    const connectedBlock = conn.targetBlock()
+    const g = new RecordMappingGenerator("PidRecordMappingPython")
+
+    g.init(workspace)
+    let code = g.blockToCode(connectedBlock)
+
+    // remove python-like string quotes
+    if (Array.isArray(code)) {
+        code = code[0].replace(/^['"]|['"]$/g, "")
+    } else {
+        code = code.replace(/^['"]|['"]$/g, "")
+    }
+
+    // check if code matches regex for PIDs
+    const isPid: boolean = /^[0-9A-Za-z]+\.[0-9A-Za-z]+.*\/[!-~]+$/.test(code)
+    if (!isPid) {
+        return `The attached block does not return a valid PID: ${code}`
+    }
+    if (handleCache.has(code)) return handleCache.get(code)!
+
+    try {
+        const response = await fetch(`https://hdl.handle.net/${code}`, {
+            redirect: "follow",
+            cache: "force-cache",
+        })
+
+        if (response.ok) {
+            await response.json()
+            handleCache.set(code, true)
+            return true
+        } else if (response.status === 404) {
+            const msg = `The provided PID could not be resolved: ${code}`
+            handleCache.set(code, msg)
+            return msg
+        } else {
+            console.warn(
+                "PID could not be resolved due to unknown error",
+                response,
+            )
+            return false
+        }
+    } catch (e) {
+        console.log(`PID ${code} could not be resolved`, e)
+
+        const msg = "PID could not be resolved due to an error."
+        handleCache.set(code, msg)
+        return msg
+    }
 }
 
 export const backlink_declaration = {

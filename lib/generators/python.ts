@@ -37,9 +37,9 @@ export class RecordMappingGenerator
 
     makeAddAttributeChainCall(key: string, value: string): string {
         if (value.startsWith("BackwardLinkFor(")) {
-            return `.addAttribute("${key}", ${value})\n`
+            return `.addAttribute(${key}, ${value})\n`
         } else {
-            return `.addAttribute("${key}", lambda: ${value})\n`
+            return `.addAttribute(${key}, lambda: ${value})\n`
         }
     }
 
@@ -135,14 +135,15 @@ forBlock["attribute_key"] = function <T extends Util.FairDoCodeGenerator>(
     block: Blockly.Block,
     generator: T,
 ) {
-    // TODO: change Order.ATOMIC to the correct operator precedence strength
-    const value_slot = generator.valueToCode(block, "slot", Order.ATOMIC)
-    const text_pid = block.getFieldValue("pid")
+    const value_key = generator.valueToCode(block, 'KEY', Order.ATOMIC);
+    const value_value = generator.valueToCode(block, 'VALUE', Order.ATOMIC);
 
     let code = ""
-    if (value_slot) {
+    const isSomething = (thing: string | null | undefined) => 
+        thing && thing.length > 0 && thing !== "''";
+    if (isSomething(value_key) && isSomething(value_value)) {
         code += generator.makeLineComment(`${block.type}`)
-        code += generator.makeAddAttributeChainCall(text_pid, value_slot)
+        code += generator.makeAddAttributeChainCall(value_key, value_value)
     }
     return code
 }
@@ -208,7 +209,7 @@ forBlock["profile_hmc"] = function <T extends Util.FairDoCodeGenerator>(
     let code = generator.makeLineComment(`## ${block.type} ##`)
     code += generator.makeLineComment(`attribute: Self-Reference`)
     code += generator.makeAddAttributeChainCall(
-        block.profileAttributeKey,
+        `"${block.profileAttributeKey}"`,
         "'" + block.profile.identifier + "'",
     )
 
@@ -218,7 +219,7 @@ forBlock["profile_hmc"] = function <T extends Util.FairDoCodeGenerator>(
         const value = generator.valueToCode(block, name, Order.ATOMIC)
         if (pid !== undefined && value && value != "") {
             code += generator.makeLineComment(`attribute: ${input.name}`)
-            code += generator.makeAddAttributeChainCall(pid, value)
+            code += generator.makeAddAttributeChainCall(`"${pid}"`, value)
         }
     }
     return code
