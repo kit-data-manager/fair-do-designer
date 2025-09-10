@@ -1,0 +1,41 @@
+cff-version: 1.2.0
+message: If you use this software, please cite it using these metadata.
+type: software
+title: fair-do-designer
+abstract: A client-side web application to generate code for generating PID 
+  Records for FAIR DOs.
+version: 0.0.1-preview
+keywords:
+  - fair
+  - do
+  - fairdo
+  - fair-do
+  - designer
+  - design
+  - pid
+  - record
+authors:
+  - given-names: Andreas
+    orcid: https://orcid.org/0000-0001-6575-1022
+    family-names: Pfeil
+    affiliation: Karlsruhe Institute of Technology (KIT)
+    email: andreas.pfeil@kit.edu
+  - given-names: Christopher
+    orcid: https://orcid.org/0009-0003-2196-9187
+    family-names: Raquet
+    affiliation: Karlsruhe Institute of Technology (KIT)
+    email: christopher.raquet@kit.edu
+contact:
+  - given-names: Andreas
+    orcid: https://orcid.org/0000-0001-6575-1022
+    family-names: Pfeil
+    affiliation: Karlsruhe Institute of Technology (KIT)
+    email: andreas.pfeil@kit.edu
+  - given-names: Christopher
+    orcid: https://orcid.org/0009-0003-2196-9187
+    family-names: Raquet
+    affiliation: Karlsruhe Institute of Technology (KIT)
+    email: christopher.raquet@kit.edu
+license: Apache-2.0
+url: https://kit-data-manager.github.io/fair-do-designer/
+repository-code: https://github.com/kit-data-manager/fair-do-designer

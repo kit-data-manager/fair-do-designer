@@ -6,7 +6,11 @@ import { toolbox } from "@/lib/toolbox"
 import { useStore } from "zustand/react"
 import { workspaceStore } from "@/lib/stores/workspace"
 import { blocks as profile_blocks } from "@/lib/blocks/all"
-import { loadFromLocalStorage, saveToLocalStorage } from "@/lib/serialization"
+import {
+    clearLocalStorage,
+    loadFromLocalStorage,
+    saveToLocalStorage,
+} from "@/lib/serialization"
 import * as ErrorsToolbox from "@/lib/toolboxes/errors_logging"
 import * as BacklinksToolbox from "@/lib/toolboxes/backlinks"
 import { ValidationField } from "@/lib/fields/ValidationField"
@@ -29,7 +33,14 @@ export function Workspace() {
     const unsetWorkspace = useStore(workspaceStore, (s) => s.unsetWorkspace)
     const router = useRouter()
 
-    useEffect(() => {
+    const validationFieldCheckInterval = useRef<number>(null)
+
+    const [remountCounter, setRemountCounter] = useState(0)
+    const forceRemount = useCallback((max?: number) => {
+        setRemountCounter((v) => (max ? (v >= max ? v : v + 1) : v + 1))
+    }, [])
+
+    const mount = useCallback(() => {
         if (!divRef.current) {
             console.error("Failed to mount workspace: divRef empty")
             return
@@ -57,7 +68,13 @@ export function Workspace() {
         })
 
         // Load the initial state from storage and run the code.
-        loadFromLocalStorage(workspace)
+        const loadResult = loadFromLocalStorage(workspace)
+
+        if (loadResult === "error") {
+            clearLocalStorage()
+            forceRemount(1)
+            return
+        }
 
         // Every time the workspace changes state, save the changes to storage.
         workspace.addChangeListener((e: Blockly.Events.Abstract) => {
@@ -87,23 +104,34 @@ export function Workspace() {
         }
 
         // Periodically check them as well
-        const interval = setInterval(() => {
+        validationFieldCheckInterval.current = window.setInterval(() => {
             checkAllValidationFields()
         }, 2000)
+    }, [forceRemount, router, setWorkspace])
 
-        // Return cleanup function for clean unmounting
-        return () => {
-            console.warn("Unloading workspace")
-            unsetWorkspace()
-            clearInterval(interval)
+    const unmount = useCallback(() => {
+        console.warn("Unloading workspace")
 
-            try {
-                workspace.dispose()
-            } catch (e) {
-                console.warn("Disposing workspace failed", e)
-            }
+        unsetWorkspace()
+        if (validationFieldCheckInterval.current)
+            window.clearInterval(validationFieldCheckInterval.current)
+
+        try {
+            // Directly access the store to remove unwanted dependency on the workspace state
+            workspaceStore.getState().workspace?.dispose()
+            if (divRef.current) divRef.current.innerHTML = ""
+        } catch (e) {
+            console.warn("Disposing workspace failed", e)
         }
-    }, [router, setWorkspace, unsetWorkspace])
+    }, [unsetWorkspace])
+
+    useEffect(() => {
+        // Automatically (re-)mount when dependencies of the mount function change
+        mount()
+
+        // Cleanup function
+        return unmount
+    }, [mount, unmount, remountCounter])
 
     // Resize the workspace if the surrounding div resizes
     useEffect(() => {

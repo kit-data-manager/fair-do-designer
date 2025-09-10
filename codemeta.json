@@ -1,0 +1,70 @@
+{
+  "@context": [
+    "https://doi.org/10.5063/schema/codemeta-2.0",
+    "https://w3id.org/software-iodata",
+    "https://raw.githubusercontent.com/jantman/repostatus.org/master/badges/latest/ontology.jsonld",
+    "https://schema.org",
+    "https://w3id.org/software-types"
+  ],
+  "@type": "SoftwareSourceCode",
+  "author": [
+    {
+      "@type": "Person",
+      "givenName": "Andreas",
+      "familyName": "Pfeil",
+      "email": "andreas.pfeil@kit.edu",
+      "@id": "https://orcid.org/0000-0001-6575-1022",
+      "identifier": "https://orcid.org/0000-0001-6575-1022",
+      "affiliation": "Karlsruhe Institute of Technology (KIT)"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Christopher",
+      "familyName": "Raquet",
+      "email": "christopher.raquet@kit.edu",
+      "@id": "https://orcid.org/0009-0003-2196-9187",
+      "identifier": "https://orcid.org/0009-0003-2196-9187",
+      "affiliation": "Karlsruhe Institute of Technology (KIT)"
+    }
+  ],
+  "name": "fair-do-designer",
+  "description": "A client-side web application to generate code for generating PID Records for FAIR DOs.",
+  "version": "0.0.1-preview",
+  "keywords": [
+    "fair",
+    "do",
+    "fairdo",
+    "fair-do",
+    "designer",
+    "design",
+    "pid",
+    "record"
+  ],
+  "maintainer": [
+    {
+      "@type": "Person",
+      "givenName": "Andreas",
+      "familyName": "Pfeil",
+      "email": "andreas.pfeil@kit.edu",
+      "@id": "https://orcid.org/0000-0001-6575-1022",
+      "identifier": "https://orcid.org/0000-0001-6575-1022",
+      "affiliation": "Karlsruhe Institute of Technology (KIT)"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Christopher",
+      "familyName": "Raquet",
+      "email": "christopher.raquet@kit.edu",
+      "@id": "https://orcid.org/0009-0003-2196-9187",
+      "identifier": "https://orcid.org/0009-0003-2196-9187",
+      "affiliation": "Karlsruhe Institute of Technology (KIT)"
+    }
+  ],
+  "license": [
+    "https://spdx.org/licenses/Apache-2.0"
+  ],
+  "softwareHelp": "https://kit-data-manager.github.io/fair-do-designer/",
+  "codeRepository": "https://github.com/kit-data-manager/fair-do-designer",
+  "buildInstructions": "https://kit-data-manager.github.io/fair-do-designer/docs",
+  "url": "https://kit-data-manager.github.io/fair-do-designer/"
+}

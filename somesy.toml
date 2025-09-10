@@ -1,0 +1,39 @@
+[project]
+name = "fair-do-designer"
+version = "0.0.1-preview"
+description = "A client-side web application to generate code for generating PID Records for FAIR DOs."
+license = "Apache-2.0"
+repository = "https://github.com/kit-data-manager/fair-do-designer"
+homepage = "https://kit-data-manager.github.io/fair-do-designer/"
+documentation = "https://kit-data-manager.github.io/fair-do-designer/docs"
+keywords = [
+    "fair",
+    "do",
+    "fairdo",
+    "fair-do",
+    "designer",
+    "design",
+    "pid",
+    "record",
+]
+
+[[project.people]]
+given-names = "Andreas"
+family-names = "Pfeil"
+email = "andreas.pfeil@kit.edu"
+orcid = "https://orcid.org/0000-0001-6575-1022"
+affiliation = "Karlsruhe Institute of Technology (KIT)"
+author = true      # is a full author of the project (i.e. appears in citations)
+maintainer = true  # currently maintains the project (i.e. is a contact person)
+
+[[project.people]]
+given-names = "Christopher"
+family-names = "Raquet"
+email = "christopher.raquet@kit.edu"
+orcid = "https://orcid.org/0009-0003-2196-9187"
+affiliation = "Karlsruhe Institute of Technology (KIT)"
+author = true      # is a full author of the project (i.e. appears in citations)
+maintainer = true  # currently maintains the project (i.e. is a contact person)
+
+[config]
+verbose = true     # show detailed information about what somesy is doing
