@@ -10,7 +10,7 @@
     "postbuild": "pagefind --site out --glob docs/**/*.{html} --output-path public/_pagefind"
   },
   "dependencies": {
-    "@blockly/block-dynamic-connection": "^0.8.1",
+    "@blockly/block-plus-minus": "^9.0.2",
     "@blockly/field-dependent-dropdown": "^5.0.1",
     "@kit-data-manager/json-picker": "file:kit-data-manager-json-picker-0.0.4.tgz",
     "@kit-data-manager/json-picker-react": "file:kit-data-manager-json-picker-react-0.0.4.tgz",
