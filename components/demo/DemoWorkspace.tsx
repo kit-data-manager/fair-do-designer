@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react"
 import * as Blockly from "blockly"
-import * as BlockDynamicConnection from "@blockly/block-dynamic-connection"
 import { WorkspaceSvg } from "blockly"
 import { cn } from "@/lib/utils"
 import { OctagonAlert } from "lucide-react"
@@ -44,19 +43,12 @@ export function DemoWorkspace({
                 theme: theme.resolvedTheme === "dark" ? "docs-dark" : undefined,
                 grid: { spacing: 20, length: 3, colour: "#ccc", snap: true },
                 plugins: {
-                    connectionPreviewer:
-                        BlockDynamicConnection.decoratePreviewer(
-                            Blockly.InsertionMarkerPreviewer,
-                        ),
+                    connectionPreviewer: Blockly.InsertionMarkerPreviewer,
                 },
             })
 
             setWorkspace(workspace)
             setLoading(false)
-
-            workspace.addChangeListener(
-                BlockDynamicConnection.finalizeConnections,
-            )
 
             workspace.registerButtonCallback("dataAccessToolboxHelp", () => {
                 alert(

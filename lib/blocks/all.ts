@@ -9,14 +9,11 @@ import { stop_design, log_value, otherwise } from "./error_handling"
 
 import * as Blockly from "blockly/core"
 import { input_custom_json, input_jsonpath } from "./input"
-import { transform_string } from "./transform"
-import * as BlockDynamicConnection from "@blockly/block-dynamic-connection"
+import "@blockly/block-plus-minus"
 
 export const blocks = Blockly.common.createBlockDefinitionsFromJsonArray([
     pidrecord,
     pidrecord_skipable,
-    attribute,
-    transform_string,
 ])
 
 Blockly.Blocks["input_jsonpath"] = input_jsonpath
@@ -26,6 +23,7 @@ Blockly.Blocks["profile_hmc"] = profile_hmc
 Blockly.Blocks["profile_hmc_reference_block"] =
     profile_hmc.createAttributeReferenceBlock()
 
+Blockly.Blocks["attribute_key"] = attribute
 Blockly.Blocks["backlink_declaration"] = backlink_declaration
 
 Blockly.Blocks["stop_design"] = stop_design
@@ -33,4 +31,3 @@ Blockly.Blocks["log_value"] = log_value
 Blockly.Blocks["otherwise"] = otherwise
 
 Blockly.common.defineBlocks(blocks)
-BlockDynamicConnection.overrideOldBlockDefinitions()

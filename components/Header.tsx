@@ -1,4 +1,10 @@
-import { ChevronDown, FrameIcon, SquarePenIcon } from "lucide-react"
+import {
+    ChevronDown,
+    FrameIcon,
+    RedoIcon,
+    SquarePenIcon,
+    UndoIcon,
+} from "lucide-react"
 import {
     Menubar,
     MenubarContent,
@@ -12,6 +18,7 @@ import { workspaceStore } from "@/lib/stores/workspace"
 import { Input } from "@/components/ui/input"
 import {
     loadFromFile,
+    loadFromLocalStorage,
     saveToDisk,
     saveToLocalStorage,
 } from "@/lib/serialization"
@@ -20,6 +27,14 @@ import { RecordMappingGenerator } from "@/lib/generators/python"
 import { PythonCodeDownload } from "@/lib/python_code_download"
 import { useCopyToClipboard } from "usehooks-ts"
 import { ThemeToggle } from "@/components/ThemeToggle"
+import { Button } from "@/components/ui/button"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog"
 
 export function Header() {
     const designName = useStore(workspaceStore, (s) => s.designName)
@@ -29,6 +44,7 @@ export function Header() {
 
     const [nameInputValue, setNameInputValue] = useState(designName)
     const [editName, setEditName] = useState(false)
+    const [loadingSaveFileFailed, setLoadingSaveFileFailed] = useState(false)
 
     const [, copy] = useCopyToClipboard()
 
@@ -52,10 +68,18 @@ export function Header() {
         }
     }, [])
 
-    const onFileUploadInputChange = useCallback(() => {
+    const onFileUploadInputChange = useCallback(async () => {
         if (fileUploadInput.current && fileUploadInput.current.files) {
             const file = fileUploadInput.current.files.item(0)
-            if (file && workspace) loadFromFile(file, workspace)
+            if (file && workspace) {
+                saveToLocalStorage(workspace)
+                const result = await loadFromFile(file, workspace)
+                if (result === "no-data" || result === "error") {
+                    setLoadingSaveFileFailed(true)
+                    loadFromLocalStorage(workspace)
+                    return
+                }
+            }
         }
     }, [workspace])
 
@@ -74,8 +98,33 @@ export function Header() {
         copy(code).then()
     }, [copy, workspace])
 
+    const undo = useCallback(() => {
+        workspace?.undo(false)
+    }, [workspace])
+
+    const redo = useCallback(() => {
+        workspace?.undo(true)
+    }, [workspace])
+
     return (
         <div className="h-12 flex items-center pl-4 pr-2 gap-3 max-w-full">
+            {/* Dialogs */}
+            <Dialog
+                open={loadingSaveFileFailed}
+                onOpenChange={setLoadingSaveFileFailed}
+            >
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Failed to load</DialogTitle>
+                        <DialogDescription>
+                            The Design you have selected could not be loaded.
+                            Either the file is corrupted, or it does not contain
+                            a valid Design.
+                        </DialogDescription>
+                    </DialogHeader>
+                </DialogContent>
+            </Dialog>
+            {/* Dialogs End */}
             <FrameIcon className="size-5 shrink-0" />
             <div className="font-bold text-nowrap">FAIR DO Designer</div>
             {editName ? (
@@ -98,6 +147,15 @@ export function Header() {
             )}
 
             <Menubar>
+                <div className="flex justify-center items-center mr-1">
+                    <Button size="menubar" variant="ghost" onClick={undo}>
+                        <UndoIcon />
+                    </Button>
+                    <Button size="menubar" variant="ghost" onClick={redo}>
+                        <RedoIcon />
+                    </Button>
+                </div>
+
                 <MenubarMenu>
                     <MenubarTrigger>
                         File

@@ -3,11 +3,14 @@
 import { useCallback, useEffect, useRef, useState, DragEvent } from "react"
 import * as Blockly from "blockly"
 import { toolbox } from "@/lib/toolbox"
-import * as BlockDynamicConnection from "@blockly/block-dynamic-connection"
 import { useStore } from "zustand/react"
 import { workspaceStore } from "@/lib/stores/workspace"
 import { blocks as profile_blocks } from "@/lib/blocks/all"
-import { loadFromLocalStorage, saveToLocalStorage } from "@/lib/serialization"
+import {
+    clearLocalStorage,
+    loadFromLocalStorage,
+    saveToLocalStorage,
+} from "@/lib/serialization"
 import * as ErrorsToolbox from "@/lib/toolboxes/errors_logging"
 import * as BacklinksToolbox from "@/lib/toolboxes/backlinks"
 import { ValidationField } from "@/lib/fields/ValidationField"
@@ -45,14 +48,20 @@ export function Workspace() {
             )
     }, [theme, workspace])
 
-    useEffect(() => {
+    const validationFieldCheckInterval = useRef<number>(null)
+
+    const [remountCounter, setRemountCounter] = useState(0)
+    const forceRemount = useCallback((max?: number) => {
+        setRemountCounter((v) => (max ? (v >= max ? v : v + 1) : v + 1))
+    }, [])
+
+    const mount = useCallback(() => {
         if (!divRef.current) {
             console.error("Failed to mount workspace: divRef empty")
             return
         }
 
         Blockly.common.defineBlocks(profile_blocks)
-        BlockDynamicConnection.overrideOldBlockDefinitions()
 
         const workspace = Blockly.inject(divRef.current, {
             rtl: false,
@@ -64,9 +73,7 @@ export function Workspace() {
                     : undefined,
             grid: { spacing: 20, length: 3, colour: "#ccc", snap: true },
             plugins: {
-                connectionPreviewer: BlockDynamicConnection.decoratePreviewer(
-                    Blockly.InsertionMarkerPreviewer,
-                ),
+                connectionPreviewer: Blockly.InsertionMarkerPreviewer,
             },
         })
 
@@ -74,14 +81,19 @@ export function Workspace() {
         setLoading(false)
 
         workspace.addChangeListener(Blockly.Events.disableOrphans)
-        workspace.addChangeListener(BlockDynamicConnection.finalizeConnections)
 
         workspace.registerButtonCallback("dataAccessToolboxHelp", () => {
             router.push("/docs/blocks/data-access#advanced-queries")
         })
 
         // Load the initial state from storage and run the code.
-        loadFromLocalStorage(workspace)
+        const loadResult = loadFromLocalStorage(workspace)
+
+        if (loadResult === "error") {
+            clearLocalStorage()
+            forceRemount(1)
+            return
+        }
 
         // Every time the workspace changes state, save the changes to storage.
         workspace.addChangeListener((e: Blockly.Events.Abstract) => {
@@ -99,7 +111,7 @@ export function Workspace() {
 
         function checkAllValidationFields() {
             workspace.getAllBlocks().forEach((block) => {
-                if (block.type === "profile_hmc") {
+                if (block.type === "profile_hmc" || block.type === "attribute_key") {
                     const fields = Array.from(block.getFields())
                     for (const field of fields) {
                         if (field instanceof ValidationField) {
@@ -111,25 +123,35 @@ export function Workspace() {
         }
 
         // Periodically check them as well
-        const interval = setInterval(() => {
+        validationFieldCheckInterval.current = window.setInterval(() => {
             checkAllValidationFields()
         }, 2000)
+    }, [forceRemount, router, setWorkspace])
 
-        // Return cleanup function for clean unmounting
-        return () => {
-            console.warn("Unloading workspace")
-            unsetWorkspace()
-            clearInterval(interval)
+    const unmount = useCallback(() => {
+        console.warn("Unloading workspace")
 
-            try {
-                workspace.dispose()
-            } catch (e) {
-                console.warn("Disposing workspace failed", e)
-            } finally {
-                if (divRef.current) divRef.current.innerHTML = ""
-            }
+        unsetWorkspace()
+        if (validationFieldCheckInterval.current)
+            window.clearInterval(validationFieldCheckInterval.current)
+
+        try {
+            // Directly access the store to remove unwanted dependency on the workspace state
+            workspaceStore.getState().workspace?.dispose()
+        } catch (e) {
+            console.warn("Disposing workspace failed", e)
+        } finally {
+            if (divRef.current) divRef.current.innerHTML = ""
         }
-    }, [router, setWorkspace, unsetWorkspace])
+    }, [unsetWorkspace])
+
+    useEffect(() => {
+        // Automatically (re-)mount when dependencies of the mount function change
+        mount()
+
+        // Cleanup function
+        return unmount
+    }, [mount, unmount, remountCounter])
 
     // Resize the workspace if the surrounding div resizes
     useEffect(() => {
@@ -149,32 +171,38 @@ export function Workspace() {
         (event: DragEvent<HTMLDivElement>) => {
             if (!workspace) return
 
-            const block = workspace.newBlock("input_jsonpath")
-            const query = event.dataTransfer?.getData("text/plain")
+            Blockly.Events.setGroup(true)
 
-            if (!query) {
-                console.error(
-                    "Received drop event that did not include a valid text/plain data point",
+            try {
+                const block = workspace.newBlock("input_jsonpath")
+                const query = event.dataTransfer?.getData("text/plain")
+
+                if (!query) {
+                    console.error(
+                        "Received drop event that did not include a valid text/plain data point",
+                    )
+                    return
+                }
+
+                if (
+                    "updateQuery" in block &&
+                    typeof block.updateQuery === "function"
+                ) {
+                    block.updateQuery(query)
+                }
+
+                block.initSvg()
+                const offset = workspace.getOriginOffsetInPixels()
+                block.moveTo(
+                    new Blockly.utils.Coordinate(
+                        event.nativeEvent.offsetX - offset.x,
+                        event.nativeEvent.offsetY - offset.y,
+                    ),
                 )
-                return
+                block.render()
+            } finally {
+                Blockly.Events.setGroup(false)
             }
-
-            if (
-                "updateQuery" in block &&
-                typeof block.updateQuery === "function"
-            ) {
-                block.updateQuery(query)
-            }
-
-            block.initSvg()
-            const offset = workspace.getOriginOffsetInPixels()
-            block.moveTo(
-                new Blockly.utils.Coordinate(
-                    event.nativeEvent.offsetX - offset.x,
-                    event.nativeEvent.offsetY - offset.y,
-                ),
-            )
-            block.render()
         },
         [workspace],
     )

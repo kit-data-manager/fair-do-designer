@@ -62,64 +62,73 @@ const load = function (
     workspaceData: WorkspaceData,
     workspace: Blockly.Workspace,
 ) {
-    try {
-        if (workspaceData.version !== version) {
-            throw `Unsupported save file version: ${workspaceData.version}`
-        }
+    if (workspaceData.version !== version) {
+        throw `Unsupported save file version: ${workspaceData.version}`
+    }
 
-        // Don't emit events during loading.
-        Blockly.Events.disable()
-        Blockly.serialization.workspaces.load(
-            workspaceData.data,
-            workspace,
-            undefined,
-        )
-        workspaceStore.getState().setDesignName(workspaceData.name)
-        if (workspaceData.lastUsedFiles) {
-            lastUsedFilesStore.getState().setFiles(workspaceData.lastUsedFiles)
-        }
-        Blockly.Events.enable()
-    } catch (error) {
-        console.error("Error loading workspace:", error)
+    Blockly.serialization.workspaces.load(workspaceData.data, workspace, {
+        recordUndo: true,
+    })
+
+    workspaceStore.getState().setDesignName(workspaceData.name)
+    if (workspaceData.lastUsedFiles) {
+        lastUsedFilesStore.getState().setFiles(workspaceData.lastUsedFiles)
     }
 }
 
 /**
  * Loads saved state from local storage into the given workspace.
  * @param workspace Blockly workspace to load into.
+ * @returns {"no-data" | "loaded" | "error"} Status code of the load operation. Only "loaded" indicates success.
  */
-export const loadFromLocalStorage = function (workspace: Blockly.Workspace) {
+export const loadFromLocalStorage = function (
+    workspace: Blockly.Workspace,
+): "no-data" | "loaded" | "error" {
     try {
         const data = window.localStorage?.getItem(storageKey)
-        if (!data) return
+        if (!data) return "no-data"
 
         const workspaceData = JSON.parse(data) as WorkspaceData
 
         load(workspaceData, workspace)
+        return "loaded"
     } catch (error) {
-        console.error("Clean local storage! Error loading workspace:", error)
-        window.localStorage?.clear()
+        console.error("Error loading workspace from local storage:", error)
+        return "error"
     }
+}
+
+/**
+ * Removes save data from local storage
+ */
+export function clearLocalStorage() {
+    window.localStorage?.removeItem(storageKey)
 }
 
 /**
  * Loads saved state from local storage into the given workspace.
  * @param file File to load from.
  * @param workspace Blockly workspace to load into.
+ * @returns {Promise<"no-data" | "loaded" | "error">} Status code of the load operation. Only "loaded" indicates success.
  */
 export const loadFromFile = async function (
     file: File,
     workspace: Blockly.Workspace,
-) {
-    try {
-        const data = await file.text()
-        if (!data) return
+): Promise<"no-data" | "loaded" | "error"> {
+    const data = await file.text().catch((e) => {
+        console.error("Failed to read file", e)
+        return undefined
+    })
 
+    if (!data) return "no-data"
+
+    try {
         const workspaceData = JSON.parse(data) as WorkspaceData
 
         load(workspaceData, workspace)
+        return "loaded"
     } catch (error) {
-        console.error("Clean local storage! Error loading workspace:", error)
-        window.localStorage?.clear()
+        console.error("Error loading workspace from file:", error)
+        return "error"
     }
 }
