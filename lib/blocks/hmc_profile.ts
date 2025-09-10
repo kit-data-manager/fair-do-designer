@@ -1,5 +1,5 @@
 import * as Blockly from "blockly"
-import { StaticValidationField, ValidationField } from "../fields/ValidationField"
+import { ValidationField } from "../fields/ValidationField"
 import * as HMCProfile from "./profiles/HMC.json"
 import { FieldImage } from "blockly"
 import { camelToTitleCase } from "../utils"
@@ -94,7 +94,7 @@ export const profile_hmc: HMCBlock = {
         this.appendDummyInput(propertyName)
         .appendField(nameLabel, value)
         .appendField(
-            new StaticValidationField(true),
+            new ValidationField({customCheck: async () => true}),
             `val-${propertyName}`,
         )
         .setAlign(Blockly.inputs.Align.RIGHT)

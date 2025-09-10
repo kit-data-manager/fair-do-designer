@@ -1,9 +1,13 @@
-import { Block, FieldImage } from "blockly"
+import { Block, Connection, FieldImage, Workspace } from "blockly"
 import { CheckIcon, CircleDashedIcon, TriangleAlertIcon } from "@/lib/icons"
 
 export interface ValidationFieldOptions {
     mandatory?: boolean
     repeatable?: boolean
+    customCheck?: (
+        workspace: Workspace,
+        conn: Connection | null,
+    ) => Promise<boolean | string>
 }
 
 export class ValidationField extends FieldImage {
@@ -29,11 +33,22 @@ export class ValidationField extends FieldImage {
 
     forceCheck() {
         const connection = this.getParentInput().connection
-        const connected =
-            connection?.isConnected() && this.checkForArrayBlocks()
-        this.setValidationResult(
-            connected && !connection?.targetBlock()?.isInsertionMarker(),
-        )
+        if (this.options.customCheck !== undefined) {
+            const workspace = this.getSourceBlock()?.workspace
+            if (!workspace) {
+                return
+            }
+
+            this.options.customCheck(workspace, connection).then((res) => {
+                this.setValidationResult(res)
+            })
+        } else {
+            const connected =
+                connection?.isConnected() && this.checkForArrayBlocks()
+            this.setValidationResult(
+                connected && !connection?.targetBlock()?.isInsertionMarker(),
+            )
+        }
     }
 
     private checkForArrayBlocks(): boolean {
@@ -56,56 +71,46 @@ export class ValidationField extends FieldImage {
             // Rule 1: All attached blocks must be valid
             // Rule 2: At least one block must be attached
             // (Note: This allows empty slots, they should just be ignored in code generation)
-            const listBlocks =  block.inputList
-                .map((input) => input.connection?.targetBlock() ?? undefined).filter(b => b !== undefined).filter(b => !b.isInsertionMarker())
-            return listBlocks
-                .every((targetBlock) => checkBlock(targetBlock)) &&  listBlocks.length > 0
+            const listBlocks = block.inputList
+                .map((input) => input.connection?.targetBlock() ?? undefined)
+                .filter((b) => b !== undefined)
+                .filter((b) => !b.isInsertionMarker())
+            return (
+                listBlocks.every((targetBlock) => checkBlock(targetBlock)) &&
+                listBlocks.length > 0
+            )
         }
 
         return checkBlock(connectedBlock)
     }
 
-    setValidationResult(success: boolean | undefined) {
+    setValidationResult(success: string | boolean | undefined) {
         if (success === undefined) {
+            this.imageElement?.classList.remove("green-icon")
+            this.imageElement?.classList.remove("yellow-icon")
             this.setValue(CircleDashedIcon)
             this.setTooltip("Validation status is unknown")
-        } else if (success) {
+        } else if (success === true) {
             this.imageElement?.classList.add("green-icon")
             this.imageElement?.classList.remove("yellow-icon")
             this.setValue(CheckIcon)
             this.setTooltip("Validation successful")
-        } else if (!success) {
+        } else if (!success || typeof success === "string") {
             this.imageElement?.classList.remove("green-icon")
             this.imageElement?.classList.add("yellow-icon")
             this.setValue(TriangleAlertIcon)
             this.setTooltip(
-                "Validation failed. Make sure a valid block is attached." +
-                    (this.options.mandatory
-                        ? " This property is mandatory and must be provided."
-                        : " This property is optional, so it can be deleted."),
+                typeof success === "string"
+                    ? success
+                    : "Validation failed. Make sure a valid block is attached." +
+                          (this.options.mandatory
+                              ? " This property is mandatory and must be provided."
+                              : " This property is optional, so it can be deleted."),
             )
         }
     }
 
     dispose() {
         super.dispose()
-    }
-}
-
-export class StaticValidationField extends ValidationField {
-    protected status: boolean | undefined = undefined
-
-    constructor(status: boolean | undefined) {
-        super({})
-        this.status = status
-    }
-    
-    initView(): void {
-        super.initView()
-        this.setValidationResult(this.status)
-    }
-
-    forceCheck(): void {
-        this.setValidationResult(this.status)
     }
 }
