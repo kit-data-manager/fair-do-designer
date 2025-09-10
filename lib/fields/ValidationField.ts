@@ -93,12 +93,12 @@ export class ValidationField extends FieldImage {
         } else if (success === true) {
             this.imageElement?.classList.add("green-icon")
             this.imageElement?.classList.remove("yellow-icon")
-            this.setValue(CheckIcon)
+            this.setValue(CheckIcon, false)
             this.setTooltip("Validation successful")
         } else if (!success || typeof success === "string") {
             this.imageElement?.classList.remove("green-icon")
             this.imageElement?.classList.add("yellow-icon")
-            this.setValue(TriangleAlertIcon)
+            this.setValue(TriangleAlertIcon, false)
             this.setTooltip(
                 typeof success === "string"
                     ? success

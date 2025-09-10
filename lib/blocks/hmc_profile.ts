@@ -4,6 +4,18 @@ import * as HMCProfile from "./profiles/HMC.json"
 import { FieldImage } from "blockly"
 import { camelToTitleCase } from "../utils"
 import { addBasePath } from "next/dist/client/add-base-path"
+import * as z from "zod/mini"
+
+function recordMutation(block: Blockly.Block, mutation: () => void) {
+    Blockly.Events.setGroup(true)
+    const before = block.saveExtraState?.()
+    mutation()
+    const after = block.saveExtraState?.()
+    Blockly.Events.fire(
+        new Blockly.Events.BlockChange(block, "mutation", null, before, after),
+    )
+    Blockly.Events.setGroup(false)
+}
 
 export interface HMCBlock extends Blockly.BlockSvg {
     profile: typeof HMCProfile
@@ -11,7 +23,7 @@ export interface HMCBlock extends Blockly.BlockSvg {
     profileAttributeKey: string
     // block methods
     addImplicitDummyField(propertyName: string, value: string): void
-    addFieldForProperty(propertyName: string): void
+    addFieldForProperty(propertyName: string, before?: string): void
     removeFieldForProperty(propertyName: string): void
     addListBlockToEmptyInput(input: Blockly.Input): void
     // data methods
@@ -40,11 +52,15 @@ export const profile_hmc: HMCBlock = {
         for (const property of this.profile.properties) {
             const details = property.representationsAndSemantics[0]
             if (details.obligation !== "Mandatory") continue // Skip optional properties by default
-            const isSelfReference = (property.identifier === this.profileAttributeKey)
+            const isSelfReference =
+                property.identifier === this.profileAttributeKey
             if (!isSelfReference) {
                 this.addFieldForProperty(property.name)
             } else {
-                this.addImplicitDummyField(property.name, this.profile.identifier)
+                this.addImplicitDummyField(
+                    property.name,
+                    this.profile.identifier,
+                )
             }
         }
 
@@ -87,10 +103,10 @@ export const profile_hmc: HMCBlock = {
 
     addImplicitDummyField(propertyName: string, value: string) {
         const nameLabel = new Blockly.FieldLabel(
-            camelToTitleCase(propertyName) + " (constant)"
+            camelToTitleCase(propertyName) + " (constant)",
         )
         nameLabel.setTooltip(propertyName + " / " + value)
-                
+
         this.appendDummyInput(propertyName)
         .appendField(nameLabel, value)
         .appendField(
@@ -100,7 +116,7 @@ export const profile_hmc: HMCBlock = {
         .setAlign(Blockly.inputs.Align.RIGHT)
     },
 
-    addFieldForProperty(propertyName) {
+    addFieldForProperty(propertyName, before) {
         const property = this.profile.properties.find(
             (p) => p.name === propertyName,
         )
@@ -127,6 +143,10 @@ export const profile_hmc: HMCBlock = {
             nameLabel,
         )
 
+        // Required when re-establishing the order of an input on undo
+        if (before && this.getInput(before))
+            this.moveInputBefore(input.name, before)
+
         if (details.obligation === "Optional") {
             const tooltip = "Click to remove this property"
             const image = new FieldImage(
@@ -134,7 +154,10 @@ export const profile_hmc: HMCBlock = {
                 16,
                 16,
                 tooltip,
-                () => this.removeFieldForProperty(propertyName),
+                () =>
+                    recordMutation(this, () =>
+                        this.removeFieldForProperty(propertyName),
+                    ),
             )
             image.setTooltip(tooltip)
             input.appendField(image, "trash_icon")
@@ -153,7 +176,6 @@ export const profile_hmc: HMCBlock = {
     },
 
     removeFieldForProperty(propertyName: string) {
-        console.log(propertyName)
         this.activeOptionalProperties = this.activeOptionalProperties.filter(
             (e) => e !== propertyName,
         )
@@ -259,15 +281,21 @@ export const profile_hmc: HMCBlock = {
             event.newValue !== "ADD"
         ) {
             // reset dropdown menu
+            Blockly.Events.setRecordUndo(false)
             this.setFieldValue("ADD", "DROPDOWN")
+            Blockly.Events.setRecordUndo(true)
             // add property if not already present
             if (!this.activeOptionalProperties.includes(event.newValue)) {
-                this.addFieldForProperty(event.newValue)
-                this.activeOptionalProperties.push(event.newValue)
-                const input = this.getInput(event.newValue)
-                if (input) {
-                    this.addListBlockToEmptyInput(input)
-                }
+                recordMutation(this, () => {
+                    if (typeof event.newValue === "string") {
+                        this.addFieldForProperty(event.newValue)
+                        this.activeOptionalProperties.push(event.newValue)
+                        const input = this.getInput(event.newValue)
+                        if (input) {
+                            this.addListBlockToEmptyInput(input)
+                        }
+                    }
+                })
             }
         }
     },
@@ -291,17 +319,44 @@ export const profile_hmc: HMCBlock = {
     },
 
     loadExtraState(data) {
-        const parsed = JSON.parse(data)
-        if (
-            typeof parsed === "object" &&
-            "activeOptionalProperties" in parsed &&
-            Array.isArray(parsed.activeOptionalProperties)
-        ) {
-            this.activeOptionalProperties = parsed.activeOptionalProperties
+        const obj = typeof data === "string" ? JSON.parse(data) : data
 
-            for (const opt of this.activeOptionalProperties) {
-                this.addFieldForProperty(opt)
+        const parsed = z
+            .object({
+                activeOptionalProperties: z.array(z.string()),
+            })
+            .safeParse(obj)
+
+        if (parsed.success) {
+            const newProperties = parsed.data.activeOptionalProperties.filter(
+                (p) => !this.activeOptionalProperties.includes(p),
+            )
+            const removedProperties = this.activeOptionalProperties.filter(
+                (p) => !parsed.data.activeOptionalProperties.includes(p),
+            )
+
+            for (const opt of newProperties) {
+                const pos = parsed.data.activeOptionalProperties.findIndex(
+                    (v) => v === opt,
+                )
+                const followingProperty =
+                    parsed.data.activeOptionalProperties.length > pos + 1
+                        ? parsed.data.activeOptionalProperties[pos + 1]
+                        : undefined
+                this.addFieldForProperty(opt, followingProperty)
             }
+
+            for (const opt of removedProperties) {
+                this.removeFieldForProperty(opt)
+            }
+
+            this.activeOptionalProperties = parsed.data.activeOptionalProperties
+        } else {
+            console.error(
+                "Failed to load extra state in hmc_profile",
+                data,
+                parsed.error,
+            )
         }
     },
 }

@@ -10,7 +10,7 @@
     "postbuild": "pagefind --site out --glob docs/**/*.{html} --output-path out/_pagefind"
   },
   "dependencies": {
-    "@blockly/block-dynamic-connection": "^0.8.1",
+    "@blockly/block-plus-minus": "^9.0.2",
     "@blockly/field-dependent-dropdown": "^5.0.1",
     "@kit-data-manager/json-picker": "file:kit-data-manager-json-picker-0.0.4.tgz",
     "@kit-data-manager/json-picker-react": "file:kit-data-manager-json-picker-react-0.0.4.tgz",
@@ -31,6 +31,7 @@
     "react-resizable-panels": "^3.0.3",
     "tailwind-merge": "^3.3.1",
     "usehooks-ts": "^3.1.1",
+    "zod": "^4.1.5",
     "zustand": "^5.0.6"
   },
   "devDependencies": {

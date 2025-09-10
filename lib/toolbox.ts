@@ -550,10 +550,6 @@ export const toolbox = {
                 },
                 {
                     kind: "block",
-                    type: "lists_create_with",
-                },
-                {
-                    kind: "block",
                     type: "lists_repeat",
                     inputs: {
                         NUM: {

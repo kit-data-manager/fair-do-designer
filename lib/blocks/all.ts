@@ -9,7 +9,7 @@ import { stop_design, log_value, otherwise } from "./error_handling"
 
 import * as Blockly from "blockly/core"
 import { input_custom_json, input_jsonpath } from "./input"
-import * as BlockDynamicConnection from "@blockly/block-dynamic-connection"
+import "@blockly/block-plus-minus"
 
 export const blocks = Blockly.common.createBlockDefinitionsFromJsonArray([
     pidrecord,
@@ -31,4 +31,3 @@ Blockly.Blocks["log_value"] = log_value
 Blockly.Blocks["otherwise"] = otherwise
 
 Blockly.common.defineBlocks(blocks)
-BlockDynamicConnection.overrideOldBlockDefinitions()

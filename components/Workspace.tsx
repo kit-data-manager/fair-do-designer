@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useRef, useState, DragEvent } from "react"
 import * as Blockly from "blockly"
 import { toolbox } from "@/lib/toolbox"
-import * as BlockDynamicConnection from "@blockly/block-dynamic-connection"
 import { useStore } from "zustand/react"
 import { workspaceStore } from "@/lib/stores/workspace"
 import { blocks as profile_blocks } from "@/lib/blocks/all"
@@ -48,7 +47,6 @@ export function Workspace() {
         }
 
         Blockly.common.defineBlocks(profile_blocks)
-        BlockDynamicConnection.overrideOldBlockDefinitions()
 
         const workspace = Blockly.inject(divRef.current, {
             rtl: false,
@@ -56,9 +54,7 @@ export function Workspace() {
             renderer: "thrasos",
             grid: { spacing: 20, length: 3, colour: "#ccc", snap: true },
             plugins: {
-                connectionPreviewer: BlockDynamicConnection.decoratePreviewer(
-                    Blockly.InsertionMarkerPreviewer,
-                ),
+                connectionPreviewer: Blockly.InsertionMarkerPreviewer,
             },
         })
 
@@ -66,7 +62,6 @@ export function Workspace() {
         setLoading(false)
 
         workspace.addChangeListener(Blockly.Events.disableOrphans)
-        workspace.addChangeListener(BlockDynamicConnection.finalizeConnections)
 
         workspace.registerButtonCallback("dataAccessToolboxHelp", () => {
             router.push("/docs/blocks/data-access#advanced-queries")
@@ -156,32 +151,38 @@ export function Workspace() {
         (event: DragEvent<HTMLDivElement>) => {
             if (!workspace) return
 
-            const block = workspace.newBlock("input_jsonpath")
-            const query = event.dataTransfer?.getData("text/plain")
+            Blockly.Events.setGroup(true)
 
-            if (!query) {
-                console.error(
-                    "Received drop event that did not include a valid text/plain data point",
+            try {
+                const block = workspace.newBlock("input_jsonpath")
+                const query = event.dataTransfer?.getData("text/plain")
+
+                if (!query) {
+                    console.error(
+                        "Received drop event that did not include a valid text/plain data point",
+                    )
+                    return
+                }
+
+                if (
+                    "updateQuery" in block &&
+                    typeof block.updateQuery === "function"
+                ) {
+                    block.updateQuery(query)
+                }
+
+                block.initSvg()
+                const offset = workspace.getOriginOffsetInPixels()
+                block.moveTo(
+                    new Blockly.utils.Coordinate(
+                        event.nativeEvent.offsetX - offset.x,
+                        event.nativeEvent.offsetY - offset.y,
+                    ),
                 )
-                return
+                block.render()
+            } finally {
+                Blockly.Events.setGroup(false)
             }
-
-            if (
-                "updateQuery" in block &&
-                typeof block.updateQuery === "function"
-            ) {
-                block.updateQuery(query)
-            }
-
-            block.initSvg()
-            const offset = workspace.getOriginOffsetInPixels()
-            block.moveTo(
-                new Blockly.utils.Coordinate(
-                    event.nativeEvent.offsetX - offset.x,
-                    event.nativeEvent.offsetY - offset.y,
-                ),
-            )
-            block.render()
         },
         [workspace],
     )
