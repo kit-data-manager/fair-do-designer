@@ -7,8 +7,7 @@ export interface ValidationFieldOptions {
     customCheck?: (
         workspace: Workspace,
         conn: Connection | null,
-        currentValue: boolean | undefined
-    ) => Promise<boolean | undefined>
+    ) => Promise<boolean>
 }
 
 export class ValidationField extends FieldImage {
@@ -38,12 +37,13 @@ export class ValidationField extends FieldImage {
         const hasCustomCheck: boolean = this.options.customCheck !== undefined
         if (hasCustomCheck) {
             const workspace = this.getSourceBlock()?.workspace
-            if (!workspace) { return false }
-            const customCheckResult = this.options.customCheck?.(workspace, connection, this.success)
-                .then((res) => {
-                    this.setValidationResult(res)
-                })
-            return
+            if (!workspace) {
+                return
+            }
+
+            this.options.customCheck?.(workspace, connection).then((res) => {
+                this.setValidationResult(res)
+            })
         } else {
             const connected =
                 connection?.isConnected() && this.checkForArrayBlocks()
@@ -73,17 +73,21 @@ export class ValidationField extends FieldImage {
             // Rule 1: All attached blocks must be valid
             // Rule 2: At least one block must be attached
             // (Note: This allows empty slots, they should just be ignored in code generation)
-            const listBlocks =  block.inputList
-                .map((input) => input.connection?.targetBlock() ?? undefined).filter(b => b !== undefined).filter(b => !b.isInsertionMarker())
-            return listBlocks
-                .every((targetBlock) => checkBlock(targetBlock)) &&  listBlocks.length > 0
+            const listBlocks = block.inputList
+                .map((input) => input.connection?.targetBlock() ?? undefined)
+                .filter((b) => b !== undefined)
+                .filter((b) => !b.isInsertionMarker())
+            return (
+                listBlocks.every((targetBlock) => checkBlock(targetBlock)) &&
+                listBlocks.length > 0
+            )
         }
 
         return checkBlock(connectedBlock)
     }
 
     setValidationResult(success: boolean | undefined) {
-        this.success = success;
+        this.success = success
         if (success === undefined) {
             this.setValue(CircleDashedIcon)
             this.setTooltip("Validation status is unknown")
