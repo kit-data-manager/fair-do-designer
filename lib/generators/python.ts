@@ -84,9 +84,7 @@ forBlock["pidrecord"] = function <T extends Util.FairDoCodeGenerator>(
     block: Blockly.Block,
     generator: T,
 ) {
-    // TODO: change Order.ATOMIC to the correct operator precedence strength
     const value_localid = generator.valueToCode(block, "local-id", Order.ATOMIC)
-
     const statement_record = generator.statementToCode(block, "record")
 
     let code = generator.makeLineComment(`${block.type}`)
@@ -104,31 +102,32 @@ forBlock["pidrecord_skipable"] = function <T extends Util.FairDoCodeGenerator>(
     block: Blockly.Block,
     generator: T,
 ) {
-    let value_skip_condition = generator.valueToCode(
+    const value_skip_condition = generator.valueToCode(
         block,
         "skip-condition",
         Order.ATOMIC,
     )
-    if (!value_skip_condition || value_skip_condition.trim() == "") {
-        value_skip_condition = "True" // Default to True if no condition is provided
-    }
+    const hasCondition = value_skip_condition && value_skip_condition.trim() != ""
 
-    // TODO: change Order.ATOMIC to the correct operator precedence strength
     const value_localid = generator.valueToCode(block, "local-id", Order.ATOMIC)
-
     const statement_record = generator.statementToCode(block, "record")
 
-    const start_comment = generator.makeLineComment(`${block.type}`)
     let code = `EXECUTOR.addDesign( RecordDesign()\n`
     code += generator.prefixNonemptyLines(
         generator.makeSetIDChainCall(value_localid),
         generator.INDENT,
     )
+    if (hasCondition) {
+        code += generator.prefixNonemptyLines(
+            `.setSkipCondition(lambda: ${value_skip_condition})\n`,
+            generator.INDENT
+        )
+    }
     code += statement_record
     code += ")\n"
-
-    const intendedCode = generator.prefixNonemptyLines(code, generator.INDENT)
-    return `${start_comment}if ${value_skip_condition}:\n${intendedCode}\n`
+    
+    const start_comment = generator.makeLineComment(`${block.type}`)
+    return `${start_comment}${code}\n`
 }
 
 forBlock["attribute_key"] = function <T extends Util.FairDoCodeGenerator>(
