@@ -13,6 +13,7 @@ import type {
 import { lastUsedFilesStore } from "@/lib/stores/last-used-files"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { InfoIcon } from "lucide-react"
+import { useTheme } from "next-themes"
 
 export function InputPane() {
     const unifiedDocument = useRef<HTMLUnifiedDocumentElement>(null)
@@ -21,6 +22,7 @@ export function InputPane() {
     const setUsedFiles = useStore(lastUsedFilesStore, (s) => s.setFiles)
     const clearUsedFiles = useStore(lastUsedFilesStore, (s) => s.clearFiles)
     const lastUsedFiles = useStore(lastUsedFilesStore, (s) => s.files)
+    const theme = useTheme()
 
     // True if user files or example files have been loaded
     const [somethingLoaded, setSomethingLoaded] = useState(false)
@@ -173,6 +175,7 @@ export function InputPane() {
                         <UnifiedDocument
                             ref={unifiedDocument}
                             onJsonKeyClick={onJsonKeyClick}
+                            dark={theme.resolvedTheme === "dark"}
                         />
                     </div>
                 </div>

@@ -15,6 +15,9 @@ import * as ErrorsToolbox from "@/lib/toolboxes/errors_logging"
 import * as BacklinksToolbox from "@/lib/toolboxes/backlinks"
 import { ValidationField } from "@/lib/fields/ValidationField"
 import { useRouter } from "next/navigation"
+import { useTheme } from "next-themes"
+import "@/lib/theme"
+import { DarkTheme } from "@/lib/theme"
 
 /**
  * This component encapsulates the {@link Blockly.Workspace} and takes care of initializing it and registering any
@@ -32,6 +35,18 @@ export function Workspace() {
     const setWorkspace = useStore(workspaceStore, (s) => s.setWorkspace)
     const unsetWorkspace = useStore(workspaceStore, (s) => s.unsetWorkspace)
     const router = useRouter()
+    const theme = useTheme()
+    const themeRef = useRef(theme)
+
+    useEffect(() => {
+        themeRef.current = theme
+        if (workspace)
+            workspace.setTheme(
+                themeRef.current.resolvedTheme === "dark"
+                    ? DarkTheme
+                    : Blockly.Themes.Classic,
+            )
+    }, [theme, workspace])
 
     const validationFieldCheckInterval = useRef<number>(null)
 
@@ -52,6 +67,10 @@ export function Workspace() {
             rtl: false,
             toolbox,
             renderer: "thrasos",
+            theme:
+                themeRef.current.resolvedTheme === "dark"
+                    ? "docs-dark"
+                    : undefined,
             grid: { spacing: 20, length: 3, colour: "#ccc", snap: true },
             plugins: {
                 connectionPreviewer: Blockly.InsertionMarkerPreviewer,
@@ -119,9 +138,10 @@ export function Workspace() {
         try {
             // Directly access the store to remove unwanted dependency on the workspace state
             workspaceStore.getState().workspace?.dispose()
-            if (divRef.current) divRef.current.innerHTML = ""
         } catch (e) {
             console.warn("Disposing workspace failed", e)
+        } finally {
+            if (divRef.current) divRef.current.innerHTML = ""
         }
     }, [unsetWorkspace])
 

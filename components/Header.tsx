@@ -26,6 +26,7 @@ import Link from "next/link"
 import { RecordMappingGenerator } from "@/lib/generators/python"
 import { PythonCodeDownload } from "@/lib/python_code_download"
 import { useCopyToClipboard } from "usehooks-ts"
+import { ThemeToggle } from "@/components/ThemeToggle"
 import { Button } from "@/components/ui/button"
 import {
     Dialog,
@@ -106,7 +107,7 @@ export function Header() {
     }, [workspace])
 
     return (
-        <div className="h-12 flex items-center px-4 gap-3 max-w-full">
+        <div className="h-12 flex items-center pl-4 pr-2 gap-3 max-w-full">
             {/* Dialogs */}
             <Dialog
                 open={loadingSaveFileFailed}
@@ -124,7 +125,6 @@ export function Header() {
                 </DialogContent>
             </Dialog>
             {/* Dialogs End */}
-
             <FrameIcon className="size-5 shrink-0" />
             <div className="font-bold text-nowrap">FAIR DO Designer</div>
             {editName ? (
@@ -205,6 +205,10 @@ export function Header() {
                     </MenubarContent>
                 </MenubarMenu>
             </Menubar>
+
+            <div className="grow" />
+
+            <ThemeToggle />
 
             <input
                 className="hidden"
