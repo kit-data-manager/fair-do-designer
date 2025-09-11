@@ -199,6 +199,11 @@ export const profile_hmc: HMCBlock = {
             listBlock.initSvg()
             listBlock.render()
 
+            if ("minus" in listBlock && typeof listBlock.minus === "function") {
+                listBlock.minus()
+                listBlock.minus()
+            }
+
             // Connect the list block to the input
             const connection = input.connection
             if (connection && listBlock.outputConnection) {
