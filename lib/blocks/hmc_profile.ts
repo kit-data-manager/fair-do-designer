@@ -108,12 +108,12 @@ export const profile_hmc: HMCBlock = {
         nameLabel.setTooltip(propertyName + " / " + value)
 
         this.appendDummyInput(propertyName)
-        .appendField(nameLabel, value)
-        .appendField(
-            new ValidationField({customCheck: async () => true}),
-            `val-${propertyName}`,
-        )
-        .setAlign(Blockly.inputs.Align.RIGHT)
+            .appendField(nameLabel, value)
+            .appendField(
+                new ValidationField({ customCheck: async () => true }),
+                `val-${propertyName}`,
+            )
+            .setAlign(Blockly.inputs.Align.RIGHT)
     },
 
     addFieldForProperty(propertyName, before) {
@@ -199,6 +199,11 @@ export const profile_hmc: HMCBlock = {
             listBlock.initSvg()
             listBlock.render()
 
+            if ("minus" in listBlock && typeof listBlock.minus === "function") {
+                listBlock.minus()
+                listBlock.minus()
+            }
+
             // Connect the list block to the input
             const connection = input.connection
             if (connection && listBlock.outputConnection) {
@@ -238,6 +243,13 @@ export const profile_hmc: HMCBlock = {
     },
 
     onBlockCreate(event: Blockly.Events.BlockCreate) {
+        if (event.workspaceId) {
+            const workspace = Blockly.Workspace.getById(event.workspaceId)
+
+            // If this is just a preview in a toolbox (flyout), do not create list blocks
+            if (workspace && workspace.isFlyout) return
+        }
+
         if (event.blockId === this.id) {
             for (const input of this.inputList) {
                 this.addListBlockToEmptyInput(input)
