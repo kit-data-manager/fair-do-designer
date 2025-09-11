@@ -5,7 +5,7 @@ import * as Blockly from "blockly"
 import { toolbox } from "@/lib/toolbox"
 import { useStore } from "zustand/react"
 import { workspaceStore } from "@/lib/stores/workspace"
-import { blocks as profile_blocks } from "@/lib/blocks/all"
+import "@/lib/blocks/all"
 import {
     clearLocalStorage,
     loadFromLocalStorage,
@@ -60,8 +60,6 @@ export function Workspace() {
             console.error("Failed to mount workspace: divRef empty")
             return
         }
-
-        Blockly.common.defineBlocks(profile_blocks)
 
         const workspace = Blockly.inject(divRef.current, {
             rtl: false,
