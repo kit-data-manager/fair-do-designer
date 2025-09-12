@@ -141,7 +141,7 @@ forBlock["attribute_key"] = function <T extends Util.FairDoCodeGenerator>(
     const isSomething = (thing: string | null | undefined) => 
         thing && thing.length > 0 && thing !== "''";
     if (isSomething(value_key) && isSomething(value_value)) {
-        code += generator.makeLineComment(`${block.type}`)
+        code += generator.makeLineComment(`## ${block.type} ##`)
         code += generator.makeAddAttributeChainCall(value_key, value_value)
     }
     return code
