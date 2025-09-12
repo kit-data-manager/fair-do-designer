@@ -11,10 +11,8 @@ import * as Blockly from "blockly/core"
 import { input_custom_json, input_jsonpath } from "./input"
 import "@blockly/block-plus-minus"
 
-export const blocks = Blockly.common.createBlockDefinitionsFromJsonArray([
-    pidrecord,
-    pidrecord_skipable,
-])
+Blockly.Blocks["pidrecord"] = pidrecord
+Blockly.Blocks["pidrecord_skipable"] = pidrecord_skipable
 
 Blockly.Blocks["input_jsonpath"] = input_jsonpath
 Blockly.Blocks["input_custom_json"] = input_custom_json
@@ -29,5 +27,3 @@ Blockly.Blocks["backlink_declaration"] = backlink_declaration
 Blockly.Blocks["stop_design"] = stop_design
 Blockly.Blocks["log_value"] = log_value
 Blockly.Blocks["otherwise"] = otherwise
-
-Blockly.common.defineBlocks(blocks)
