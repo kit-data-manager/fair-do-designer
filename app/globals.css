@@ -81,8 +81,9 @@ code {
   fill: var(--muted);
 }
 
-g.blocklyDisabled g.blocklyLabelField text.blocklyText {
-  fill: rgb(40, 40, 40);
+.blocklyDisabledPattern > .blocklyPath {
+  fill-opacity: .7;
+  stroke-opacity: .6;
 }
 
 g > image[alt="Click to remove this property"], g > image.base-icon {

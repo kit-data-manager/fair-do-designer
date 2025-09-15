@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
 import "@/lib/theme"
 import { DarkTheme } from "@/lib/theme"
+import { applyFillAttrAsStyle } from "@/lib/utils"
 
 /**
  * This component encapsulates the {@link Blockly.Workspace} and takes care of initializing it and registering any
@@ -79,6 +80,7 @@ export function Workspace() {
         setLoading(false)
 
         workspace.addChangeListener(Blockly.Events.disableOrphans)
+        workspace.addChangeListener(applyFillAttrAsStyle)
 
         workspace.registerButtonCallback("dataAccessToolboxHelp", () => {
             router.push("/docs/blocks/data-access#advanced-queries")
@@ -109,7 +111,10 @@ export function Workspace() {
 
         function checkAllValidationFields() {
             workspace.getAllBlocks().forEach((block) => {
-                if (block.type === "profile_hmc" || block.type === "attribute_key") {
+                if (
+                    block.type === "profile_hmc" ||
+                    block.type === "attribute_key"
+                ) {
                     const fields = Array.from(block.getFields())
                     for (const field of fields) {
                         if (field instanceof ValidationField) {
