@@ -1,65 +1,37 @@
+import * as Blockly from "blockly/core"
 import { addBasePath } from "next/dist/client/add-base-path"
 
 export const pidrecord = {
-    type: "pidrecord",
-    tooltip:
-        "Defines a PID record, which holds a set of attributes and profiles.",
-    helpUrl: addBasePath("/docs/blocks/records"),
-    message0: "PID Record %1 %2 Local ID (pseudo-pid) %3 %4",
-    args0: [
-        {
-            type: "field_label_serializable",
-            text: "(no PID yet)",
-            name: "pid",
-        },
-        {
-            type: "input_dummy",
-            name: "label",
-        },
-        {
-            type: "input_value",
-            name: "local-id",
-        },
-        {
-            type: "input_statement",
-            name: "record",
-            check: ["profile", "attribute_key"],
-        },
-    ],
-    colour: 300,
-    inputsInline: false,
-}
+    init: function () {
+        this.appendValueInput("local-id")
+            .setAlign(Blockly.inputs.Align.RIGHT)
+            .appendField("Create PID Record with ID:")
+        this.appendStatementInput("record")
+            .setCheck(["profile", "attribute_key"])
+        this.setInputsInline(false)
+        this.setTooltip(
+            "Defines a PID record, which holds a set of attributes and profiles.",
+        )
+        this.setHelpUrl(addBasePath("/docs/blocks/records"))
+        this.setColour(300)
+    },
+} as Blockly.Block
 
 export const pidrecord_skipable = {
-    type: "pidrecord_skipable",
-    tooltip:
-        "Defines a PID record, which holds a set of attributes and profiles. It can be skipped based on a condition.",
-    helpUrl: addBasePath("/docs/blocks/records"),
-    message0: "PID Record %1 %2 Local ID (pseudo-pid) %3 %4 Skip if %5",
-    args0: [
-        {
-            type: "field_label_serializable",
-            text: "(no PID yet)",
-            name: "pid",
-        },
-        {
-            type: "input_dummy",
-            name: "label",
-        },
-        {
-            type: "input_value",
-            name: "local-id",
-        },
-        {
-            type: "input_statement",
-            name: "record",
-            check: ["profile", "attribute_key"],
-        },
-        {
-            type: "input_value",
-            name: "skip-condition",
-        },
-    ],
-    colour: 300,
-    inputsInline: false,
-}
+    init: function () {
+        this.appendValueInput("local-id")
+            .setAlign(Blockly.inputs.Align.RIGHT)
+            .appendField("Create PID Record with ID:")
+        this.appendValueInput("skip-condition")
+            .setAlign(Blockly.inputs.Align.RIGHT)
+            .appendField("Skip if:")
+        this.appendStatementInput("record")
+            .setCheck(["profile", "attribute_key"])
+        this.setInputsInline(false)
+        this.setTooltip(
+            "Defines a PID record, which holds a set of attributes and profiles. It can be skipped based on a condition.",
+        )
+        this.setHelpUrl(addBasePath("/docs/blocks/records"))
+        this.setColour(300)
+    },
+} as Blockly.Block

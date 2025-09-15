@@ -1,5 +1,5 @@
 import sys
-from typing import Dict, Set, List, Tuple, Callable, TypeVar, Any, Sequence, Mapping, Self
+from typing import Dict, Set, List, Tuple, Callable, TypeVar, Any, Sequence, Mapping, Self, Optional
 import json
 
 Primitive = str | bool | int | float
@@ -109,6 +109,8 @@ class RecordDesign:
         self._attributes: Dict[str, List[Eval[Any]]] = dict()
         # Set of (forward_link_type, backward_link_type)
         self._backlinks: Set[Tuple[str, str]] = set()
+        # If true, apply() shall skip the creation of a record.
+        self._skipCondition: Eval[bool] = lambda: False
 
     def setId(self, id: Eval[str]) -> Self:
         self._id = id
@@ -128,17 +130,24 @@ class RecordDesign:
             self._attributes[key].append(value)
         return self
     
+    def setSkipCondition(self, condition: Eval[bool]) -> Self:
+        self._skipCondition = condition
+        return self
+    
     def addBacklink(self, forward_link_type: str, backward_link_type: str) -> Self:
         self._backlinks.add((forward_link_type, backward_link_type))
         return self
     
-    def apply(self, json: JsonType) -> Tuple[PidRecord, InferenceRules]:
+    def apply(self, json: JsonType) -> Optional[Tuple[PidRecord, InferenceRules]]:
         """
         Applies the given JSON to this design and returns a PidRecord.
         """
 
         global current_source_json
         current_source_json = json
+
+        if (self._skipCondition()):
+            return None
 
         record: PidRecord = PidRecord()
         record.setId(self._id())
@@ -271,9 +280,11 @@ class Executor:
                     assert len(json_data) > 0, "JSON file is empty or not valid."
                     sender: PidRecord
                     inference_rules: InferenceRules
-                    sender, inference_rules = design.apply(json_data)
-                    print("Created record:", sender.getId())
-                    # Store the record in the graph
-                    self.RECORD_GRAPH[sender.getId()] = sender
-                    # merge rules into DB
-                    self.INFERENCE_MATCHES_DB.update(inference_rules)
+                    maybe_record = design.apply(json_data)
+                    if (maybe_record != None):
+                        sender, inference_rules = maybe_record
+                        print("Created record:", sender.getId())
+                        # Store the record in the graph
+                        self.RECORD_GRAPH[sender.getId()] = sender
+                        # merge rules into DB
+                        self.INFERENCE_MATCHES_DB.update(inference_rules)

@@ -80,55 +80,51 @@ export class RecordMappingGenerator
  */
 const forBlock = Object.create(null)
 
-forBlock["pidrecord"] = function <T extends Util.FairDoCodeGenerator>(
+function genericRecord<T extends Util.FairDoCodeGenerator>(
     block: Blockly.Block,
     generator: T,
+    value_skip_condition: string,
 ) {
-    // TODO: change Order.ATOMIC to the correct operator precedence strength
     const value_localid = generator.valueToCode(block, "local-id", Order.ATOMIC)
-
     const statement_record = generator.statementToCode(block, "record")
-
+    
     let code = generator.makeLineComment(`${block.type}`)
     code += `EXECUTOR.addDesign( RecordDesign()\n`
     code += generator.prefixNonemptyLines(
         generator.makeSetIDChainCall(`str(${value_localid}[0])`),
         generator.INDENT,
     )
+
+    const hasCondition = value_skip_condition && value_skip_condition.trim() != ""
+    if (hasCondition) {
+        code += generator.prefixNonemptyLines(
+            `.setSkipCondition(lambda: ${value_skip_condition})\n`,
+            generator.INDENT
+        )
+    }
+    
     code += statement_record
     code += ")\n"
     return code
+}
+
+forBlock["pidrecord"] = function <T extends Util.FairDoCodeGenerator>(
+    block: Blockly.Block,
+    generator: T,
+) {
+    return genericRecord(block, generator, "")
 }
 
 forBlock["pidrecord_skipable"] = function <T extends Util.FairDoCodeGenerator>(
     block: Blockly.Block,
     generator: T,
 ) {
-    let value_skip_condition = generator.valueToCode(
+    const value_skip_condition = generator.valueToCode(
         block,
         "skip-condition",
         Order.ATOMIC,
     )
-    if (!value_skip_condition || value_skip_condition.trim() == "") {
-        value_skip_condition = "True" // Default to True if no condition is provided
-    }
-
-    // TODO: change Order.ATOMIC to the correct operator precedence strength
-    const value_localid = generator.valueToCode(block, "local-id", Order.ATOMIC)
-
-    const statement_record = generator.statementToCode(block, "record")
-
-    const start_comment = generator.makeLineComment(`${block.type}`)
-    let code = `EXECUTOR.addDesign( RecordDesign()\n`
-    code += generator.prefixNonemptyLines(
-        generator.makeSetIDChainCall(value_localid),
-        generator.INDENT,
-    )
-    code += statement_record
-    code += ")\n"
-
-    const intendedCode = generator.prefixNonemptyLines(code, generator.INDENT)
-    return `${start_comment}if ${value_skip_condition}:\n${intendedCode}\n`
+    return genericRecord(block, generator, value_skip_condition)
 }
 
 forBlock["attribute_key"] = function <T extends Util.FairDoCodeGenerator>(
@@ -142,24 +138,10 @@ forBlock["attribute_key"] = function <T extends Util.FairDoCodeGenerator>(
     const isSomething = (thing: string | null | undefined) => 
         thing && thing.length > 0 && thing !== "''";
     if (isSomething(value_key) && isSomething(value_value)) {
-        code += generator.makeLineComment(`${block.type}`)
+        code += generator.makeLineComment(`## ${block.type} ##`)
         code += generator.makeAddAttributeChainCall(value_key, value_value)
     }
     return code
-}
-
-forBlock["transform_string"] = function <T extends Util.FairDoCodeGenerator>(
-    block: Blockly.Block,
-    generator: T,
-) {
-    const inBlock = block.getInputTargetBlock("INPUT")
-    let inText = "null"
-
-    if (inBlock) {
-        inText = generator.blockToCode(inBlock)[0]
-    }
-
-    return [`transform.toString(${inText})`, Order.ATOMIC]
 }
 
 const jsonpathCall = (path: string) =>
