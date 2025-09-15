@@ -5,10 +5,9 @@ export const pidrecord = {
     init: function () {
         this.appendValueInput("local-id")
             .setAlign(Blockly.inputs.Align.RIGHT)
-            .appendField("PID Record with ID:")
+            .appendField("Create PID Record with ID:")
         this.appendStatementInput("record")
             .setCheck(["profile", "attribute_key"])
-            .appendField("Attributes:")
         this.setInputsInline(false)
         this.setTooltip(
             "Defines a PID record, which holds a set of attributes and profiles.",
@@ -22,13 +21,12 @@ export const pidrecord_skipable = {
     init: function () {
         this.appendValueInput("local-id")
             .setAlign(Blockly.inputs.Align.RIGHT)
-            .appendField("PID Record with ID:")
+            .appendField("Create PID Record with ID:")
         this.appendValueInput("skip-condition")
             .setAlign(Blockly.inputs.Align.RIGHT)
             .appendField("Skip if:")
         this.appendStatementInput("record")
             .setCheck(["profile", "attribute_key"])
-            .appendField("Attributes:")
         this.setInputsInline(false)
         this.setTooltip(
             "Defines a PID record, which holds a set of attributes and profiles. It can be skipped based on a condition.",
