@@ -146,14 +146,18 @@ forBlock["attribute_key"] = function <T extends Util.FairDoCodeGenerator>(
 }
 
 const jsonPointerCall = (path: string) =>
-    `jsonpath.pointer.resolve("${path}", executor.current_source_json)`
+    `jsonpath.pointer.resolve(${path}, executor.current_source_json)`
 
 const jsonpathCall = (path: string) =>
-    `jsonpath.findall("${path}", executor.current_source_json)`
+    `jsonpath.findall(${path}, executor.current_source_json)`
 
-forBlock["input_json_pointer"] = function (block: Blockly.Block) {
+forBlock["input_json_pointer"] = function (
+    block: Blockly.Block,
+    generator: PythonGenerator,
+) {
     const value_input = block.getFieldValue("QUERY")
-    return [jsonPointerCall(value_input), Order.ATOMIC]
+    const quoted = generator.quote_(value_input)
+    return [jsonPointerCall(quoted), Order.ATOMIC]
 }
 forBlock["input_jsonpath"] = forBlock["input_json_pointer"] // TODO remove
 
