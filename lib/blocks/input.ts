@@ -74,7 +74,9 @@ export const input_jsonpath: InputJsonPath = {
     },
 
     updateQuery: function (query: string) {
-        const display = query.split(".")[query.split(".").length - 1]
+        const display = query.startsWith("/")
+            ? query.split("/")[query.split("/").length - 1]
+            : query.split(".")[query.split(".").length - 1]
         this.setFieldValue(display, "DISPLAY_QUERY")
         this.setFieldValue(query, "QUERY")
         this.getField("QUERY")?.setVisible(false)

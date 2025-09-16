@@ -19,6 +19,10 @@ import { useTheme } from "next-themes"
 import "@/lib/theme"
 import { DarkTheme } from "@/lib/theme"
 import { applyFillAttrAsStyle } from "@/lib/utils"
+import {
+    PathSegment,
+    pathSegmentsToPointer,
+} from "@kit-data-manager/json-picker"
 
 /**
  * This component encapsulates the {@link Blockly.Workspace} and takes care of initializing it and registering any
@@ -178,20 +182,22 @@ export function Workspace() {
 
             try {
                 const block = workspace.newBlock("input_jsonpath")
-                const query = event.dataTransfer?.getData("text/plain")
+                const rawQuery = event.dataTransfer?.getData("application/json")
 
-                if (!query) {
+                if (!rawQuery) {
                     console.error(
                         "Received drop event that did not include a valid text/plain data point",
                     )
                     return
                 }
 
+                const query = JSON.parse(rawQuery) as PathSegment[]
+
                 if (
                     "updateQuery" in block &&
                     typeof block.updateQuery === "function"
                 ) {
-                    block.updateQuery(query)
+                    block.updateQuery(pathSegmentsToPointer(query))
                 }
 
                 block.initSvg()
