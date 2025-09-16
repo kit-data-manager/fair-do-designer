@@ -8,14 +8,21 @@ import { attribute, backlink_declaration } from "./attribute"
 import { stop_design, log_value, otherwise } from "./error_handling"
 
 import * as Blockly from "blockly/core"
-import { input_custom_json, input_jsonpath } from "./input"
+import {
+    input_custom_json_path,
+    input_custom_json_pointer,
+    input_json_pointer,
+} from "./input"
 import "@blockly/block-plus-minus"
 
 Blockly.Blocks["pidrecord"] = pidrecord
 Blockly.Blocks["pidrecord_skipable"] = pidrecord_skipable
 
-Blockly.Blocks["input_jsonpath"] = input_jsonpath
-Blockly.Blocks["input_custom_json"] = input_custom_json
+Blockly.Blocks["input_jsonpath"] = input_json_pointer // TODO: Remove
+Blockly.Blocks["input_json_pointer"] = input_json_pointer
+Blockly.Blocks["input_custom_json"] = input_custom_json_path // TODO: Remove
+Blockly.Blocks["input_custom_json_path"] = input_custom_json_path
+Blockly.Blocks["input_custom_json_pointer"] = input_custom_json_pointer
 
 Blockly.Blocks["profile_hmc"] = profile_hmc
 Blockly.Blocks["profile_hmc_reference_block"] =
