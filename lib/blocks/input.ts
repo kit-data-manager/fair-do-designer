@@ -3,6 +3,10 @@ import { FieldLabel } from "blockly"
 import { FileSearchIcon } from "@/lib/icons"
 import { FieldIcon } from "@/lib/fields/FieldIcon"
 import { addBasePath } from "next/dist/client/add-base-path"
+import {
+    pathSegmentsToPointer,
+    pathToPathSegments,
+} from "@kit-data-manager/json-picker"
 
 export interface InputJsonPath extends Blockly.BlockSvg {
     findQueryProperty(): void
@@ -92,7 +96,14 @@ export const input_jsonpath: InputJsonPath = {
             return
         }
 
-        this.updateQuery(query)
+        if (query.startsWith("$")) {
+            // Query is in JSON Path format, converting to JSON Pointer
+            const temp = pathToPathSegments(query)
+            const pointer = pathSegmentsToPointer(temp)
+            this.updateQuery(pointer)
+        } else {
+            this.updateQuery(query)
+        }
     },
 }
 

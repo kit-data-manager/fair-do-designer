@@ -151,18 +151,9 @@ const jsonPointerCall = (path: string) =>
 const jsonpathCall = (path: string) =>
     `jsonpath.findall("${path}", executor.current_source_json)`
 
-forBlock["input_jsonpath"] = function <T extends Util.FairDoCodeGenerator>(
-    block: Blockly.Block,
-    generator: T,
-) {
-    const value_input = generator.valueToCode(block, "QUERY", Order.ATOMIC)
-    if (value_input.startsWith("/")) {
-        // JSON Pointer
-        return [jsonPointerCall(value_input), Order.ATOMIC]
-    } else {
-        // JSON Path
-        return [jsonpathCall(value_input), Order.ATOMIC]
-    }
+forBlock["input_jsonpath"] = function (block: Blockly.Block) {
+    const value_input = block.getFieldValue("QUERY")
+    return [jsonPointerCall(value_input), Order.ATOMIC]
 }
 
 forBlock["input_custom_json"] = function <T extends Util.FairDoCodeGenerator>(
