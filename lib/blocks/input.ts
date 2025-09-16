@@ -8,13 +8,13 @@ import {
     pathToPathSegments,
 } from "@kit-data-manager/json-picker"
 
-export interface InputJsonPath extends Blockly.BlockSvg {
+export interface InputJsonPointer extends Blockly.BlockSvg {
     findQueryProperty(): void
     updateQuery(query: string): void
 }
 
 /* @ts-expect-error Object can't be cast to class */
-export const input_jsonpath: InputJsonPath = {
+export const input_json_pointer: InputJsonPointer = {
     init: function () {
         const hiddenQueryField = new FieldLabel("JSON")
         hiddenQueryField.setVisible(false)
@@ -108,18 +108,39 @@ export const input_jsonpath: InputJsonPath = {
 }
 
 /* @ts-expect-error Object can't be cast to class */
-export const input_custom_json: Blockly.BlockSvg = {
+export const input_custom_json_pointer: Blockly.BlockSvg = {
     init: function () {
         this.appendValueInput("QUERY")
             .setCheck("String")
             .appendField(
-                new Blockly.FieldLabelSerializable("Custom Query"),
+                new Blockly.FieldLabelSerializable("Custom JSON Pointer"),
                 "NAME",
             )
         this.setInputsInline(true)
         this.setOutput(true, "JSON")
         this.setTooltip(
-            "Execute a custom jsonpath query against the current Source Document",
+            "Resolve a custom JSON Pointer against the current Source Document",
+        )
+        this.setHelpUrl(
+            addBasePath("/docs/blocks/data-access#advanced-queries"),
+        )
+        this.setColour(210)
+    },
+}
+
+/* @ts-expect-error Object can't be cast to class */
+export const input_custom_json_path: Blockly.BlockSvg = {
+    init: function () {
+        this.appendValueInput("QUERY")
+            .setCheck("String")
+            .appendField(
+                new Blockly.FieldLabelSerializable("Custom JSON Path"),
+                "NAME",
+            )
+        this.setInputsInline(true)
+        this.setOutput(true, "JSON")
+        this.setTooltip(
+            "Execute a custom JSON Path query against the current Source Document",
         )
         this.setHelpUrl(
             addBasePath("/docs/blocks/data-access#advanced-queries"),

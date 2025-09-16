@@ -664,13 +664,27 @@ export const toolbox = {
                 },
                 {
                     kind: "block",
-                    type: "input_custom_json",
+                    type: "input_custom_json_path",
                     inputs: {
                         QUERY: {
                             shadow: {
                                 type: "text",
                                 fields: {
-                                    TEXT: "$.customProperty",
+                                    TEXT: "$.customProperty.someValue",
+                                },
+                            },
+                        },
+                    },
+                },
+                {
+                    kind: "block",
+                    type: "input_custom_json_pointer",
+                    inputs: {
+                        QUERY: {
+                            shadow: {
+                                type: "text",
+                                fields: {
+                                    TEXT: "/customProperty/someValue",
                                 },
                             },
                         },

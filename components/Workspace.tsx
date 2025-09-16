@@ -23,6 +23,7 @@ import {
     PathSegment,
     pathSegmentsToPointer,
 } from "@kit-data-manager/json-picker"
+import { InputJsonPointer } from "@/lib/blocks/input"
 
 /**
  * This component encapsulates the {@link Blockly.Workspace} and takes care of initializing it and registering any
@@ -181,7 +182,7 @@ export function Workspace() {
             Blockly.Events.setGroup(true)
 
             try {
-                const block = workspace.newBlock("input_jsonpath")
+                const block = workspace.newBlock("input_json_pointer")
                 const rawQuery = event.dataTransfer?.getData("application/json")
 
                 if (!rawQuery) {
@@ -197,7 +198,9 @@ export function Workspace() {
                     "updateQuery" in block &&
                     typeof block.updateQuery === "function"
                 ) {
-                    block.updateQuery(pathSegmentsToPointer(query))
+                    ;(block as InputJsonPointer).updateQuery(
+                        pathSegmentsToPointer(query),
+                    )
                 }
 
                 block.initSvg()
