@@ -81,6 +81,14 @@ code {
   fill: var(--muted);
 }
 
+.dark input.blocklyHtmlInput {
+  color: var(--background);
+}
+
+.blocklyEditing > text {
+  opacity: 0;
+}
+
 .blocklyDisabledPattern > .blocklyPath {
   fill-opacity: .7;
   stroke-opacity: .6;
