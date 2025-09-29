@@ -91,7 +91,7 @@ function genericRecord<T extends Util.FairDoCodeGenerator>(
     let code = generator.makeLineComment(`${block.type}`)
     code += `EXECUTOR.addDesign( RecordDesign()\n`
     code += generator.prefixNonemptyLines(
-        generator.makeSetIDChainCall(`str(${value_localid}[0])`),
+        generator.makeSetIDChainCall(`str(${value_localid})`),
         generator.INDENT,
     )
 
