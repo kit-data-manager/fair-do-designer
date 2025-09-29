@@ -24,10 +24,14 @@ export const DataSourcePicker = forwardRef<DataSourcePickerRef>(
         const jsonUnifier = useRef(new Unifier())
         const [flat, setFlat] = useState<DocumentEntry[]>([])
         const [search, setSearch] = useState("")
+        const [totalDocuments, setTotalDocuments] = useState(0)
 
         const addFile = useCallback((doc: JSONValues) => {
             jsonUnifier.current.process(doc)
             setFlat(jsonUnifier.current.getFlattenedDocument())
+            setTotalDocuments(
+                jsonUnifier.current.getUnifiedDocument().timesObserved,
+            )
         }, [])
 
         useImperativeHandle(ref, () => ({
@@ -35,14 +39,21 @@ export const DataSourcePicker = forwardRef<DataSourcePickerRef>(
         }))
 
         const filtered = useMemo(() => {
-            return flat.filter(
-                (doc) =>
-                    doc.key.includes(search) ||
-                    [...doc.observedValues.keys()].some((e) =>
-                        (e + "").includes(search),
-                    ),
-            )
-        }, [flat, search])
+            return flat
+                .filter(
+                    (doc) =>
+                        doc.key.includes(search) ||
+                        [...doc.observedValues.keys()].some((e) =>
+                            (e + "").includes(search),
+                        ),
+                )
+                .sort((a, b) => a.key.localeCompare(b.key))
+                .sort(
+                    (a, b) =>
+                        b.timesObserved / totalDocuments -
+                        a.timesObserved / totalDocuments,
+                )
+        }, [flat, search, totalDocuments])
 
         return (
             <div>
@@ -58,7 +69,11 @@ export const DataSourcePicker = forwardRef<DataSourcePickerRef>(
 
                 <div className="grid grid-cols-[max(50%)_1fr]">
                     {filtered.map((entry, i) => (
-                        <Entry entry={entry} key={i} />
+                        <Entry
+                            entry={entry}
+                            key={i}
+                            totalDocuments={totalDocuments}
+                        />
                     ))}
                 </div>
             </div>

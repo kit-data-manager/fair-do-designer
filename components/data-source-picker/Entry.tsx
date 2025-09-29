@@ -3,8 +3,15 @@ import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import { ValueRenderer } from "@/components/data-source-picker/ValueRenderer"
 import { useCallback, DragEvent } from "react"
+import { AvailabilityScale } from "@/components/data-source-picker/AvailabilityScale"
 
-export function Entry({ entry }: { entry: DocumentEntry }) {
+export function Entry({
+    entry,
+    totalDocuments,
+}: {
+    entry: DocumentEntry
+    totalDocuments: number
+}) {
     const onDragStart = useCallback(
         (e: DragEvent) => {
             e.dataTransfer?.setData(
@@ -22,12 +29,19 @@ export function Entry({ entry }: { entry: DocumentEntry }) {
                 draggable
                 onDragStart={onDragStart}
             >
-                <Button
-                    variant="ghost"
-                    className="shrink-0 p-0 text-muted-foreground h-5.5"
-                >
-                    <ArrowLeft />
-                </Button>
+                <div className="flex items-center gap-1">
+                    <Button
+                        variant="ghost"
+                        className="shrink-0 p-0 text-muted-foreground h-5.5"
+                    >
+                        <ArrowLeft />
+                    </Button>
+                    <AvailabilityScale
+                        total={totalDocuments}
+                        current={entry.timesObserved}
+                    />
+                </div>
+
                 <div className="truncate">{entry.key}</div>
             </div>
             <ValueRenderer values={entry.observedValues} />
