@@ -1,7 +1,6 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { UnifiedDocument } from "@kit-data-manager/json-picker-react"
 import { useCallback, useRef, useState } from "react"
 import * as Blockly from "blockly"
 import { useStore } from "zustand/react"
@@ -13,16 +12,18 @@ import type {
 import { lastUsedFilesStore } from "@/lib/stores/last-used-files"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { InfoIcon } from "lucide-react"
-import { useTheme } from "next-themes"
+import {
+    DataSourcePicker,
+    DataSourcePickerRef,
+} from "@/components/data-source-picker/DataSourcePicker"
 
 export function InputPane() {
-    const unifiedDocument = useRef<HTMLUnifiedDocumentElement>(null)
     const uploadInputRef = useRef<HTMLInputElement>(null)
+    const dataSourcePicker = useRef<DataSourcePickerRef>(null)
     const addToUsedFiles = useStore(lastUsedFilesStore, (s) => s.appendToFiles)
     const setUsedFiles = useStore(lastUsedFilesStore, (s) => s.setFiles)
     const clearUsedFiles = useStore(lastUsedFilesStore, (s) => s.clearFiles)
     const lastUsedFiles = useStore(lastUsedFilesStore, (s) => s.files)
-    const theme = useTheme()
 
     // True if user files or example files have been loaded
     const [somethingLoaded, setSomethingLoaded] = useState(false)
@@ -36,7 +37,7 @@ export function InputPane() {
     }, [])
 
     const onUploadInputChange = useCallback(() => {
-        if (uploadInputRef.current && unifiedDocument.current) {
+        if (uploadInputRef.current) {
             if (
                 uploadInputRef.current.files &&
                 uploadInputRef.current.files.length > 0
@@ -58,9 +59,6 @@ export function InputPane() {
                 }
 
                 setSomethingLoaded(true)
-                unifiedDocument.current
-                    .addFiles([...uploadInputRef.current.files])
-                    .catch(console.error)
             }
         }
     }, [addToUsedFiles, setUsedFiles, somethingLoaded])
@@ -85,16 +83,15 @@ export function InputPane() {
             blobs.push(blob)
         }
 
-        if (!unifiedDocument.current) return
-        unifiedDocument.current.addFiles(blobs).catch(console.error)
+        for (const blob of blobs) {
+            dataSourcePicker.current!.addFile(JSON.parse(await blob.text()))
+        }
+
         setSomethingLoaded(true)
     }, [])
 
     const reset = useCallback(() => {
-        if (unifiedDocument.current) {
-            clearUsedFiles()
-            unifiedDocument.current.resetFiles().then()
-        }
+        clearUsedFiles()
     }, [clearUsedFiles])
 
     const onJsonKeyClick = useCallback(
@@ -172,11 +169,7 @@ export function InputPane() {
                         </Alert>
                     )}
                     <div>
-                        <UnifiedDocument
-                            ref={unifiedDocument}
-                            onJsonKeyClick={onJsonKeyClick}
-                            dark={theme.resolvedTheme === "dark"}
-                        />
+                        <DataSourcePicker ref={dataSourcePicker} />
                     </div>
                 </div>
             </div>
