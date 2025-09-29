@@ -17,6 +17,42 @@ export const toolbox = {
     contents: [
         {
             kind: "category",
+            name: "Quickstart",
+            colour: 170,
+            contents: [
+                {
+                    kind: "block",
+                    type: "pidrecord",
+                    inputs: {
+                        record: {
+                            block: {
+                                kind: "block",
+                                type: "profile_hmc",
+                            },
+                        },
+                    },
+                },
+                {
+                    kind: "block",
+                    type: "otherwise",
+                    inputs: {
+                        OTHER: {
+                            block: {
+                                type: "text",
+                                fields: {
+                                    TEXT: "Fallback value",
+                                },
+                            },
+                        },
+                    },
+                },
+            ],
+        },
+        {
+            kind: "sep",
+        },
+        {
+            kind: "category",
             name: "Records & Profiles",
             colour: 230,
             contents: [
@@ -40,15 +76,9 @@ export const toolbox = {
         },
         {
             kind: "category",
-            name: "Automatic backlinks",
+            name: "Automatic Backlinks",
             colour: 120,
             custom: "BACKLINKS",
-        },
-        {
-            kind: "category",
-            name: "Checks and Errors",
-            colour: "gray",
-            custom: "ERRORS",
         },
         {
             kind: "sep",
@@ -639,23 +669,29 @@ export const toolbox = {
             ],
         },
         {
-            kind: "sep",
+            kind: "category",
+            name: "Control Flow",
+            colour: 360,
+            contents: [
+                {
+                    kind: "block",
+                    type: "stop_design",
+                    inputs: {
+                        MESSAGE: {
+                            block: {
+                                type: "text",
+                                fields: {
+                                    TEXT: "Something went wrong!",
+                                },
+                            },
+                        },
+                    },
+                },
+            ],
         },
         {
             kind: "category",
-            name: "Variables",
-            categorystyle: "variable_category",
-            custom: "VARIABLE",
-        },
-        {
-            kind: "category",
-            name: "Functions",
-            categorystyle: "procedure_category",
-            custom: "PROCEDURE",
-        },
-        {
-            kind: "category",
-            name: "Data Access",
+            name: "Experts",
             colour: 210,
             contents: [
                 {
@@ -696,6 +732,21 @@ export const toolbox = {
                     callbackKey: "dataAccessToolboxHelp",
                 },
             ],
+        },
+        {
+            kind: "sep",
+        },
+        {
+            kind: "category",
+            name: "Variables",
+            categorystyle: "variable_category",
+            custom: "VARIABLE",
+        },
+        {
+            kind: "category",
+            name: "Functions",
+            categorystyle: "procedure_category",
+            custom: "PROCEDURE",
         },
     ],
 }

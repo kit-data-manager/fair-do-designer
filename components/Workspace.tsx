@@ -11,7 +11,6 @@ import {
     loadFromLocalStorage,
     saveToLocalStorage,
 } from "@/lib/serialization"
-import * as ErrorsToolbox from "@/lib/toolboxes/errors_logging"
 import * as BacklinksToolbox from "@/lib/toolboxes/backlinks"
 import { ValidationField } from "@/lib/fields/ValidationField"
 import { useRouter } from "next/navigation"
@@ -108,7 +107,6 @@ export function Workspace() {
             saveToLocalStorage(workspace)
         })
 
-        ErrorsToolbox.register(workspace)
         BacklinksToolbox.register(workspace)
 
         // Initialize all validation fields
