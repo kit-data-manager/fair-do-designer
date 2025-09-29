@@ -60,7 +60,7 @@ export function SingleValueRenderer({
 }) {
     return (
         <div className={`text-chart-1 truncate ${showAll ? "pb-1" : ""}`}>
-            {value}
+            {value + ""}
         </div>
     )
 }
