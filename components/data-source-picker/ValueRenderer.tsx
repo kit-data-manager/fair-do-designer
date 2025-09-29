@@ -27,9 +27,9 @@ export function ValueRenderer({
 
     return (
         <div
-            className={`p-1 group-hover:bg-muted/50 flex items-center truncate ${showAll ? "flex-col items-start" : "gap-2"}`}
+            className={`p-1 group-hover:bg-muted/50 flex items-center  ${showAll ? "flex-col items-start" : "gap-2 truncate"}`}
         >
-            <div className="truncate">
+            <div className={showAll ? "" : "truncate"}>
                 {sliced.map((value, i) => (
                     <SingleValueRenderer
                         value={value}
@@ -59,7 +59,7 @@ export function SingleValueRenderer({
     showAll: boolean
 }) {
     return (
-        <div className={`text-chart-1 truncate ${showAll ? "pb-1" : ""}`}>
+        <div className={`text-chart-1  ${showAll ? "pb-1" : "truncate"}`}>
             {value + ""}
         </div>
     )
