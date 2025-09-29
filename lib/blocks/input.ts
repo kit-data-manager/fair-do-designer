@@ -1,15 +1,12 @@
 import * as Blockly from "blockly"
 import { FieldLabel } from "blockly"
-import { FileSearchIcon } from "@/lib/icons"
-import { FieldIcon } from "@/lib/fields/FieldIcon"
 import { addBasePath } from "next/dist/client/add-base-path"
 import {
     pathSegmentsToPointer,
     pathToPathSegments,
-} from "@kit-data-manager/json-picker"
+} from "@/lib/data-source-picker/json-path"
 
 export interface InputJsonPointer extends Blockly.BlockSvg {
-    findQueryProperty(): void
     updateQuery(query: string): void
 }
 
@@ -19,16 +16,9 @@ export const input_json_pointer: InputJsonPointer = {
         const hiddenQueryField = new FieldLabel("JSON")
         hiddenQueryField.setVisible(false)
 
-        const icon = new FieldIcon(
-            FileSearchIcon,
-            this.findQueryProperty.bind(this),
-            { tooltip: "Highlight in Source Document" },
-        )
-
         this.appendDummyInput()
             .appendField("Read")
             .appendField("JSON", "DISPLAY_QUERY")
-            .appendField(icon)
             .appendField(hiddenQueryField, "QUERY")
         this.setTooltip(
             "Read value from Source Document. Right-click for more.",
@@ -68,13 +58,6 @@ export const input_json_pointer: InputJsonPointer = {
             },
             enabled: true,
         })
-    },
-
-    findQueryProperty() {
-        const query = this.getField("QUERY")?.getValue()
-        if (!query || typeof query !== "string") return
-        const unified = document.querySelector("unified-document")
-        unified?.setFocusedPath(query)
     },
 
     updateQuery: function (query: string) {

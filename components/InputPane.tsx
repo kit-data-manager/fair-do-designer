@@ -5,10 +5,6 @@ import { useCallback, useRef, useState } from "react"
 import * as Blockly from "blockly"
 import { useStore } from "zustand/react"
 import { workspaceStore } from "@/lib/stores/workspace"
-import type {
-    JSONKeyClickEvent,
-    UnifiedDocumentCustomEvent,
-} from "@kit-data-manager/json-picker"
 import { lastUsedFilesStore } from "@/lib/stores/last-used-files"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { InfoIcon } from "lucide-react"
@@ -16,6 +12,8 @@ import {
     DataSourcePicker,
     DataSourcePickerRef,
 } from "@/components/data-source-picker/DataSourcePicker"
+import { DocumentEntry } from "@/lib/data-source-picker/json-unifier"
+import { pathSegmentsToPointer } from "@/lib/data-source-picker/json-path"
 
 export function InputPane() {
     const uploadInputRef = useRef<HTMLInputElement>(null)
@@ -94,21 +92,17 @@ export function InputPane() {
         clearUsedFiles()
     }, [clearUsedFiles])
 
-    const onJsonKeyClick = useCallback(
-        (event: UnifiedDocumentCustomEvent<JSONKeyClickEvent>) => {
+    const onEntryClick = useCallback(
+        (event: DocumentEntry) => {
             if (!workspace) return
-            const query = event.detail.path
-            if (!query) {
-                console.error("Unexpected empty query", query)
-                return
-            }
+
             const block = workspace.newBlock("input_jsonpath")
 
             if (
                 "updateQuery" in block &&
                 typeof block.updateQuery === "function"
             ) {
-                block.updateQuery(query)
+                block.updateQuery(pathSegmentsToPointer(event.path))
             }
 
             block.initSvg()
@@ -169,7 +163,10 @@ export function InputPane() {
                         </Alert>
                     )}
                     <div>
-                        <DataSourcePicker ref={dataSourcePicker} />
+                        <DataSourcePicker
+                            ref={dataSourcePicker}
+                            onEntryClick={onEntryClick}
+                        />
                     </div>
                 </div>
             </div>

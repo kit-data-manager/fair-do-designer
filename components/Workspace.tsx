@@ -18,11 +18,11 @@ import { useTheme } from "next-themes"
 import "@/lib/theme"
 import { DarkTheme } from "@/lib/theme"
 import { applyFillAttrAsStyle } from "@/lib/utils"
+import { InputJsonPointer } from "@/lib/blocks/input"
 import {
     PathSegment,
     pathSegmentsToPointer,
-} from "@kit-data-manager/json-picker"
-import { InputJsonPointer } from "@/lib/blocks/input"
+} from "@/lib/data-source-picker/json-path"
 
 /**
  * This component encapsulates the {@link Blockly.Workspace} and takes care of initializing it and registering any

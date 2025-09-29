@@ -8,9 +8,11 @@ import { AvailabilityScale } from "@/components/data-source-picker/AvailabilityS
 export function Entry({
     entry,
     totalDocuments,
+    onEntryClick,
 }: {
     entry: DocumentEntry
     totalDocuments: number
+    onEntryClick?: (entry: DocumentEntry) => void
 }) {
     const onDragStart = useCallback(
         (e: DragEvent) => {
@@ -22,6 +24,10 @@ export function Entry({
         [entry.path],
     )
 
+    const onSelfClick = useCallback(() => {
+        if (onEntryClick) onEntryClick(entry)
+    }, [entry, onEntryClick])
+
     return (
         <div className="contents group">
             <div
@@ -31,6 +37,7 @@ export function Entry({
             >
                 <div className="flex items-center gap-1">
                     <Button
+                        onClick={onSelfClick}
                         variant="ghost"
                         className="shrink-0 p-0 text-muted-foreground h-5.5"
                     >
