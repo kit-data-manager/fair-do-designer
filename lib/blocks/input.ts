@@ -3,14 +3,18 @@ import { FieldLabel } from "blockly"
 import { FileSearchIcon } from "@/lib/icons"
 import { FieldIcon } from "@/lib/fields/FieldIcon"
 import { addBasePath } from "next/dist/client/add-base-path"
+import {
+    pathSegmentsToPointer,
+    pathToPathSegments,
+} from "@kit-data-manager/json-picker"
 
-export interface InputJsonPath extends Blockly.BlockSvg {
+export interface InputJsonPointer extends Blockly.BlockSvg {
     findQueryProperty(): void
     updateQuery(query: string): void
 }
 
 /* @ts-expect-error Object can't be cast to class */
-export const input_jsonpath: InputJsonPath = {
+export const input_json_pointer: InputJsonPointer = {
     init: function () {
         const hiddenQueryField = new FieldLabel("JSON")
         hiddenQueryField.setVisible(false)
@@ -74,7 +78,9 @@ export const input_jsonpath: InputJsonPath = {
     },
 
     updateQuery: function (query: string) {
-        const display = query.split(".")[query.split(".").length - 1]
+        const display = query.startsWith("/")
+            ? query.split("/")[query.split("/").length - 1]
+            : query.split(".")[query.split(".").length - 1]
         this.setFieldValue(display, "DISPLAY_QUERY")
         this.setFieldValue(query, "QUERY")
         this.getField("QUERY")?.setVisible(false)
@@ -90,23 +96,51 @@ export const input_jsonpath: InputJsonPath = {
             return
         }
 
-        this.updateQuery(query)
+        if (query.startsWith("$")) {
+            // Query is in JSON Path format, converting to JSON Pointer
+            const temp = pathToPathSegments(query)
+            const pointer = pathSegmentsToPointer(temp)
+            this.updateQuery(pointer)
+        } else {
+            this.updateQuery(query)
+        }
     },
 }
 
 /* @ts-expect-error Object can't be cast to class */
-export const input_custom_json: Blockly.BlockSvg = {
+export const input_custom_json_pointer: Blockly.BlockSvg = {
     init: function () {
         this.appendValueInput("QUERY")
             .setCheck("String")
             .appendField(
-                new Blockly.FieldLabelSerializable("Custom Query"),
+                new Blockly.FieldLabelSerializable("Custom JSON Pointer"),
                 "NAME",
             )
         this.setInputsInline(true)
         this.setOutput(true, "JSON")
         this.setTooltip(
-            "Execute a custom jsonpath query against the current Source Document",
+            "Resolve a custom JSON Pointer against the current Source Document",
+        )
+        this.setHelpUrl(
+            addBasePath("/docs/blocks/data-access#advanced-queries"),
+        )
+        this.setColour(210)
+    },
+}
+
+/* @ts-expect-error Object can't be cast to class */
+export const input_custom_json_path: Blockly.BlockSvg = {
+    init: function () {
+        this.appendValueInput("QUERY")
+            .setCheck("String")
+            .appendField(
+                new Blockly.FieldLabelSerializable("Custom JSON Path"),
+                "NAME",
+            )
+        this.setInputsInline(true)
+        this.setOutput(true, "JSON")
+        this.setTooltip(
+            "Execute a custom JSON Path query against the current Source Document",
         )
         this.setHelpUrl(
             addBasePath("/docs/blocks/data-access#advanced-queries"),
