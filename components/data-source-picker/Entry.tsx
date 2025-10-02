@@ -4,6 +4,12 @@ import { ArrowLeft } from "lucide-react"
 import { ValueRenderer } from "@/components/data-source-picker/ValueRenderer"
 import { useCallback, DragEvent } from "react"
 import { AvailabilityScale } from "@/components/data-source-picker/AvailabilityScale"
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { pathSegmentsToPointer } from "@/lib/data-source-picker/json-path"
 
 export function Entry({
     entry,
@@ -49,9 +55,19 @@ export function Entry({
                     />
                 </div>
 
-                <div className="truncate">{entry.key}</div>
+                <Tooltip delayDuration={700}>
+                    <TooltipTrigger>
+                        <div className="truncate">{entry.key}</div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        {pathSegmentsToPointer(entry.path)}
+                    </TooltipContent>
+                </Tooltip>
             </div>
-            <ValueRenderer values={entry.observedValues} />
+            <ValueRenderer
+                values={entry.observedValues}
+                timesObserved={entry.timesObserved}
+            />
         </div>
     )
 }
