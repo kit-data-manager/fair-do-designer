@@ -17,6 +17,7 @@ import { SearchIcon } from "lucide-react"
 
 export type DataSourcePickerRef = {
     addFile: (doc: JSONValues) => void
+    reset: () => void
 }
 
 export const DataSourcePicker = forwardRef<
@@ -36,8 +37,15 @@ export const DataSourcePicker = forwardRef<
         )
     }, [])
 
+    const reset = useCallback(() => {
+        jsonUnifier.current.reset()
+        setFlat([])
+        setTotalDocuments(0)
+    }, [])
+
     useImperativeHandle(ref, () => ({
         addFile,
+        reset,
     }))
 
     const filtered = useMemo(() => {
@@ -57,19 +65,39 @@ export const DataSourcePicker = forwardRef<
             )
     }, [flat, search, totalDocuments])
 
+    const searchNoResults = useMemo(() => {
+        return flat.length > 0 && filtered.length === 0
+    }, [filtered.length, flat.length])
+
+    const noData = useMemo(() => {
+        return flat.length === 0
+    }, [flat.length])
+
     return (
         <div>
-            <div className="relative">
-                <SearchIcon className="absolute size-4 left-2.5 top-2.5 text-muted-foreground" />
-                <Input
-                    value={search}
-                    className="pl-8 mb-2"
-                    placeholder="Search for keys or values..."
-                    onChange={(e) => setSearch(e.target.value)}
-                />
-            </div>
+            {!noData && (
+                <div className="relative">
+                    <SearchIcon className="absolute size-4 left-2.5 top-2.5 text-muted-foreground" />
+                    <Input
+                        value={search}
+                        className="pl-8 mb-2"
+                        placeholder="Search for keys or values..."
+                        onChange={(e) => setSearch(e.target.value)}
+                    />
+                </div>
+            )}
 
             <div className="grid grid-cols-[max(50%)_1fr]">
+                {noData && (
+                    <div className="col-span-2 flex justify-center text-muted-foreground p-4">
+                        Upload files or add example files to show values here
+                    </div>
+                )}
+                {searchNoResults && (
+                    <div className="col-span-2 flex justify-center text-muted-foreground p-4">
+                        No Results
+                    </div>
+                )}
                 {filtered.map((entry, i) => (
                     <Entry
                         entry={entry}

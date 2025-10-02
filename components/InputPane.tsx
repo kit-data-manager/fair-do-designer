@@ -34,8 +34,8 @@ export function InputPane() {
         }
     }, [])
 
-    const onUploadInputChange = useCallback(() => {
-        if (uploadInputRef.current) {
+    const onUploadInputChange = useCallback(async () => {
+        if (uploadInputRef.current && dataSourcePicker.current) {
             if (
                 uploadInputRef.current.files &&
                 uploadInputRef.current.files.length > 0
@@ -56,7 +56,18 @@ export function InputPane() {
                     )
                 }
 
+                // Hide notice about last used files
                 setSomethingLoaded(true)
+
+                for (const file of uploadInputRef.current.files) {
+                    try {
+                        dataSourcePicker.current.addFile(
+                            JSON.parse(await file.text()),
+                        )
+                    } catch (e) {
+                        console.error("Failed to parse file", e)
+                    }
+                }
             }
         }
     }, [addToUsedFiles, setUsedFiles, somethingLoaded])
@@ -81,15 +92,21 @@ export function InputPane() {
             blobs.push(blob)
         }
 
-        for (const blob of blobs) {
-            dataSourcePicker.current!.addFile(JSON.parse(await blob.text()))
-        }
-
+        // Hide notice about last used files
         setSomethingLoaded(true)
+
+        for (const blob of blobs) {
+            try {
+                dataSourcePicker.current!.addFile(JSON.parse(await blob.text()))
+            } catch (e) {
+                console.error("Failed to parse file", e)
+            }
+        }
     }, [])
 
     const reset = useCallback(() => {
         clearUsedFiles()
+        if (dataSourcePicker.current) dataSourcePicker.current.reset()
     }, [clearUsedFiles])
 
     const onEntryClick = useCallback(
@@ -147,7 +164,7 @@ export function InputPane() {
                             <InfoIcon />
                             <AlertTitle className="flex items-start justify-between">
                                 The following files were previously used with
-                                this design
+                                this design:
                             </AlertTitle>
                             <AlertDescription>
                                 {lastUsedFiles.map((file) => (
