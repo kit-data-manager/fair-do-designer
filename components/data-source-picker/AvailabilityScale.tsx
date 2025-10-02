@@ -19,7 +19,7 @@ export function AvailabilityScale({
     return (
         <Tooltip>
             <TooltipTrigger>
-                <div className="text-xs relative p-1 h-3 w-10 text-center text-foreground">
+                <div className="text-xs relative p-1 h-3 w-6 text-center text-foreground">
                     <div
                         className={`absolute z-20 left-0 top-0 bottom-0 border-chart-3 rounded-md ${percentage == "100" ? "border-4" : "bg-chart-3"}`}
                         style={{ width: `${percentage}%` }}

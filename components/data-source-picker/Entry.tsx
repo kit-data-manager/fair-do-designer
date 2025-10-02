@@ -35,7 +35,7 @@ export function Entry({
                 draggable
                 onDragStart={onDragStart}
             >
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 mr-2">
                     <Button
                         onClick={onSelfClick}
                         variant="ghost"
