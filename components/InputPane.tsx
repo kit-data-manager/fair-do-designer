@@ -1,28 +1,27 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { UnifiedDocument } from "@kit-data-manager/json-picker-react"
 import { useCallback, useRef, useState } from "react"
 import * as Blockly from "blockly"
 import { useStore } from "zustand/react"
 import { workspaceStore } from "@/lib/stores/workspace"
-import type {
-    JSONKeyClickEvent,
-    UnifiedDocumentCustomEvent,
-} from "@kit-data-manager/json-picker"
 import { lastUsedFilesStore } from "@/lib/stores/last-used-files"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { InfoIcon } from "lucide-react"
-import { useTheme } from "next-themes"
+import {
+    DataSourcePicker,
+    DataSourcePickerRef,
+} from "@/components/data-source-picker/DataSourcePicker"
+import { DocumentEntry } from "@/lib/data-source-picker/json-unifier"
+import { pathSegmentsToPointer } from "@/lib/data-source-picker/json-path"
 
 export function InputPane() {
-    const unifiedDocument = useRef<HTMLUnifiedDocumentElement>(null)
     const uploadInputRef = useRef<HTMLInputElement>(null)
+    const dataSourcePicker = useRef<DataSourcePickerRef>(null)
     const addToUsedFiles = useStore(lastUsedFilesStore, (s) => s.appendToFiles)
     const setUsedFiles = useStore(lastUsedFilesStore, (s) => s.setFiles)
     const clearUsedFiles = useStore(lastUsedFilesStore, (s) => s.clearFiles)
     const lastUsedFiles = useStore(lastUsedFilesStore, (s) => s.files)
-    const theme = useTheme()
 
     // True if user files or example files have been loaded
     const [somethingLoaded, setSomethingLoaded] = useState(false)
@@ -35,8 +34,8 @@ export function InputPane() {
         }
     }, [])
 
-    const onUploadInputChange = useCallback(() => {
-        if (uploadInputRef.current && unifiedDocument.current) {
+    const onUploadInputChange = useCallback(async () => {
+        if (uploadInputRef.current && dataSourcePicker.current) {
             if (
                 uploadInputRef.current.files &&
                 uploadInputRef.current.files.length > 0
@@ -57,10 +56,18 @@ export function InputPane() {
                     )
                 }
 
+                // Hide notice about last used files
                 setSomethingLoaded(true)
-                unifiedDocument.current
-                    .addFiles([...uploadInputRef.current.files])
-                    .catch(console.error)
+
+                for (const file of uploadInputRef.current.files) {
+                    try {
+                        dataSourcePicker.current.addFile(
+                            JSON.parse(await file.text()),
+                        )
+                    } catch (e) {
+                        console.error("Failed to parse file", e)
+                    }
+                }
             }
         }
     }, [addToUsedFiles, setUsedFiles, somethingLoaded])
@@ -85,33 +92,34 @@ export function InputPane() {
             blobs.push(blob)
         }
 
-        if (!unifiedDocument.current) return
-        unifiedDocument.current.addFiles(blobs).catch(console.error)
+        // Hide notice about last used files
         setSomethingLoaded(true)
+
+        for (const blob of blobs) {
+            try {
+                dataSourcePicker.current!.addFile(JSON.parse(await blob.text()))
+            } catch (e) {
+                console.error("Failed to parse file", e)
+            }
+        }
     }, [])
 
     const reset = useCallback(() => {
-        if (unifiedDocument.current) {
-            clearUsedFiles()
-            unifiedDocument.current.resetFiles().then()
-        }
+        clearUsedFiles()
+        if (dataSourcePicker.current) dataSourcePicker.current.reset()
     }, [clearUsedFiles])
 
-    const onJsonKeyClick = useCallback(
-        (event: UnifiedDocumentCustomEvent<JSONKeyClickEvent>) => {
+    const onEntryClick = useCallback(
+        (event: DocumentEntry) => {
             if (!workspace) return
-            const query = event.detail.path
-            if (!query) {
-                console.error("Unexpected empty query", query)
-                return
-            }
+
             const block = workspace.newBlock("input_jsonpath")
 
             if (
                 "updateQuery" in block &&
                 typeof block.updateQuery === "function"
             ) {
-                block.updateQuery(query)
+                block.updateQuery(pathSegmentsToPointer(event.path))
             }
 
             block.initSvg()
@@ -156,7 +164,7 @@ export function InputPane() {
                             <InfoIcon />
                             <AlertTitle className="flex items-start justify-between">
                                 The following files were previously used with
-                                this design
+                                this design:
                             </AlertTitle>
                             <AlertDescription>
                                 {lastUsedFiles.map((file) => (
@@ -172,10 +180,9 @@ export function InputPane() {
                         </Alert>
                     )}
                     <div>
-                        <UnifiedDocument
-                            ref={unifiedDocument}
-                            onJsonKeyClick={onJsonKeyClick}
-                            dark={theme.resolvedTheme === "dark"}
+                        <DataSourcePicker
+                            ref={dataSourcePicker}
+                            onEntryClick={onEntryClick}
                         />
                     </div>
                 </div>
