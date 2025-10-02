@@ -14,6 +14,10 @@ import {
 import { Entry } from "@/components/data-source-picker/Entry"
 import { Input } from "@/components/ui/input"
 import { SearchIcon } from "lucide-react"
+import {
+    PathSegment,
+    pathSegmentsToPointer,
+} from "@/lib/data-source-picker/json-path"
 
 export type DataSourcePickerRef = {
     addFile: (doc: JSONValues) => void
@@ -48,14 +52,35 @@ export const DataSourcePicker = forwardRef<
         reset,
     }))
 
+    const shortenedPaths = useMemo(() => {
+        const pointers = flat.map((d) => d.path)
+        const shortened = shortenPathsUnique(pointers)
+        const zipped = pointers.map(
+            (pointer, i) =>
+                [pathSegmentsToPointer(pointer), shortened[i]] as [
+                    string,
+                    string,
+                ],
+        )
+        return new Map(zipped)
+    }, [flat])
+
+    const withFullPointers = useMemo(() => {
+        return flat.map((p) => ({
+            fullPointer: pathSegmentsToPointer(p.path),
+            ...p,
+        }))
+    }, [flat])
+
     const filtered = useMemo(() => {
-        return flat
+        return withFullPointers
             .filter(
                 (doc) =>
                     doc.key.includes(search) ||
                     [...doc.observedValues.keys()].some((e) =>
                         (e + "").includes(search),
-                    ),
+                    ) ||
+                    doc.fullPointer.includes(search),
             )
             .sort((a, b) => a.key.localeCompare(b.key))
             .sort(
@@ -63,7 +88,7 @@ export const DataSourcePicker = forwardRef<
                     b.timesObserved / totalDocuments -
                     a.timesObserved / totalDocuments,
             )
-    }, [flat, search, totalDocuments])
+    }, [search, totalDocuments, withFullPointers])
 
     const searchNoResults = useMemo(() => {
         return flat.length > 0 && filtered.length === 0
@@ -104,9 +129,75 @@ export const DataSourcePicker = forwardRef<
                         key={i}
                         totalDocuments={totalDocuments}
                         onEntryClick={onEntryClick}
+                        shortened={
+                            shortenedPaths.get(
+                                pathSegmentsToPointer(entry.path),
+                            ) ?? pathSegmentsToPointer(entry.path)
+                        }
                     />
                 ))}
             </div>
         </div>
     )
 })
+
+function shortenPathsUnique(paths: PathSegment[][]) {
+    const base = paths.map((p) => ({
+        path: p,
+        length: 1,
+        fullPointer: pathSegmentsToPointer(p),
+    }))
+    let nextIteration = base.slice()
+
+    while (nextIteration.length > 0) {
+        const { conflicted, mapping } = findConflicted(nextIteration)
+        const promoteToNextIteration = []
+
+        for (const candidate of nextIteration) {
+            const partialPointer = mapping.get(candidate.fullPointer)!
+            if (conflicted.has(partialPointer)) {
+                candidate.length += 1
+                promoteToNextIteration.push(candidate)
+            }
+        }
+
+        nextIteration = promoteToNextIteration.slice()
+    }
+
+    return base.map(getPartialPointer)
+}
+
+function getPartialPointer(part: {
+    path: PathSegment[]
+    length: number
+    fullPointer: string
+}) {
+    return part.path
+        .slice()
+        .reverse()
+        .slice(0, part.length)
+        .reverse()
+        .map((p) => p.value)
+        .join("/")
+}
+
+function findConflicted(
+    parts: { path: PathSegment[]; length: number; fullPointer: string }[],
+) {
+    const firstPass = new Set<string>()
+    const secondPass = new Set<string>()
+    const mapping = new Map<string, string>()
+
+    for (const part of parts) {
+        const partialPointer = getPartialPointer(part)
+        mapping.set(part.fullPointer, partialPointer)
+
+        if (firstPass.has(partialPointer)) {
+            secondPass.add(partialPointer)
+        } else {
+            firstPass.add(partialPointer)
+        }
+    }
+
+    return { conflicted: secondPass, mapping }
+}

@@ -6,6 +6,7 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { EllipsisIcon, XIcon } from "lucide-react"
 
 export function ValueRenderer({
     values,
@@ -34,7 +35,7 @@ export function ValueRenderer({
 
     return (
         <div
-            className={`p-1 group-hover:bg-muted/50 flex items-center  ${showAll ? "flex-col items-start" : "gap-2 truncate"}`}
+            className={`p-1 flex items-center  ${showAll ? "justify-between" : "gap-2 truncate"}`}
         >
             <div className={showAll ? "" : "truncate"}>
                 {sliced.map(([value, observedTimes], i) => (
@@ -52,9 +53,13 @@ export function ValueRenderer({
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowAll(!showAll)}
-                className={`shrink-0 p-0 text-muted-foreground h-4 ${canShowMore ? "" : "hidden"}`}
+                className={`shrink-0 p-0 text-muted-foreground h-4 ${canShowMore ? "" : "hidden"} ${showAll ? "p-1 h-6" : ""}`}
             >
-                {showAll ? "Show less" : "[...]"}
+                {showAll ? (
+                    <XIcon className="size-4 shrink-0" />
+                ) : (
+                    <EllipsisIcon className="size-4 shrink-0" />
+                )}
             </Button>
         </div>
     )
@@ -76,13 +81,19 @@ export function SingleValueRenderer({
     }, [observedTimes, timesObserved])
 
     return (
-        <div className="flex items-start gap-1 pb-1">
-            {showAll && <div className="text-muted-foreground">-</div>}
-            <div className={`text-chart-1 ${showAll ? "" : "truncate"}`}>
+        <div className="flex items-start gap-1">
+            <div
+                className={`text-muted-foreground ${showAll ? "my-1 leading-tight" : "opacity-0"}`}
+            >
+                -
+            </div>
+            <div
+                className={`text-chart-1 ${showAll ? "my-1 leading-tight" : "truncate"}`}
+            >
                 <Tooltip delayDuration={700}>
                     <TooltipTrigger asChild>
                         <span
-                            className={`${showAll ? "line-clamp-4" : "truncate"}`}
+                            className={`inline ${showAll ? "line-clamp-4" : "truncate"}`}
                         >
                             {value + " "}
                         </span>
@@ -93,8 +104,8 @@ export function SingleValueRenderer({
                 </Tooltip>
                 {showAll && (
                     <Tooltip>
-                        <TooltipTrigger>
-                            <span className="text-xs text-muted-foreground">
+                        <TooltipTrigger asChild>
+                            <span className="text-xs text-muted-foreground inline">
                                 {percentage}%
                             </span>
                         </TooltipTrigger>
