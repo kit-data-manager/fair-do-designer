@@ -87,7 +87,7 @@ export const DataSourcePicker = forwardRef<
                 </div>
             )}
 
-            <div className="grid grid-cols-[max(50%)_1fr]">
+            <div className="grid grid-cols-[max(55%)_1fr]">
                 {noData && (
                     <div className="col-span-2 flex justify-center text-muted-foreground p-4">
                         Upload files or add example files to show values here

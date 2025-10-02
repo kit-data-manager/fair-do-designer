@@ -76,10 +76,21 @@ export function SingleValueRenderer({
     }, [observedTimes, timesObserved])
 
     return (
-        <div className="flex items-start gap-1">
+        <div className="flex items-start gap-1 pb-1">
             {showAll && <div className="text-muted-foreground">-</div>}
-            <div className={`text-chart-1  ${showAll ? "pb-1" : "truncate"}`}>
-                {value + " "}
+            <div className={`text-chart-1 ${showAll ? "" : "truncate"}`}>
+                <Tooltip delayDuration={700}>
+                    <TooltipTrigger asChild>
+                        <span
+                            className={`${showAll ? "line-clamp-4" : "truncate"}`}
+                        >
+                            {value + " "}
+                        </span>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-[400px]">
+                        {value}
+                    </TooltipContent>
+                </Tooltip>
                 {showAll && (
                     <Tooltip>
                         <TooltipTrigger>

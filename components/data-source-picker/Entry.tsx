@@ -37,7 +37,7 @@ export function Entry({
     return (
         <div className="contents group">
             <div
-                className="text-chart-3 p-1 group-hover:bg-muted/50 flex justify-between truncate"
+                className="text-chart-3 p-1 group-hover:bg-muted/50 flex justify-between items-center min-w-0 max-w-full"
                 draggable
                 onDragStart={onDragStart}
             >
@@ -56,7 +56,7 @@ export function Entry({
                 </div>
 
                 <Tooltip delayDuration={700}>
-                    <TooltipTrigger>
+                    <TooltipTrigger asChild>
                         <div className="truncate">{entry.key}</div>
                     </TooltipTrigger>
                     <TooltipContent>
