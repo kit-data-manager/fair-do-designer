@@ -1,0 +1,26 @@
+
+# Save Migration
+
+Whenever breaking changes are made to the blocks included with the app, old saves may have to be migrated. The following changes are considered breaking for the save file:
+
+ - Block type changes (renaming or removing)
+ - Block input changes (renaming or removing)
+ - Adding required fields to blocks
+
+Whenever these changes are necessary, the type of the block should be changed.
+
+```
+some-block -> some-block-1
+some-block-6 -> some-block-7
+```
+
+Then a save file migration must be added for the old name of the block. This allows easily tracking necessary migrations across multiple versions of the app.
+
+## Migration Methods
+
+There are two methods available for migrating save files:
+
+ - **JSON-based**: Simple text-replace migrations can be applied before the save file is loaded into Blockly
+ - **Blockly-based**: Blockly-based migrations can be applied (using a migration workspace) to the save file after it is loaded into Blockly
+
+JSON-based migrations are preferred for simple migrations. Blockly-based migrations are preferred for more complex migrations. JSON-based migrations are always run first, the Blockly-based migrations are run after.
