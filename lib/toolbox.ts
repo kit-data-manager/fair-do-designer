@@ -17,6 +17,42 @@ export const toolbox = {
     contents: [
         {
             kind: "category",
+            name: "Quickstart",
+            colour: 170,
+            contents: [
+                {
+                    kind: "block",
+                    type: "pidrecord",
+                    inputs: {
+                        record: {
+                            block: {
+                                kind: "block",
+                                type: "profile_hmc",
+                            },
+                        },
+                    },
+                },
+                {
+                    kind: "block",
+                    type: "otherwise",
+                    inputs: {
+                        OTHER: {
+                            block: {
+                                type: "text",
+                                fields: {
+                                    TEXT: "Fallback value",
+                                },
+                            },
+                        },
+                    },
+                },
+            ],
+        },
+        {
+            kind: "sep",
+        },
+        {
+            kind: "category",
             name: "Records & Profiles",
             colour: 230,
             contents: [
@@ -40,15 +76,9 @@ export const toolbox = {
         },
         {
             kind: "category",
-            name: "Automatic backlinks",
+            name: "Automatic Backlinks",
             colour: 120,
             custom: "BACKLINKS",
-        },
-        {
-            kind: "category",
-            name: "Checks and Errors",
-            colour: "gray",
-            custom: "ERRORS",
         },
         {
             kind: "sep",
@@ -639,6 +669,71 @@ export const toolbox = {
             ],
         },
         {
+            kind: "category",
+            name: "Control Flow",
+            colour: 360,
+            contents: [
+                {
+                    kind: "block",
+                    type: "stop_design",
+                    inputs: {
+                        MESSAGE: {
+                            block: {
+                                type: "text",
+                                fields: {
+                                    TEXT: "Something went wrong!",
+                                },
+                            },
+                        },
+                    },
+                },
+            ],
+        },
+        {
+            kind: "category",
+            name: "Experts",
+            colour: 210,
+            contents: [
+                {
+                    kind: "label",
+                    text: "For Expert use",
+                },
+                {
+                    kind: "block",
+                    type: "input_custom_json_path",
+                    inputs: {
+                        QUERY: {
+                            shadow: {
+                                type: "text",
+                                fields: {
+                                    TEXT: "$.customProperty.someValue",
+                                },
+                            },
+                        },
+                    },
+                },
+                {
+                    kind: "block",
+                    type: "input_custom_json_pointer",
+                    inputs: {
+                        QUERY: {
+                            shadow: {
+                                type: "text",
+                                fields: {
+                                    TEXT: "/customProperty/someValue",
+                                },
+                            },
+                        },
+                    },
+                },
+                {
+                    kind: "button",
+                    text: "Help",
+                    callbackKey: "dataAccessToolboxHelp",
+                },
+            ],
+        },
+        {
             kind: "sep",
         },
         {
@@ -652,36 +747,6 @@ export const toolbox = {
             name: "Functions",
             categorystyle: "procedure_category",
             custom: "PROCEDURE",
-        },
-        {
-            kind: "category",
-            name: "Data Access",
-            colour: 210,
-            contents: [
-                {
-                    kind: "label",
-                    text: "For Expert use",
-                },
-                {
-                    kind: "block",
-                    type: "input_custom_json",
-                    inputs: {
-                        QUERY: {
-                            shadow: {
-                                type: "text",
-                                fields: {
-                                    TEXT: "$.customProperty",
-                                },
-                            },
-                        },
-                    },
-                },
-                {
-                    kind: "button",
-                    text: "Help",
-                    callbackKey: "dataAccessToolboxHelp",
-                },
-            ],
         },
     ],
 }

@@ -87,22 +87,23 @@ function genericRecord<T extends Util.FairDoCodeGenerator>(
 ) {
     const value_localid = generator.valueToCode(block, "local-id", Order.ATOMIC)
     const statement_record = generator.statementToCode(block, "record")
-    
+
     let code = generator.makeLineComment(`${block.type}`)
     code += `EXECUTOR.addDesign( RecordDesign()\n`
     code += generator.prefixNonemptyLines(
-        generator.makeSetIDChainCall(`str(${value_localid}[0])`),
+        generator.makeSetIDChainCall(`str(${value_localid})`),
         generator.INDENT,
     )
 
-    const hasCondition = value_skip_condition && value_skip_condition.trim() != ""
+    const hasCondition =
+        value_skip_condition && value_skip_condition.trim() != ""
     if (hasCondition) {
         code += generator.prefixNonemptyLines(
             `.setSkipCondition(lambda: ${value_skip_condition})\n`,
-            generator.INDENT
+            generator.INDENT,
         )
     }
-    
+
     code += statement_record
     code += ")\n"
     return code
@@ -131,12 +132,12 @@ forBlock["attribute_key"] = function <T extends Util.FairDoCodeGenerator>(
     block: Blockly.Block,
     generator: T,
 ) {
-    const value_key = generator.valueToCode(block, 'KEY', Order.ATOMIC);
-    const value_value = generator.valueToCode(block, 'VALUE', Order.ATOMIC);
+    const value_key = generator.valueToCode(block, "KEY", Order.ATOMIC)
+    const value_value = generator.valueToCode(block, "VALUE", Order.ATOMIC)
 
     let code = ""
-    const isSomething = (thing: string | null | undefined) => 
-        thing && thing.length > 0 && thing !== "''";
+    const isSomething = (thing: string | null | undefined) =>
+        thing && thing.length > 0 && thing !== "''"
     if (isSomething(value_key) && isSomething(value_value)) {
         code += generator.makeLineComment(`## ${block.type} ##`)
         code += generator.makeAddAttributeChainCall(value_key, value_value)
@@ -144,20 +145,35 @@ forBlock["attribute_key"] = function <T extends Util.FairDoCodeGenerator>(
     return code
 }
 
+const jsonPointerCall = (path: string) =>
+    `jsonpath.pointer.resolve(${path}, executor.current_source_json)`
+
 const jsonpathCall = (path: string) =>
-    `jsonpath.findall("${path}", executor.current_source_json)`
+    `jsonpath.findall(${path}, executor.current_source_json)`
 
-forBlock["input_jsonpath"] = function (block: Blockly.Block) {
-    const value_input = block.getFieldValue("QUERY")
-    return [jsonpathCall(value_input), Order.ATOMIC]
-}
-
-forBlock["input_custom_json"] = function <T extends Util.FairDoCodeGenerator>(
+forBlock["input_json_pointer"] = function (
     block: Blockly.Block,
-    generator: T,
+    generator: PythonGenerator,
 ) {
+    const value_input = block.getFieldValue("QUERY")
+    const quoted = generator.quote_(value_input)
+    return [jsonPointerCall(quoted), Order.ATOMIC]
+}
+forBlock["input_jsonpath"] = forBlock["input_json_pointer"] // TODO remove
+
+forBlock["input_custom_json_path"] = function <
+    T extends Util.FairDoCodeGenerator,
+>(block: Blockly.Block, generator: T) {
     const value_block = generator.valueToCode(block, "QUERY", Order.ATOMIC)
     return [jsonpathCall(value_block), Order.ATOMIC]
+}
+forBlock["input_custom_json"] = forBlock["input_custom_json_path"] // TODO remove
+
+forBlock["input_custom_json_pointer"] = function <
+    T extends Util.FairDoCodeGenerator,
+>(block: Blockly.Block, generator: T) {
+    const value_block = generator.valueToCode(block, "QUERY", Order.ATOMIC)
+    return [jsonPointerCall(value_block), Order.ATOMIC]
 }
 
 // Type guard for HmcBlock interface
@@ -284,5 +300,10 @@ forBlock["lists_create_with"] = function <T extends Util.FairDoCodeGenerator>(
         }
     }
 
-    return ["[\n" + generator.prefixLines(values.join(", "), generator.INDENT) + "]", Order.COLLECTION]
+    return [
+        "[\n" +
+            generator.prefixLines(values.join(", "), generator.INDENT) +
+            "]",
+        Order.COLLECTION,
+    ]
 }

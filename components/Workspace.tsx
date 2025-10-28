@@ -11,7 +11,6 @@ import {
     loadFromLocalStorage,
     saveToLocalStorage,
 } from "@/lib/serialization"
-import * as ErrorsToolbox from "@/lib/toolboxes/errors_logging"
 import * as BacklinksToolbox from "@/lib/toolboxes/backlinks"
 import { ValidationField } from "@/lib/fields/ValidationField"
 import { useRouter } from "next/navigation"
@@ -19,6 +18,11 @@ import { useTheme } from "next-themes"
 import "@/lib/theme"
 import { DarkTheme } from "@/lib/theme"
 import { applyFillAttrAsStyle } from "@/lib/utils"
+import { InputJsonPointer } from "@/lib/blocks/input"
+import {
+    PathSegment,
+    pathSegmentsToPointer,
+} from "@/lib/data-source-picker/json-path"
 
 /**
  * This component encapsulates the {@link Blockly.Workspace} and takes care of initializing it and registering any
@@ -103,7 +107,6 @@ export function Workspace() {
             saveToLocalStorage(workspace)
         })
 
-        ErrorsToolbox.register(workspace)
         BacklinksToolbox.register(workspace)
 
         // Initialize all validation fields
@@ -177,21 +180,25 @@ export function Workspace() {
             Blockly.Events.setGroup(true)
 
             try {
-                const block = workspace.newBlock("input_jsonpath")
-                const query = event.dataTransfer?.getData("text/plain")
+                const block = workspace.newBlock("input_json_pointer")
+                const rawQuery = event.dataTransfer?.getData("application/json")
 
-                if (!query) {
+                if (!rawQuery) {
                     console.error(
                         "Received drop event that did not include a valid text/plain data point",
                     )
                     return
                 }
 
+                const query = JSON.parse(rawQuery) as PathSegment[]
+
                 if (
                     "updateQuery" in block &&
                     typeof block.updateQuery === "function"
                 ) {
-                    block.updateQuery(query)
+                    ;(block as InputJsonPointer).updateQuery(
+                        pathSegmentsToPointer(query),
+                    )
                 }
 
                 block.initSvg()
