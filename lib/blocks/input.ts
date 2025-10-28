@@ -2,16 +2,37 @@ import * as Blockly from "blockly"
 import { FieldLabel } from "blockly"
 import { addBasePath } from "next/dist/client/add-base-path"
 import {
+    PathSegment,
     pathSegmentsToPointer,
     pathToPathSegments,
+    pointerToPathSegments,
 } from "@/lib/data-source-picker/json-path"
 
 export interface InputJsonPointer extends Blockly.BlockSvg {
-    updateQuery(query: string): void
+    path: PathSegment[]
+    label?: string
+
+    /**
+     * Update the query field and optionally the label field. If no label is provided, the current label is used. If there is currently no label, it will be generated from the query, but not saved to the state of the block.
+     * @param query Query to update the block with.
+     * @param label Optional label to set for the block.
+     */
+    updateQuery(query: PathSegment[], label?: string): void
+}
+
+/**
+ * Type for the extra state of the input_json_pointer block.
+ */
+type ExtraState = {
+    version: number
+    path: PathSegment[]
+    label: string | null
 }
 
 /* @ts-expect-error Object can't be cast to class */
 export const input_json_pointer: InputJsonPointer = {
+    path: [],
+
     init: function () {
         const hiddenQueryField = new FieldLabel("JSON")
         hiddenQueryField.setVisible(false)
@@ -37,6 +58,19 @@ export const input_json_pointer: InputJsonPointer = {
             separator: true,
         })
         menu.splice(0, 0, {
+            text: "Edit Label",
+            callback: () => {
+                const result = prompt(
+                    "⭐️ Enter the new Label below:",
+                    this.getField("DISPLAY_QUERY")?.getValue() ?? "",
+                )
+                if (result) {
+                    this.updateQuery(this.path, result)
+                }
+            },
+            enabled: true,
+        })
+        menu.splice(0, 0, {
             text: "Edit Query",
             callback: () => {
                 const result = prompt(
@@ -44,11 +78,13 @@ export const input_json_pointer: InputJsonPointer = {
                     this.getField("QUERY")?.getValue() ?? "",
                 )
                 if (result) {
-                    this.updateQuery(result)
+                    const pathSegments = pointerToPathSegments(result)
+                    this.updateQuery(pathSegments)
                 }
             },
             enabled: true,
         })
+
         menu.splice(0, 0, {
             text: "Show full Query",
             callback: () => {
@@ -60,17 +96,25 @@ export const input_json_pointer: InputJsonPointer = {
         })
     },
 
-    updateQuery: function (query: string) {
+    updateQuery: function (path: PathSegment[], label?: string) {
+        this.path = path
+        if (label) this.label = label
+
+        const query = pathSegmentsToPointer(path)
         const display = query.startsWith("/")
             ? query.split("/")[query.split("/").length - 1]
             : query.split(".")[query.split(".").length - 1]
-        this.setFieldValue(display, "DISPLAY_QUERY")
+        this.setFieldValue(this.label ?? display, "DISPLAY_QUERY")
         this.setFieldValue(query, "QUERY")
         this.getField("QUERY")?.setVisible(false)
     },
 
     saveExtraState: function () {
-        return this.getField("QUERY")?.getValue()
+        return JSON.stringify({
+            version: 1,
+            path: this.path,
+            label: this.label ?? null,
+        } satisfies ExtraState)
     },
 
     loadExtraState: function (query: unknown) {
@@ -80,13 +124,27 @@ export const input_json_pointer: InputJsonPointer = {
         }
 
         if (query.startsWith("$")) {
-            // Query is in JSON Path format, converting to JSON Pointer
-            const temp = pathToPathSegments(query)
-            const pointer = pathSegmentsToPointer(temp)
-            this.updateQuery(pointer)
+            // Query is in JSON Path format (version 1 of this block)
+            this.path = pathToPathSegments(query)
+        } else if (!query.startsWith("{")) {
+            // Query probably in JSON Pointer format (version 2 of this block)
+            this.path = pointerToPathSegments(query)
         } else {
-            this.updateQuery(query)
+            // Query in PathSegment format (version 3 of this block)
+            try {
+                const extraState = JSON.parse(query) as ExtraState
+                this.path = extraState.path
+                this.label = extraState.label ?? undefined
+            } catch {
+                console.error(
+                    "Failed to load extra state of input_json_pointer",
+                    query,
+                )
+                this.label = "Invalid state"
+            }
         }
+
+        this.updateQuery(this.path, this.label)
     },
 }
 
