@@ -1,5 +1,5 @@
 {
   "labels": ["dependencies"],
-  "baseBranches": ["development"],
+  "baseBranches": ["main"],
   "minimumReleaseAge": "3 days"
 }
