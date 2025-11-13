@@ -196,10 +196,10 @@ export function Header() {
                         />
                     </MenubarTrigger>
                     <MenubarContent>
-                        <Link href={"/docs"}>
+                        <Link href={"/docs"} target={"_blank"}>
                             <MenubarItem>Documentation</MenubarItem>
                         </Link>
-                        <Link href={"/docs/getting-started"}>
+                        <Link href={"/docs/getting-started"} target={"_blank"}>
                             <MenubarItem>Getting Started</MenubarItem>
                         </Link>
                     </MenubarContent>
