@@ -37,7 +37,6 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --color-string: var(--string);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -192,7 +191,6 @@ g > image.red-icon {
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
-  --string: oklch(0.674 0.166 155.081);
 }
 
 /*---break---*/
@@ -229,7 +227,6 @@ g > image.red-icon {
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
-  --string: oklch(0.674 0.166 155.081);
 }
 
 /*---break---*/
