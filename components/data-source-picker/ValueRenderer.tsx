@@ -88,7 +88,7 @@ export function SingleValueRenderer({
                 -
             </div>
             <div
-                className={`text-chart-1 ${showAll ? "my-1 leading-tight" : "truncate"}`}
+                className={`text-primary dark:text-foreground/70 ${showAll ? "my-1 leading-tight" : "truncate"}`}
             >
                 <Tooltip delayDuration={700}>
                     <TooltipTrigger asChild>
