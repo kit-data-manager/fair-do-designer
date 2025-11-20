@@ -8,12 +8,16 @@ export class PythonCodeDownload {
             "conditionals.py",
             "pyproject.toml",
             "README.md",
-            "LICENSE"
+            "LICENSE",
         ]
         const promises = filesToFetch.map((name) =>
             name in this.staticFileCache
                 ? Promise.resolve(this.staticFileCache[name])
-                : fetch(process.env.NEXT_PUBLIC_BASE_PATH + "/python/" + name).then((res) => res.text()),
+                : fetch(
+                      (process.env.NEXT_PUBLIC_BASE_PATH ?? "") +
+                          "/python/" +
+                          name,
+                  ).then((res) => res.text()),
         )
 
         const fetchedFile = await Promise.all(promises)
@@ -35,7 +39,9 @@ export class PythonCodeDownload {
                         return reject(err)
                     }
 
-                    const blob = new Blob([data], { type: "application/zip" })
+                    const blob = new Blob([data.slice()], {
+                        type: "application/zip",
+                    })
                     const url = URL.createObjectURL(blob)
                     const a = document.createElement("a")
                     a.href = url
