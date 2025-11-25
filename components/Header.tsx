@@ -163,7 +163,7 @@ export function Header() {
 
                 <MenubarMenu>
                     <MenubarTrigger>
-                        File
+                        Design
                         <ChevronDown
                             className={"size-4 ml-1 text-muted-foreground"}
                         />
@@ -177,7 +177,7 @@ export function Header() {
                         </MenubarItem>
                         <MenubarSeparator />
                         <MenubarItem onClick={clearWorkspace}>
-                            Clear Workspace
+                            New empty Design
                         </MenubarItem>
                     </MenubarContent>
                 </MenubarMenu>
