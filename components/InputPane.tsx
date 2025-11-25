@@ -13,6 +13,7 @@ import {
     DataSourcePickerRef,
 } from "@/components/data-source-picker/DataSourcePicker"
 import { DocumentEntry } from "@/lib/data-source-picker/json-unifier"
+import { InputJsonPointer } from "@/lib/blocks/input"
 
 export function InputPane() {
     const uploadInputRef = useRef<HTMLInputElement>(null)
@@ -118,7 +119,7 @@ export function InputPane() {
                 "updateQuery" in block &&
                 typeof block.updateQuery === "function"
             ) {
-                block.updateQuery(event.path)
+                ;(block as InputJsonPointer).updateQuery(event.path)
             }
 
             block.initSvg()
