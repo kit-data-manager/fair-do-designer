@@ -55,6 +55,7 @@ export class Unifier {
 
     reset() {
         this.root = structuredClone(starterDoc)
+        this.documents = {}
     }
 
     getUnifiedDocument() {
@@ -76,6 +77,12 @@ export class Unifier {
         } while (stack.length > 0)
 
         return flattened
+    }
+
+    getDocuments() {
+        return Object.entries(structuredClone(this.documents)).map(
+            ([name, doc]) => ({ name, doc }),
+        )
     }
 
     private processChild(unified: DocumentEntry, content: JSONValues) {

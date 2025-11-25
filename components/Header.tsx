@@ -17,10 +17,10 @@ import { useStore } from "zustand/react"
 import { workspaceStore } from "@/lib/stores/workspace"
 import { Input } from "@/components/ui/input"
 import {
-    loadFromFile,
-    loadFromLocalStorage,
-    saveToDisk,
-    saveToLocalStorage,
+    useLoadFromFile,
+    useLoadFromLocalStorage,
+    useSaveToDisk,
+    useSaveToLocalStorage,
 } from "@/lib/serialization"
 import Link from "next/link"
 import { RecordMappingGenerator } from "@/lib/generators/python"
@@ -48,19 +48,24 @@ export function Header() {
 
     const [, copy] = useCopyToClipboard()
 
+    const saveToLocalStorage = useSaveToLocalStorage()
+    const saveToDisk = useSaveToDisk()
+    const loadFromFile = useLoadFromFile()
+    const loadFromLocalStorage = useLoadFromLocalStorage()
+
     const confirmNameChange = useCallback(() => {
         setDesignName(nameInputValue)
         setEditName(false)
-        if (workspace) saveToLocalStorage(workspace)
-    }, [nameInputValue, setDesignName, workspace])
+        saveToLocalStorage()
+    }, [nameInputValue, saveToLocalStorage, setDesignName])
 
     useEffect(() => {
         setNameInputValue(designName)
     }, [designName])
 
     const doSaveToDisk = useCallback(() => {
-        if (workspace) saveToDisk(workspace)
-    }, [workspace])
+        saveToDisk()
+    }, [saveToDisk])
 
     const triggerLoadFromDisk = useCallback(() => {
         if (fileUploadInput.current) {
@@ -71,17 +76,17 @@ export function Header() {
     const onFileUploadInputChange = useCallback(async () => {
         if (fileUploadInput.current && fileUploadInput.current.files) {
             const file = fileUploadInput.current.files.item(0)
-            if (file && workspace) {
-                saveToLocalStorage(workspace)
-                const result = await loadFromFile(file, workspace)
+            if (file) {
+                saveToLocalStorage()
+                const result = await loadFromFile(file)
                 if (result === "no-data" || result === "error") {
                     setLoadingSaveFileFailed(true)
-                    loadFromLocalStorage(workspace)
+                    loadFromLocalStorage()
                     return
                 }
             }
         }
-    }, [workspace])
+    }, [loadFromFile, loadFromLocalStorage, saveToLocalStorage])
 
     const codeGenerator = useRef(
         new RecordMappingGenerator("PidRecordMappingPython"),

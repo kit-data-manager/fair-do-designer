@@ -8,8 +8,8 @@ import { workspaceStore } from "@/lib/stores/workspace"
 import "@/lib/blocks/all"
 import {
     clearLocalStorage,
-    loadFromLocalStorage,
-    saveToLocalStorage,
+    useLoadFromLocalStorage,
+    useSaveToLocalStorage,
 } from "@/lib/serialization"
 import * as BacklinksToolbox from "@/lib/toolboxes/backlinks"
 import { ValidationField } from "@/lib/fields/ValidationField"
@@ -60,6 +60,9 @@ export function Workspace() {
         setRemountCounter((v) => (max ? (v >= max ? v : v + 1) : v + 1))
     }, [])
 
+    const loadFromLocalStorage = useLoadFromLocalStorage()
+    const saveToLocalStorage = useSaveToLocalStorage()
+
     const mount = useCallback(() => {
         if (!divRef.current) {
             console.error("Failed to mount workspace: divRef empty")
@@ -91,7 +94,7 @@ export function Workspace() {
         })
 
         // Load the initial state from storage and run the code.
-        const loadResult = loadFromLocalStorage(workspace)
+        const loadResult = loadFromLocalStorage()
 
         if (loadResult === "error") {
             clearLocalStorage()
@@ -104,7 +107,7 @@ export function Workspace() {
             // UI events are things like scrolling, zooming, etc.
             // No need to save after one of these.
             if (e.isUiEvent) return
-            saveToLocalStorage(workspace)
+            saveToLocalStorage()
         })
 
         BacklinksToolbox.register(workspace)
@@ -132,7 +135,13 @@ export function Workspace() {
         validationFieldCheckInterval.current = window.setInterval(() => {
             checkAllValidationFields()
         }, 2000)
-    }, [forceRemount, router, setWorkspace])
+    }, [
+        forceRemount,
+        loadFromLocalStorage,
+        router,
+        saveToLocalStorage,
+        setWorkspace,
+    ])
 
     const unmount = useCallback(() => {
         console.warn("Unloading workspace")

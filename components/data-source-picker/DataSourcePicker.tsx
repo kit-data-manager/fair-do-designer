@@ -1,15 +1,14 @@
 import {
     forwardRef,
     useCallback,
+    useContext,
     useImperativeHandle,
     useMemo,
-    useRef,
     useState,
 } from "react"
 import {
     DocumentEntry,
     JSONValues,
-    Unifier,
 } from "@/lib/data-source-picker/json-unifier"
 import { Entry } from "@/components/data-source-picker/Entry"
 import { Input } from "@/components/ui/input"
@@ -18,6 +17,7 @@ import {
     PathSegment,
     pathSegmentsToPointer,
 } from "@/lib/data-source-picker/json-path"
+import { UnifierContext } from "@/components/UnifierContext"
 
 export type DataSourcePickerRef = {
     addFile: (name: string, doc: JSONValues) => void
@@ -28,24 +28,28 @@ export const DataSourcePicker = forwardRef<
     DataSourcePickerRef,
     { onEntryClick?: (entry: DocumentEntry) => void }
 >(function DataSourcePicker({ onEntryClick }, ref) {
-    const jsonUnifier = useRef(new Unifier())
-    const [flat, setFlat] = useState<DocumentEntry[]>([])
+    const {
+        unifier: jsonUnifier,
+        flat,
+        updateFlat,
+        totalDocumentCount,
+    } = useContext(UnifierContext)
     const [search, setSearch] = useState("")
-    const [totalDocuments, setTotalDocuments] = useState(0)
 
-    const addFile = useCallback((name: string, doc: JSONValues) => {
-        jsonUnifier.current.process(name, doc)
-        setFlat(jsonUnifier.current.getFlattenedDocument())
-        setTotalDocuments(
-            jsonUnifier.current.getUnifiedDocument().timesObserved,
-        )
-    }, [])
+    const addFile = useCallback(
+        (name: string, doc: JSONValues) => {
+            if (!jsonUnifier) throw "UnifiedContext not mounted"
+            jsonUnifier.process(name, doc)
+            updateFlat()
+        },
+        [jsonUnifier, updateFlat],
+    )
 
     const reset = useCallback(() => {
-        jsonUnifier.current.reset()
-        setFlat([])
-        setTotalDocuments(0)
-    }, [])
+        if (!jsonUnifier) throw "UnifiedContext not mounted"
+        jsonUnifier.reset()
+        updateFlat()
+    }, [jsonUnifier, updateFlat])
 
     useImperativeHandle(ref, () => ({
         addFile,
@@ -85,10 +89,10 @@ export const DataSourcePicker = forwardRef<
             .sort((a, b) => a.key.localeCompare(b.key))
             .sort(
                 (a, b) =>
-                    b.timesObserved / totalDocuments -
-                    a.timesObserved / totalDocuments,
+                    b.timesObserved / totalDocumentCount -
+                    a.timesObserved / totalDocumentCount,
             )
-    }, [search, totalDocuments, withFullPointers])
+    }, [search, totalDocumentCount, withFullPointers])
 
     const searchNoResults = useMemo(() => {
         return flat.length > 0 && filtered.length === 0
@@ -127,7 +131,7 @@ export const DataSourcePicker = forwardRef<
                     <Entry
                         entry={entry}
                         key={i}
-                        totalDocuments={totalDocuments}
+                        totalDocuments={totalDocumentCount}
                         onEntryClick={onEntryClick}
                         shortened={
                             shortenedPaths.get(
