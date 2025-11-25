@@ -1,0 +1,60 @@
+
+# Save Migration
+
+Whenever breaking changes are made to the blocks included with the app, old saves may have to be migrated. The following changes are considered breaking for the save file:
+
+ - Block type changes (renaming or removing)
+ - Block input changes (renaming or removing)
+ - Adding required fields to blocks
+
+Whenever these changes are necessary, the type of the block should be changed.
+
+```
+some-block -> some-block-1
+some-block-6 -> some-block-7
+```
+
+Then a save file migration must be added for the old name of the block. This allows easily tracking necessary migrations across multiple versions of the app.
+
+## Migration Methods
+
+There are two methods available for migrating save files:
+
+ - **JSON-based**: Simple text-replace migrations can be applied before the save file is loaded into Blockly
+ - **Blockly-based**: Blockly-based migrations can be applied after the save file is loaded into Blockly
+
+JSON-based migrations are preferred for simple migrations. Blockly-based migrations are preferred for more complex migrations. JSON-based migrations are always run first, the Blockly-based migrations are run after the JSON migrations.
+
+### JSON-based Migrations
+
+To add a migration using the JSON mechanism, you must add a Migration function to the `lib/migrate/json_migrate.ts` file. A Migration function has the following signature:
+
+```ts
+type Migration = (data: WorkspaceData) => WorkspaceData
+```
+
+To make migrations easier, a MigrationHelper class is provided. This class can be used to search for blocks of a specific type and call a handler for each one. An example migration might look like this:
+
+```ts
+const exampleMigration: Migration = (data) => {
+    const helper = new MigrationHelper(data)
+
+    helper.handleBlockType("example_block_0", (block) => {
+        if (block.fields?.example_field === "old_value") {
+            block.fields.example_field = "new_value"
+        }
+
+        block.type = "example_block_1"
+
+        return block
+    })
+
+    return data
+}
+```
+
+This migration will find all blocks of type `example_block_0` and change the value of the `example_field` field to `new_value`. It will also change the type of the block to `example_block_1`. Migrations are run in the order they are added to the `migrations` array in `lib/migrate/json_migrate.ts`.
+
+### Blockly-based Migrations
+
+A workspace-based migrator has not been implemented yet.

@@ -7,14 +7,30 @@
 import * as Blockly from "blockly/core"
 import { workspaceStore } from "@/lib/stores/workspace"
 import { LastUsedFile, lastUsedFilesStore } from "@/lib/stores/last-used-files"
+import { runAllMigrations } from "@/lib/migrate/json_migrate"
 
 const storageKey = "fairdoWorkspace"
 const version = 1
 
-interface WorkspaceData {
+export interface BlockData extends Record<string, unknown> {
+    type: string
+    id: string
+    x?: number
+    y?: number
+    fields?: Record<string, unknown>
+    inputs?: Record<string, { block?: BlockData; shadow?: BlockData }>
+}
+
+export interface WorkspaceData {
     version: number
     name: string
-    data: Record<string, unknown>
+    data: {
+        blocks: {
+            languageVersion: number // seems to always be 0
+            blocks: BlockData[]
+        }
+        variables: unknown[]
+    }
     lastUsedFiles?: LastUsedFile[]
 }
 
@@ -24,7 +40,9 @@ interface WorkspaceData {
  * @returns Serializable workspace data.
  */
 function save(workspace: Blockly.Workspace): WorkspaceData {
-    const data = Blockly.serialization.workspaces.save(workspace)
+    const data = Blockly.serialization.workspaces.save(
+        workspace,
+    ) as WorkspaceData["data"]
     const name = workspaceStore.getState().designName
     const lastUsedFiles = lastUsedFilesStore.getState().files
 
@@ -62,6 +80,8 @@ const load = function (
     workspaceData: WorkspaceData,
     workspace: Blockly.Workspace,
 ) {
+    workspaceData = runAllMigrations(workspaceData)
+
     if (workspaceData.version !== version) {
         throw `Unsupported save file version: ${workspaceData.version}`
     }
