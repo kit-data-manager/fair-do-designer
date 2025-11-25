@@ -14,7 +14,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { useLoadFromFile } from "@/lib/serialization"
 import { Error } from "@/components/error"
-import { ShieldAlert } from "lucide-react"
+import { ShieldAlert, TriangleAlert } from "lucide-react"
 
 export function RemoteDesignImport() {
     return (
@@ -114,6 +114,12 @@ function InnerRemoteDesignImport() {
                     </span>
                     Only import Designs from sources that you trust. Are you
                     sure you want to continue?
+                    <br />
+                    <br />
+                    <div className="flex items-center gap-2 text-warn">
+                        <TriangleAlert className="size-4" /> Your current Design
+                        will be lost.
+                    </div>
                     <DialogFooter className="pt-4">
                         <Button
                             variant={"secondary"}
