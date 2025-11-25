@@ -5,7 +5,7 @@
     "scripts": {
         "dev": "bun --bun next dev --turbopack",
         "build": "bun --bun next build --turbopack",
-        "start": "bun --bun npx serve@latest out",
+        "start": "bunx --bun serve@latest out",
         "lint": "bun --bun next lint",
         "postbuild": "pagefind --site out --glob docs/**/*.{html} --output-path out/_pagefind"
     },
