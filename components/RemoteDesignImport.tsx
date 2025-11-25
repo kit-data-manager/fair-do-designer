@@ -54,7 +54,7 @@ function InnerRemoteDesignImport() {
         if (
             url &&
             isValidUrl(url) &&
-            //url.startsWith("https://") &&
+            url.startsWith("https://") &&
             url.endsWith(".json")
         ) {
             setRemoteDesignImportURL(url)
