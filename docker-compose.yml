@@ -1,7 +1,9 @@
 services:
   dev:
     container_name: fairdo-designer-dev
-    build: ./docker  # we do not need context, so I chose a directory with small size
+    build:
+      context: ./docker
+      dockerfile: Dockerfile
     # simulate deployment environment
     environment:
       BASE_PATH: "/fair-do-designer"
@@ -11,4 +13,4 @@ services:
     volumes:
       - .:/app
     working_dir: /app
-    command: sh -c "pipx run pre-commit install && npm ci && npm run build && npm run dev"
+    command: sh -c "pipx run pre-commit install && bun install && bun run build && bun run dev"
