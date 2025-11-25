@@ -10,6 +10,7 @@ import {
     MenubarContent,
     MenubarItem,
     MenubarMenu,
+    MenubarSeparator,
     MenubarTrigger,
 } from "@/components/ui/menubar"
 import { useCallback, useEffect, useRef, useState } from "react"
@@ -106,6 +107,10 @@ export function Header() {
         workspace?.undo(true)
     }, [workspace])
 
+    const clearWorkspace = useCallback(() => {
+        workspace?.clear()
+    }, [workspace])
+
     return (
         <div className="h-12 flex items-center pl-4 pr-2 gap-3 max-w-full">
             {/* Dialogs */}
@@ -158,7 +163,7 @@ export function Header() {
 
                 <MenubarMenu>
                     <MenubarTrigger>
-                        File
+                        Design
                         <ChevronDown
                             className={"size-4 ml-1 text-muted-foreground"}
                         />
@@ -169,6 +174,10 @@ export function Header() {
                         </MenubarItem>
                         <MenubarItem onClick={doSaveToDisk}>
                             Save Design
+                        </MenubarItem>
+                        <MenubarSeparator />
+                        <MenubarItem onClick={clearWorkspace}>
+                            New empty Design
                         </MenubarItem>
                     </MenubarContent>
                 </MenubarMenu>
@@ -196,10 +205,10 @@ export function Header() {
                         />
                     </MenubarTrigger>
                     <MenubarContent>
-                        <Link href={"/docs"}>
+                        <Link href={"/docs"} target={"_blank"}>
                             <MenubarItem>Documentation</MenubarItem>
                         </Link>
-                        <Link href={"/docs/getting-started"}>
+                        <Link href={"/docs/getting-started"} target={"_blank"}>
                             <MenubarItem>Getting Started</MenubarItem>
                         </Link>
                     </MenubarContent>
