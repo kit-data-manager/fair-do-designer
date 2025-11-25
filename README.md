@@ -5,19 +5,22 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 One way is to use the compose file to run a development container:
 
 ```bash
+# with podman:
+podman compose build
 podman compose up -d
-# if you use docker:
-# docker compose up -d
+# or, if you prefer docker:
+docker compose build
+docker compose up -d
 ```
 
 You can then use vscode to attach to the container.
 The dev server is available at http://localhost:8080/fair-do-designer.
-The container comes pre-installed with required tooling like node/npm and uv.
+The container comes pre-installed with required tooling like bun and uv.
 
 Otherwise, use these manual steps (install required tooling manually in beforehand):
 
 - `pipx run pre-commit install` to enable all pre-commit hooks.
-- `npm ci && npm run build && npm run dev` to install dependencies for npm and run the service.
+- `bun install && bun run build && bun run dev` to install dependencies and run the service. It is possible to use NPM if you prefer.
 
 ### Python setup
 

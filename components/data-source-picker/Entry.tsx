@@ -51,8 +51,9 @@ export function Entry({
                 "application/json",
                 JSON.stringify(entry.path),
             )
+            e.dataTransfer?.setData("text/plain", shortened)
         },
-        [entry.path],
+        [entry.path, shortened],
     )
 
     const onSelfClick = useCallback(() => {
