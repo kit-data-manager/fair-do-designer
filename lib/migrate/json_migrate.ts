@@ -2,20 +2,22 @@ import { BlockData, WorkspaceData } from "@/lib/serialization"
 
 type Migration = (data: WorkspaceData) => WorkspaceData
 
-// TODO Remove this example
-const exampleMigration: Migration = (data) => {
-    const helper = new MigrationHelper(data)
-    helper.handleBlockType("example_block_0", (block) => {
-        if (block.fields?.example_field === "old_value") {
-            block.fields.example_field = "new_value"
-            return block
-        }
-        return null
-    })
-    return data
-}
+// Example migration (can be removed once there is an actual migration here)
+// const exampleMigration: Migration = (data) => {
+//     const helper = new MigrationHelper(data)
+//     helper.handleBlockType("example_block_0", (block) => {
+//         if (block.fields?.example_field === "old_value") {
+//             block.fields.example_field = "new_value"
+//             return block
+//         }
+//         return null
+//     })
+//     return data
+// }
 
-const migrations: Migration[] = [exampleMigration]
+const migrations: Migration[] = [
+    // exampleMigration
+]
 
 /**
  * Runs the migrations from the migrations array in order (lowest index first)
