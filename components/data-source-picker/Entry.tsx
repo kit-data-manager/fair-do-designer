@@ -51,8 +51,9 @@ export function Entry({
                 "application/json",
                 JSON.stringify(entry.path),
             )
+            e.dataTransfer?.setData("text/plain", shortened)
         },
-        [entry.path],
+        [entry.path, shortened],
     )
 
     const onSelfClick = useCallback(() => {
@@ -60,9 +61,9 @@ export function Entry({
     }, [entry, onEntryClick])
 
     return (
-        <div className="contents [&:nth-child(2n)_>_div]:bg-muted/70 [&:hover:nth-child(2n)_>_div]:bg-muted [&:hover:nth-child(2n+1)_>_div]:bg-muted">
+        <div className="contents [&:hover:nth-child(2n)_>_div]:bg-muted/70 [&:hover:nth-child(2n+1)_>_div]:bg-muted/70">
             <div
-                className="text-chart-3 p-1 flex justify-between items-center min-w-0 max-w-full min-h-[32px]"
+                className="p-1 flex justify-between items-center min-w-0 max-w-full min-h-[32px]"
                 draggable
                 onDragStart={onDragStart}
                 ref={divRef}

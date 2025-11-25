@@ -7,6 +7,7 @@
 import * as Blockly from "blockly/core"
 import { workspaceStore } from "@/lib/stores/workspace"
 import { LastUsedFile, lastUsedFilesStore } from "@/lib/stores/last-used-files"
+import { runAllMigrations } from "@/lib/migrate/json_migrate"
 import { useCallback, useContext } from "react"
 import { UnifierContext } from "@/components/UnifierContext"
 import { JSONValues, Unifier } from "@/lib/data-source-picker/json-unifier"
@@ -15,10 +16,25 @@ import { Workspace } from "blockly"
 const storageKey = "fairdoWorkspace"
 const version = 2
 
-interface WorkspaceData {
+export interface BlockData extends Record<string, unknown> {
+    type: string
+    id: string
+    x?: number
+    y?: number
+    fields?: Record<string, unknown>
+    inputs?: Record<string, { block?: BlockData; shadow?: BlockData }>
+}
+
+export interface WorkspaceData {
     version: number
     name: string
-    data: Record<string, unknown>
+    data: {
+        blocks: {
+            languageVersion: number // seems to always be 0
+            blocks: BlockData[]
+        }
+        variables: unknown[]
+    }
     lastUsedFiles?: LastUsedFile[]
     documents: { name: string; doc: unknown }[]
 }
@@ -30,7 +46,9 @@ interface WorkspaceData {
  * @returns Serializable workspace data.
  */
 function save(workspace: Blockly.Workspace, unifier: Unifier): WorkspaceData {
-    const data = Blockly.serialization.workspaces.save(workspace)
+    const data = Blockly.serialization.workspaces.save(
+        workspace,
+    ) as WorkspaceData["data"]
     const name = workspaceStore.getState().designName
     const lastUsedFiles = lastUsedFilesStore.getState().files
 
@@ -89,6 +107,8 @@ const useLoad = function () {
         (workspaceData: WorkspaceData) => {
             const workspace = workspaceStore.getState().workspace
             if (!workspace || !unifier) return
+
+            workspaceData = runAllMigrations(workspaceData)
 
             function loadWorkspace() {
                 Blockly.serialization.workspaces.load(

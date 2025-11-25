@@ -19,10 +19,7 @@ import "@/lib/theme"
 import { DarkTheme } from "@/lib/theme"
 import { applyFillAttrAsStyle } from "@/lib/utils"
 import { InputJsonPointer } from "@/lib/blocks/input"
-import {
-    PathSegment,
-    pathSegmentsToPointer,
-} from "@/lib/data-source-picker/json-path"
+import { PathSegment } from "@/lib/data-source-picker/json-path"
 
 /**
  * This component encapsulates the {@link Blockly.Workspace} and takes care of initializing it and registering any
@@ -191,8 +188,15 @@ export function Workspace() {
             try {
                 const block = workspace.newBlock("input_json_pointer")
                 const rawQuery = event.dataTransfer?.getData("application/json")
+                const label = event.dataTransfer?.getData("text/plain")
 
                 if (!rawQuery) {
+                    console.error(
+                        "Received drop event that did not include a valid application/json data point",
+                    )
+                    return
+                }
+                if (!label) {
                     console.error(
                         "Received drop event that did not include a valid text/plain data point",
                     )
@@ -205,9 +209,7 @@ export function Workspace() {
                     "updateQuery" in block &&
                     typeof block.updateQuery === "function"
                 ) {
-                    ;(block as InputJsonPointer).updateQuery(
-                        pathSegmentsToPointer(query),
-                    )
+                    ;(block as InputJsonPointer).updateQuery(query, label)
                 }
 
                 block.initSvg()
