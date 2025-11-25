@@ -163,7 +163,7 @@ export const useLoadFromFile = function () {
     const load = useLoad()
 
     return useCallback(
-        async (file: File): Promise<"no-data" | "loaded" | "error"> => {
+        async (file: Blob): Promise<"no-data" | "loaded" | "error"> => {
             const data = await file.text().catch((e) => {
                 console.error("Failed to read file", e)
                 return undefined

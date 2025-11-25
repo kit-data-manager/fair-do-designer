@@ -12,6 +12,9 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
+import { useLoadFromFile } from "@/lib/serialization"
+import { Error } from "@/components/error"
+import { ShieldAlert } from "lucide-react"
 
 export function RemoteDesignImport() {
     return (
@@ -25,8 +28,12 @@ function InnerRemoteDesignImport() {
     const params = useSearchParams()
     const [remoteDesignImportURL, setRemoteDesignImportURL] = useState<string>()
     const [showModal, setShowModal] = useState(false)
+    const [isImportInProgress, setIsImportInProgress] = useState(false)
+    const [importError, setImportError] = useState<unknown>()
     const router = useRouter()
     const pathname = usePathname()
+
+    const loadFromFile = useLoadFromFile()
 
     const setShowModalInterceptor = useCallback(
         (value: boolean) => {
@@ -44,11 +51,46 @@ function InnerRemoteDesignImport() {
 
     if (params.has("remoteDesignImport") && !remoteDesignImportURL) {
         const url = params.get("remoteDesignImport")
-        if (url && isValidUrl(url)) {
+        if (
+            url &&
+            isValidUrl(url) &&
+            //url.startsWith("https://") &&
+            url.endsWith(".json")
+        ) {
             setRemoteDesignImportURL(url)
             setShowModal(true)
         }
     }
+
+    const doImport = useCallback(async () => {
+        try {
+            if (remoteDesignImportURL) {
+                setIsImportInProgress(true)
+                const req = await fetch(remoteDesignImportURL)
+                if (req.ok) {
+                    const json = await req.json()
+                    const blob = new Blob([JSON.stringify(json)], {
+                        type: "application/json",
+                    })
+                    const status = await loadFromFile(blob)
+                    if (status === "no-data") {
+                        setImportError("The imported file is empty or invalid.")
+                    } else if (status === "error") {
+                        setImportError("Failed to load the imported file.")
+                    } else {
+                        setShowModalInterceptor(false)
+                    }
+                } else {
+                    setImportError("Failed to fetch the remote file.")
+                }
+            }
+        } catch (e) {
+            console.error(e)
+            setImportError(e)
+        } finally {
+            setIsImportInProgress(false)
+        }
+    }, [loadFromFile, remoteDesignImportURL, setShowModalInterceptor])
 
     return (
         <>
@@ -62,18 +104,30 @@ function InnerRemoteDesignImport() {
                             from trusted sources.
                         </DialogDescription>
                     </DialogHeader>
+                    <Error title={"Design Import failed"} error={importError} />
+                    <div className="flex justify-center p-2">
+                        <ShieldAlert className="size-10 text-warn" />
+                    </div>
                     You are about to import a Design from the following URL:
-                    <span className="font-mono">{remoteDesignImportURL}</span>
+                    <span className="border border-warn text-warn rounded-md p-3">
+                        {remoteDesignImportURL}
+                    </span>
                     Only import Designs from sources that you trust. Are you
                     sure you want to continue?
-                    <DialogFooter>
+                    <DialogFooter className="pt-4">
                         <Button
                             variant={"secondary"}
+                            className={"grow"}
                             onClick={() => setShowModalInterceptor(false)}
                         >
                             Cancel
                         </Button>
-                        <Button>Yes, I am sure</Button>
+                        <Button
+                            disabled={isImportInProgress}
+                            onClick={doImport}
+                        >
+                            Yes, I am sure
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
