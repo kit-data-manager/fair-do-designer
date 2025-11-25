@@ -62,6 +62,7 @@ export function InputPane() {
                 for (const file of uploadInputRef.current.files) {
                     try {
                         dataSourcePicker.current.addFile(
+                            file.name,
                             JSON.parse(await file.text()),
                         )
                     } catch (e) {
@@ -97,7 +98,10 @@ export function InputPane() {
 
         for (const blob of blobs) {
             try {
-                dataSourcePicker.current!.addFile(JSON.parse(await blob.text()))
+                dataSourcePicker.current!.addFile(
+                    "Example metadata",
+                    JSON.parse(await blob.text()),
+                )
             } catch (e) {
                 console.error("Failed to parse file", e)
             }

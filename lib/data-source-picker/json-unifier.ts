@@ -26,10 +26,31 @@ const starterDoc: DocumentEntry = {
 
 export class Unifier {
     private root: DocumentEntry = structuredClone(starterDoc)
+    private documents: Record<string, JSONValues> = {}
 
-    process(doc: JSONValues) {
+    process(name: string, doc: JSONValues) {
         this.root.timesObserved++
+        this.documents[this.generateUniqueDocumentName(name)] = doc
         this.processChild(this.root, doc)
+    }
+
+    /**
+     * Generates a unique name for a document based on the provided name.
+     * If the name is already used, a number suffix is appended to make it unique.
+     * @param name
+     * @private
+     */
+    private generateUniqueDocumentName(name: string) {
+        if (!(name in this.documents)) {
+            return name
+        }
+
+        let i = 1
+        while (name + ` (${i})` in this.documents) {
+            i++
+        }
+
+        return name + ` (${i})`
     }
 
     reset() {

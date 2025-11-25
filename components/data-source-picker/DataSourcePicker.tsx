@@ -20,7 +20,7 @@ import {
 } from "@/lib/data-source-picker/json-path"
 
 export type DataSourcePickerRef = {
-    addFile: (doc: JSONValues) => void
+    addFile: (name: string, doc: JSONValues) => void
     reset: () => void
 }
 
@@ -33,8 +33,8 @@ export const DataSourcePicker = forwardRef<
     const [search, setSearch] = useState("")
     const [totalDocuments, setTotalDocuments] = useState(0)
 
-    const addFile = useCallback((doc: JSONValues) => {
-        jsonUnifier.current.process(doc)
+    const addFile = useCallback((name: string, doc: JSONValues) => {
+        jsonUnifier.current.process(name, doc)
         setFlat(jsonUnifier.current.getFlattenedDocument())
         setTotalDocuments(
             jsonUnifier.current.getUnifiedDocument().timesObserved,
