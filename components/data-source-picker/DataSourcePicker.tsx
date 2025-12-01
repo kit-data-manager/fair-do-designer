@@ -1,7 +1,6 @@
 import {
     forwardRef,
     useCallback,
-    useContext,
     useImperativeHandle,
     useMemo,
     useState,
@@ -17,8 +16,9 @@ import {
     PathSegment,
     pathSegmentsToPointer,
 } from "@/lib/data-source-picker/json-path"
-import { UnifierContext } from "@/components/UnifierContext"
-import { useSaveToLocalStorage } from "@/lib/serialization"
+import { saveToLocalStorage } from "@/lib/serialization"
+import { useStore } from "zustand/react"
+import { dataSourcePickerStore } from "@/lib/stores/data-source-picker-store"
 
 export type DataSourcePickerRef = {
     addFile: (name: string, doc: JSONValues) => void
@@ -34,9 +34,8 @@ export const DataSourcePicker = forwardRef<
         flat,
         updateFlat,
         totalDocumentCount,
-    } = useContext(UnifierContext)
+    } = useStore(dataSourcePickerStore)
     const [search, setSearch] = useState("")
-    const saveToLocalStorage = useSaveToLocalStorage()
 
     const addFile = useCallback(
         (name: string, doc: JSONValues) => {
@@ -45,7 +44,7 @@ export const DataSourcePicker = forwardRef<
             updateFlat()
             saveToLocalStorage()
         },
-        [jsonUnifier, saveToLocalStorage, updateFlat],
+        [jsonUnifier, updateFlat],
     )
 
     const reset = useCallback(() => {
@@ -53,7 +52,7 @@ export const DataSourcePicker = forwardRef<
         jsonUnifier.reset()
         updateFlat()
         saveToLocalStorage()
-    }, [jsonUnifier, saveToLocalStorage, updateFlat])
+    }, [jsonUnifier, updateFlat])
 
     useImperativeHandle(ref, () => ({
         addFile,

@@ -8,8 +8,8 @@ import { workspaceStore } from "@/lib/stores/workspace"
 import "@/lib/blocks/all"
 import {
     clearLocalStorage,
-    useLoadFromLocalStorage,
-    useSaveToLocalStorage,
+    loadFromLocalStorage,
+    saveToLocalStorage,
 } from "@/lib/serialization"
 import * as BacklinksToolbox from "@/lib/toolboxes/backlinks"
 import { ValidationField } from "@/lib/fields/ValidationField"
@@ -56,9 +56,6 @@ export function Workspace() {
     const forceRemount = useCallback((max?: number) => {
         setRemountCounter((v) => (max ? (v >= max ? v : v + 1) : v + 1))
     }, [])
-
-    const loadFromLocalStorage = useLoadFromLocalStorage()
-    const saveToLocalStorage = useSaveToLocalStorage()
 
     const mount = useCallback(() => {
         if (!divRef.current) {
@@ -132,13 +129,7 @@ export function Workspace() {
         validationFieldCheckInterval.current = window.setInterval(() => {
             checkAllValidationFields()
         }, 2000)
-    }, [
-        forceRemount,
-        loadFromLocalStorage,
-        router,
-        saveToLocalStorage,
-        setWorkspace,
-    ])
+    }, [forceRemount, router, setWorkspace])
 
     const unmount = useCallback(() => {
         console.warn("Unloading workspace")

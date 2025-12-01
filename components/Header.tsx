@@ -18,10 +18,10 @@ import { useStore } from "zustand/react"
 import { workspaceStore } from "@/lib/stores/workspace"
 import { Input } from "@/components/ui/input"
 import {
-    useLoadFromFile,
-    useLoadFromLocalStorage,
-    useSaveToDisk,
-    useSaveToLocalStorage,
+    loadFromFile,
+    loadFromLocalStorage,
+    saveToDisk,
+    saveToLocalStorage,
 } from "@/lib/serialization"
 import Link from "next/link"
 import { RecordMappingGenerator } from "@/lib/generators/python"
@@ -49,24 +49,15 @@ export function Header() {
 
     const [, copy] = useCopyToClipboard()
 
-    const saveToLocalStorage = useSaveToLocalStorage()
-    const saveToDisk = useSaveToDisk()
-    const loadFromFile = useLoadFromFile()
-    const loadFromLocalStorage = useLoadFromLocalStorage()
-
     const confirmNameChange = useCallback(() => {
         setDesignName(nameInputValue)
         setEditName(false)
         saveToLocalStorage()
-    }, [nameInputValue, saveToLocalStorage, setDesignName])
+    }, [nameInputValue, setDesignName])
 
     useEffect(() => {
         setNameInputValue(designName)
     }, [designName])
-
-    const doSaveToDisk = useCallback(() => {
-        saveToDisk()
-    }, [saveToDisk])
 
     const triggerLoadFromDisk = useCallback(() => {
         if (fileUploadInput.current) {
@@ -87,7 +78,7 @@ export function Header() {
                 }
             }
         }
-    }, [loadFromFile, loadFromLocalStorage, saveToLocalStorage])
+    }, [])
 
     const codeGenerator = useRef(
         new RecordMappingGenerator("PidRecordMappingPython"),
@@ -177,7 +168,7 @@ export function Header() {
                         <MenubarItem onClick={triggerLoadFromDisk}>
                             Load Design
                         </MenubarItem>
-                        <MenubarItem onClick={doSaveToDisk}>
+                        <MenubarItem onClick={saveToDisk}>
                             Save Design
                         </MenubarItem>
                         <MenubarSeparator />

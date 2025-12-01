@@ -12,7 +12,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { useLoadFromFile } from "@/lib/serialization"
+import { loadFromFile } from "@/lib/serialization"
 import { Error } from "@/components/error"
 import { ShieldAlert, TriangleAlert } from "lucide-react"
 
@@ -32,8 +32,6 @@ function InnerRemoteDesignImport() {
     const [importError, setImportError] = useState<unknown>()
     const router = useRouter()
     const pathname = usePathname()
-
-    const loadFromFile = useLoadFromFile()
 
     const setShowModalInterceptor = useCallback(
         (value: boolean) => {
@@ -90,7 +88,7 @@ function InnerRemoteDesignImport() {
         } finally {
             setIsImportInProgress(false)
         }
-    }, [loadFromFile, remoteDesignImportURL, setShowModalInterceptor])
+    }, [remoteDesignImportURL, setShowModalInterceptor])
 
     return (
         <>

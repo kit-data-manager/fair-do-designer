@@ -8,10 +8,9 @@ import * as Blockly from "blockly/core"
 import { workspaceStore } from "@/lib/stores/workspace"
 import { LastUsedFile, lastUsedFilesStore } from "@/lib/stores/last-used-files"
 import { runAllMigrations } from "@/lib/migrate/json_migrate"
-import { useCallback, useContext } from "react"
-import { UnifierContext } from "@/components/UnifierContext"
 import { JSONValues, Unifier } from "@/lib/data-source-picker/json-unifier"
 import { Workspace } from "blockly"
+import { dataSourcePickerStore } from "@/lib/stores/data-source-picker-store"
 
 const storageKey = "fairdoWorkspace"
 const version = 2
@@ -62,111 +61,94 @@ function save(workspace: Blockly.Workspace, unifier: Unifier): WorkspaceData {
 }
 
 /**
- * Hook that saves the state of the designer to browser's local storage.
+ * Utility that saves the state of the designer to browser's local storage.
  */
-export function useSaveToLocalStorage() {
-    const { unifier } = useContext(UnifierContext)
+export function saveToLocalStorage() {
+    const workspace = workspaceStore.getState().workspace
+    if (!workspace) return
 
-    return useCallback(() => {
-        const workspace = workspaceStore.getState().workspace
-        if (!workspace || !unifier) return
-
-        window.localStorage?.setItem(
-            storageKey,
-            JSON.stringify(save(workspace, unifier)),
-        )
-    }, [unifier])
+    window.localStorage?.setItem(
+        storageKey,
+        JSON.stringify(
+            save(workspace, dataSourcePickerStore.getState().unifier),
+        ),
+    )
 }
 
 /**
- * Hook that saves the state of the workspace to disk by downloading a JSON file.
+ * Utility that saves the state of the workspace to disk by downloading a JSON file.
  */
-export function useSaveToDisk() {
-    const { unifier } = useContext(UnifierContext)
+export function saveToDisk() {
+    const workspace = workspaceStore.getState().workspace
+    if (!workspace) return
 
-    return useCallback(() => {
-        const workspace = workspaceStore.getState().workspace
-        if (!workspace || !unifier) return
-
-        const data = save(workspace, unifier)
-        const blob = new Blob([JSON.stringify(data)], {
-            type: "application/json",
-        })
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement("a")
-        a.href = url
-        a.download = `FAIR DO Designer - ${data.name.replaceAll(/[^a-zA-Z0-9 _-]/gm, "")} - ${new Date().toISOString()}.json`
-        a.click()
-    }, [unifier])
+    const data = save(workspace, dataSourcePickerStore.getState().unifier)
+    const blob = new Blob([JSON.stringify(data)], {
+        type: "application/json",
+    })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `FAIR DO Designer - ${data.name.replaceAll(/[^a-zA-Z0-9 _-]/gm, "")} - ${new Date().toISOString()}.json`
+    a.click()
 }
 
-const useLoad = function () {
-    const { unifier, updateFlat } = useContext(UnifierContext)
+const load = function (workspaceData: WorkspaceData) {
+    const workspace = workspaceStore.getState().workspace
+    if (!workspace) return
 
-    return useCallback(
-        (workspaceData: WorkspaceData) => {
-            const workspace = workspaceStore.getState().workspace
-            if (!workspace || !unifier) return
+    workspaceData = runAllMigrations(workspaceData)
 
-            workspaceData = runAllMigrations(workspaceData)
+    function loadWorkspace() {
+        Blockly.serialization.workspaces.load(
+            workspaceData.data,
+            workspace as Workspace,
+            {
+                recordUndo: true,
+            },
+        )
 
-            function loadWorkspace() {
-                Blockly.serialization.workspaces.load(
-                    workspaceData.data,
-                    workspace as Workspace,
-                    {
-                        recordUndo: true,
-                    },
-                )
+        workspaceStore.getState().setDesignName(workspaceData.name)
+        if (workspaceData.lastUsedFiles) {
+            lastUsedFilesStore.getState().setFiles(workspaceData.lastUsedFiles)
+        }
+    }
 
-                workspaceStore.getState().setDesignName(workspaceData.name)
-                if (workspaceData.lastUsedFiles) {
-                    lastUsedFilesStore
-                        .getState()
-                        .setFiles(workspaceData.lastUsedFiles)
-                }
-            }
+    function loadDocuments() {
+        for (const doc of workspaceData.documents) {
+            dataSourcePickerStore
+                .getState()
+                .unifier.process(doc.name, doc.doc as JSONValues)
+        }
+        dataSourcePickerStore.getState().updateFlat()
+    }
 
-            function loadDocuments() {
-                for (const doc of workspaceData.documents) {
-                    unifier?.process(doc.name, doc.doc as JSONValues)
-                }
-                updateFlat()
-            }
-
-            if (workspaceData.version === 1) {
-                loadWorkspace()
-            } else if (workspaceData.version === version) {
-                loadWorkspace()
-                loadDocuments()
-            } else {
-                throw `Unsupported save file version: ${workspaceData.version}`
-            }
-        },
-        [unifier, updateFlat],
-    )
+    if (workspaceData.version === 1) {
+        loadWorkspace()
+    } else if (workspaceData.version === version) {
+        loadWorkspace()
+        loadDocuments()
+    } else {
+        throw `Unsupported save file version: ${workspaceData.version}`
+    }
 }
 
 /**
  * Loads saved state from local storage into the given workspace.
  */
-export const useLoadFromLocalStorage = function () {
-    const load = useLoad()
+export const loadFromLocalStorage = function () {
+    try {
+        const data = window.localStorage?.getItem(storageKey)
+        if (!data) return "no-data"
 
-    return useCallback((): "no-data" | "loaded" | "error" => {
-        try {
-            const data = window.localStorage?.getItem(storageKey)
-            if (!data) return "no-data"
+        const workspaceData = JSON.parse(data) as WorkspaceData
 
-            const workspaceData = JSON.parse(data) as WorkspaceData
-
-            load(workspaceData)
-            return "loaded"
-        } catch (error) {
-            console.error("Error loading workspace from local storage:", error)
-            return "error"
-        }
-    }, [load])
+        load(workspaceData)
+        return "loaded"
+    } catch (error) {
+        console.error("Error loading workspace from local storage:", error)
+        return "error"
+    }
 }
 
 /**
@@ -179,28 +161,21 @@ export function clearLocalStorage() {
 /**
  * Loads saved state from local storage into the given workspace.
  */
-export const useLoadFromFile = function () {
-    const load = useLoad()
+export const loadFromFile = async function (file: Blob) {
+    const data = await file.text().catch((e) => {
+        console.error("Failed to read file", e)
+        return undefined
+    })
 
-    return useCallback(
-        async (file: Blob): Promise<"no-data" | "loaded" | "error"> => {
-            const data = await file.text().catch((e) => {
-                console.error("Failed to read file", e)
-                return undefined
-            })
+    if (!data) return "no-data"
 
-            if (!data) return "no-data"
+    try {
+        const workspaceData = JSON.parse(data) as WorkspaceData
 
-            try {
-                const workspaceData = JSON.parse(data) as WorkspaceData
-
-                load(workspaceData)
-                return "loaded"
-            } catch (error) {
-                console.error("Error loading workspace from file:", error)
-                return "error"
-            }
-        },
-        [load],
-    )
+        load(workspaceData)
+        return "loaded"
+    } catch (error) {
+        console.error("Error loading workspace from file:", error)
+        return "error"
+    }
 }

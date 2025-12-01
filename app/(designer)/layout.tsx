@@ -2,7 +2,6 @@ import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import "../globals.css"
 import { ThemeProvider } from "@/components/ThemeProvider"
-import { UnifierProvider } from "@/components/UnifierContext"
 import { ReactNode } from "react"
 
 const geistSans = Geist({
@@ -36,7 +35,7 @@ export default function RootLayout({
                     enableSystem
                     disableTransitionOnChange
                 >
-                    <UnifierProvider>{children}</UnifierProvider>
+                    {children}
                 </ThemeProvider>
             </body>
         </html>
