@@ -18,6 +18,7 @@ import {
     pathSegmentsToPointer,
 } from "@/lib/data-source-picker/json-path"
 import { UnifierContext } from "@/components/UnifierContext"
+import { useSaveToLocalStorage } from "@/lib/serialization"
 
 export type DataSourcePickerRef = {
     addFile: (name: string, doc: JSONValues) => void
@@ -35,21 +36,24 @@ export const DataSourcePicker = forwardRef<
         totalDocumentCount,
     } = useContext(UnifierContext)
     const [search, setSearch] = useState("")
+    const saveToLocalStorage = useSaveToLocalStorage()
 
     const addFile = useCallback(
         (name: string, doc: JSONValues) => {
             if (!jsonUnifier) throw "UnifiedContext not mounted"
             jsonUnifier.process(name, doc)
             updateFlat()
+            saveToLocalStorage()
         },
-        [jsonUnifier, updateFlat],
+        [jsonUnifier, saveToLocalStorage, updateFlat],
     )
 
     const reset = useCallback(() => {
         if (!jsonUnifier) throw "UnifiedContext not mounted"
         jsonUnifier.reset()
         updateFlat()
-    }, [jsonUnifier, updateFlat])
+        saveToLocalStorage()
+    }, [jsonUnifier, saveToLocalStorage, updateFlat])
 
     useImperativeHandle(ref, () => ({
         addFile,
