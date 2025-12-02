@@ -108,12 +108,12 @@ const load = function (workspaceData: WorkspaceData) {
     }
 
     function loadDocuments() {
+        const state = dataSourcePickerStore.getState()
+        state.unifier.reset()
         for (const doc of workspaceData.documents) {
-            dataSourcePickerStore
-                .getState()
-                .unifier.process(doc.name, doc.doc as JSONValues)
+            state.unifier.process(doc.name, doc.doc as JSONValues)
         }
-        dataSourcePickerStore.getState().updateFlat()
+        state.updateFlat()
     }
 
     if (workspaceData.version === 1) {
