@@ -6,7 +6,6 @@
 
 import * as Blockly from "blockly/core"
 import { workspaceStore } from "@/lib/stores/workspace"
-import { LastUsedFile, lastUsedFilesStore } from "@/lib/stores/last-used-files"
 import { runAllMigrations } from "@/lib/migrate/json_migrate"
 import { JSONValues, Unifier } from "@/lib/data-source-picker/json-unifier"
 import { Workspace } from "blockly"
@@ -34,7 +33,6 @@ export interface WorkspaceData {
         }
         variables: unknown[]
     }
-    lastUsedFiles?: LastUsedFile[]
     documents: { name: string; doc: unknown }[]
 }
 
@@ -49,13 +47,11 @@ function save(workspace: Blockly.Workspace, unifier: Unifier): WorkspaceData {
         workspace,
     ) as WorkspaceData["data"]
     const name = workspaceStore.getState().designName
-    const lastUsedFiles = lastUsedFilesStore.getState().files
 
     return {
         version,
         name,
         data,
-        lastUsedFiles,
         documents: unifier.getDocuments(),
     }
 }
@@ -109,9 +105,6 @@ const load = function (workspaceData: WorkspaceData) {
         )
 
         workspaceStore.getState().setDesignName(workspaceData.name)
-        if (workspaceData.lastUsedFiles) {
-            lastUsedFilesStore.getState().setFiles(workspaceData.lastUsedFiles)
-        }
     }
 
     function loadDocuments() {
