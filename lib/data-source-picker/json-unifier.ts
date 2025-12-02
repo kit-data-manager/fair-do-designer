@@ -1,4 +1,5 @@
-import { PathSegment } from "./json-path"
+import { PathSegment, pathSegmentsToPath } from "./json-path"
+import { JSONPath } from "jsonpath-plus"
 
 export type JSONValuesSingle = string | boolean | number | null | undefined
 export type JSONValues =
@@ -161,5 +162,21 @@ export class Unifier {
                 (unified.observedValues.get(asSingleValue) || 0) + 1,
             )
         }
+    }
+
+    executeQuery(path: PathSegment[]) {
+        const results = Object.entries(this.documents).map(([name, doc]) => {
+            return [
+                name,
+                JSONPath({
+                    path: pathSegmentsToPath(path),
+                    json: doc as {},
+                    resultType: "value",
+                }),
+            ] satisfies [string, JSONValues]
+        })
+        return results.filter(
+            ([_, result]) => !Array.isArray(result) || result.length > 0,
+        )
     }
 }
