@@ -158,7 +158,7 @@ export const input_custom_json_pointer: Blockly.BlockSvg = {
                 "NAME",
             )
         this.setInputsInline(true)
-        this.setOutput(true, "JSON")
+        this.setOutput(true, null)
         this.setTooltip(
             "Resolve a custom JSON Pointer against the current Source Document",
         )
@@ -179,7 +179,7 @@ export const input_custom_json_path: Blockly.BlockSvg = {
                 "NAME",
             )
         this.setInputsInline(true)
-        this.setOutput(true, "JSON")
+        this.setOutput(true, null)
         this.setTooltip(
             "Execute a custom JSON Path query against the current Source Document",
         )
