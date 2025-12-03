@@ -1,5 +1,5 @@
 import executor
-from executor import RecordDesign, Executor, log
+from executor import RecordDesign, Executor
 from conditionals import *
 import jsonpath
 
