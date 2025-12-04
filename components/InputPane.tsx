@@ -75,11 +75,10 @@ export function InputPane() {
     const loadExampleFiles = useCallback(async () => {
         const basePath = process.env.NEXT_PUBLIC_BASE_PATH || ""
         const urls = [
-            `${basePath}/demo/json/metadata.json`,
-            `${basePath}/demo/json/metadata(1).json`,
-            `${basePath}/demo/json/metadata(2).json`,
-            `${basePath}/demo/json/metadata(3).json`,
-            `${basePath}/demo/json/metadata(4).json`,
+            `${basePath}/demo/json/example-data1.json`,
+            `${basePath}/demo/json/example-data2.json`,
+            `${basePath}/demo/json/example-data3.json`,
+            `${basePath}/demo/json/example-data4.json`,
         ]
         const blobs: Blob[] = []
 

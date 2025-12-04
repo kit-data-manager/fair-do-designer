@@ -1,0 +1,19 @@
+{
+    "experiment_id": "EXP-047",
+    "title": "Thermal Conductivity of Novel Polymer Blends",
+    "date": "2025-03-02",
+    "researcher": {
+        "name": "Dr. Alan Rivera"
+    },
+    "description": "Measurement of thermal conductivity across different polymer blend ratios.",
+    "variables": {
+        "independent": "Polymer blend ratio (%)",
+        "dependent": "Thermal conductivity (W/mK)"
+    },
+    "equipment": ["Heat flow meter apparatus"],
+    "data_access": {
+        "data_url": "https://labdata.example.com/polymer/exp047/data.json",
+        "mime_type": "application/json"
+    },
+    "notes": "Second trial; first trial was invalid due to calibration issues."
+}

@@ -1,0 +1,35 @@
+{
+    "experiment_id": "EXP-001",
+    "title": "Effect of Light Intensity on Plant Growth",
+    "date": "2025-01-15",
+    "researcher": {
+        "name": "Dr. Jane Smith",
+        "institution": "Greenfield Botany Lab"
+    },
+    "description": "A controlled experiment testing how varying light intensities affect the growth rate of Arabidopsis thaliana.",
+    "variables": {
+        "independent": "Light intensity (lux)",
+        "dependent": "Plant height (cm)",
+        "controlled": [
+            "Water volume",
+            "Soil type",
+            "Temperature",
+            "Plant species"
+        ]
+    },
+    "equipment": [
+        "LED grow lights",
+        "Lux meter",
+        "Digital calipers",
+        "Growth chamber"
+    ],
+    "data_summary": {
+        "num_samples": 30,
+        "duration_days": 14,
+        "light_levels_tested": [200, 500, 1000]
+    },
+    "data_access": {
+        "data_url": "https://example.org/data/exp-001/results.csv",
+        "mime_type": "text/csv"
+    }
+}

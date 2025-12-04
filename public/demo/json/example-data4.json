@@ -1,0 +1,24 @@
+{
+    "experiment_id": "EXP-099",
+    "title": "Magnetic Field Effects on Ion Drift Velocity",
+    "date": "2024-11-12",
+    "description": "Observation of how varying magnetic field strength affects ion drift in a controlled vacuum chamber.",
+    "variables": {
+        "independent": "Magnetic field strength (mT)",
+        "dependent": "Ion drift velocity (m/s)"
+    },
+    "equipment": ["Vacuum chamber", "Helmholtz coils", "Ion detector"],
+    "data_access": {
+        "data_url": "s3://physics-lab/ion-drift/exp099/results.parquet",
+        "mime_type": "application/x-parquet"
+    },
+    "processing_pipeline": {
+        "software": "IonDriftAnalyzer v2.0",
+        "steps": [
+            "baseline subtraction",
+            "noise filtering",
+            "velocity curve fitting"
+        ]
+    },
+    "additional_tags": ["physics", "ion transport", "magnetics"]
+}
