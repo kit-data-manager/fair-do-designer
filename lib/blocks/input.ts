@@ -7,6 +7,8 @@ import {
     pathToPathSegments,
     pointerToPathSegments,
 } from "@/lib/data-source-picker/json-path"
+import { dataSourcePickerStore } from "@/lib/stores/data-source-picker-store"
+import { JSONValues } from "@/lib/data-source-picker/json-unifier"
 
 export interface InputJsonPointer extends Blockly.BlockSvg {
     path: PathSegment[]
@@ -18,6 +20,12 @@ export interface InputJsonPointer extends Blockly.BlockSvg {
      * @param label Optional label to set for the block.
      */
     updateQuery(query: PathSegment[], label?: string): void
+
+    /**
+     * Executes the query stored in the block against the current example metadata documents in the input tab.
+     * Only used for trial-runs in the UI, not critical.
+     */
+    executeQuery(): [string, JSONValues][]
 }
 
 /**
@@ -58,6 +66,21 @@ export const input_json_pointer: InputJsonPointer = {
             separator: true,
         })
         menu.splice(0, 0, {
+            text: "Execute Query",
+            callback: () => {
+                const result = this.executeQuery()
+                if (!result) alert("The query returned no result")
+                else
+                    alert(
+                        `The query returned results on ${result.length} documents:\n  - ` +
+                            result
+                                .map(([name, value]) => name + ": " + value)
+                                .join("\n  - "),
+                    )
+            },
+            enabled: true,
+        })
+        menu.splice(0, 0, {
             text: "Edit Label",
             callback: () => {
                 const result = prompt(
@@ -94,6 +117,10 @@ export const input_json_pointer: InputJsonPointer = {
             },
             enabled: true,
         })
+    },
+
+    executeQuery: function () {
+        return dataSourcePickerStore.getState().unifier.executeQuery(this.path)
     },
 
     updateQuery: function (path: PathSegment[], label?: string) {

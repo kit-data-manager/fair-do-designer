@@ -88,7 +88,7 @@ export function Workspace() {
         })
 
         // Load the initial state from storage and run the code.
-        const loadResult = loadFromLocalStorage(workspace)
+        const loadResult = loadFromLocalStorage()
 
         if (loadResult === "error") {
             clearLocalStorage()
@@ -101,7 +101,7 @@ export function Workspace() {
             // UI events are things like scrolling, zooming, etc.
             // No need to save after one of these.
             if (e.isUiEvent) return
-            saveToLocalStorage(workspace)
+            saveToLocalStorage()
         })
 
         BacklinksToolbox.register(workspace)
