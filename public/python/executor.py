@@ -2,8 +2,6 @@ import sys
 from typing import Dict, Set, List, Tuple, Callable, TypeVar, Any, Sequence, Mapping, Self, Optional
 import json
 
-from jsonpath import JSONPathError, JSONPointerResolutionError
-
 Primitive = str | bool | int | float
 # ---Types-for-designs------------------------------------------- #
 JsonType = str | Sequence[Any] | Mapping[str, Any]
@@ -152,17 +150,14 @@ class RecordDesign:
             return None
         
         record: PidRecord = PidRecord()
-        try:
-            record.setId(self._id())
-            record.setPid(self._pid())
-            for key, lazy_values in self._attributes.items():
-                for lazy_value in lazy_values:
-                    value = lazy_value()
-                    record.addAttribute(key, value)
-        except JSONPointerResolutionError as e:
-            print("Error while applying design:", e)
-        except JSONPathError as e:
-            print("Error while applying design:", e)
+        record.setId(self._id())
+        record.setPid(self._pid())
+        for key, lazy_values in self._attributes.items():
+            print("get", len(lazy_values), "potential values for attribute", key)
+            for lazy_value in lazy_values:
+                value = lazy_value()
+                record.addAttribute(key, value)
+                print("    to", value)
 
         rules: InferenceRules = {}
         for relation in self._backlinks:
