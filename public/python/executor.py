@@ -128,8 +128,8 @@ class RecordDesign:
         else:
             if key not in self._attributes.keys():
                 self._attributes[key] = [value]
-                pass
-            self._attributes[key].append(value)
+            else:
+                self._attributes[key].append(value)
         return self
     
     def setSkipCondition(self, condition: Eval[bool]) -> Self:
