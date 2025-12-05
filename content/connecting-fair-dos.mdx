@@ -6,7 +6,7 @@ PID Records of FAIR Digital Objects (FAIR DOs) contain
 the most relevant metadata for identification and selection.
 Similar to knowledge graphs, it is recommended to link to to related FAIR DOs.
 
-![Definition of the terms forward-link and back-link](./img/connecting-fair-dos/term-reference-inverse.drawio.svg)
+![Explain a link and reverse link visually.](./img/connecting-fair-dos/term-reference-inverse.drawio.svg)
 
 Connecting FAIR DOs is not a complicated mechanism:
 It means to put the PID of one record as a value of another record, similar to Hyperlinks in the Web.
@@ -32,7 +32,7 @@ This means you can see two records separated in your design,
 because everything you see in the Designer will be applied *per document*.
 The solution could look similar to this:
 
-![](./img/connecting-fair-dos/connect-from-same-document.drawio.svg)
+![Example 1 links two records per document together, in both directions.](./img/connecting-fair-dos/connect-from-same-document.drawio.svg)
 
 This is already it.
 As you can see, in a design, we use local IDs to link records.
@@ -48,7 +48,7 @@ But how do you connect them if you cannot see them?
 The answer needs to be, as always, in your input data.
 But let's first look at the solution:
 
-![](./img/connecting-fair-dos/connect-between-documents.drawio.svg)
+![Example 2 links records from different documents.](./img/connecting-fair-dos/connect-between-documents.drawio.svg)
 
 Why does it work?
 Like in the first example, you assign each record a local identifier.
@@ -73,13 +73,13 @@ because the local ID is (likely) not a valid value.
 As with the first examples, linking to any record does not require any special handling.
 The important part is to use the local IDs:
 
-![](./img/connecting-fair-dos/connect-between-and-within-documents.drawio.svg)
+![Example 3 mixes the approaches, demonstrating link can reference arbitrary records.](./img/connecting-fair-dos/connect-between-and-within-documents.drawio.svg)
 
 In the example above, we design two records per document. The "Has Metadata" link will reference whichever record has the identifier, no matter if it is in this document or another, or if it is the design on the left or the one on the right. We could even add more records without changing anything.
 
 ## General summary
 
-![](./img/connecting-fair-dos/use.drawio.svg)
+![The general concept of linking records in the FAIR DO Designer.](./img/connecting-fair-dos/use.drawio.svg)
 
 
 The figure above describes how to define and assign the pseudo-pids visually.
