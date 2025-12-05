@@ -126,8 +126,8 @@ class RecordDesign:
         else:
             if key not in self._attributes.keys():
                 self._attributes[key] = [value]
-                pass
-            self._attributes[key].append(value)
+            else:
+                self._attributes[key].append(value)
         return self
     
     def setSkipCondition(self, condition: Eval[bool]) -> Self:
@@ -148,15 +148,17 @@ class RecordDesign:
 
         if (self._skipCondition()):
             return None
-
+        
         record: PidRecord = PidRecord()
         record.setId(self._id())
         record.setPid(self._pid())
         for key, lazy_values in self._attributes.items():
+            print("get", len(lazy_values), "potential values for attribute", key)
             for lazy_value in lazy_values:
                 value = lazy_value()
                 record.addAttribute(key, value)
-        
+                print("    set value", value)
+
         rules: InferenceRules = {}
         for relation in self._backlinks:
             forward_link_type = relation[0]

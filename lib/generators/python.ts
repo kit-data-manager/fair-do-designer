@@ -259,7 +259,7 @@ forBlock["otherwise"] = function <T extends Util.FairDoCodeGenerator>(
     // TODO: change Order.ATOMIC to the correct operator precedence strength
     const value_other = generator.valueToCode(block, "OTHER", Order.ATOMIC)
 
-    const code = `otherwise(${value_value}, lambda: ${value_other})\n`
+    const code = `otherwise(lambda: ${value_value}, lambda: ${value_other})\n`
     // TODO: Change Order.NONE to the correct operator precedence strength
     return [code, Order.NONE]
 }
