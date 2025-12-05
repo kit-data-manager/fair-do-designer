@@ -9,7 +9,7 @@ def otherwise(either: Callable[[], Any], otherwise: Callable[[], Any]) -> Any:
     :return: `either` if it is not None, otherwise `otherwise`.
     """
 
-    eitherResult = ""
+    eitherResult: Any = ""
     try:
         eitherResult = either()
     except:
