@@ -1,10 +1,15 @@
-# Connecting FAIR DOs
+import { DemoWorkspace } from "../components/demo/DemoWorkspace"
 
-![Definition of the terms forward-link and back-link](./img/connecting-fair-dos/term-reference-inverse.drawio.svg)
+# Linking FAIR DOs
 
 PID Records of FAIR Digital Objects (FAIR DOs) contain
 the most relevant metadata for identification and selection.
-Similar to knowledge graphs, it is recommended to connect related FAIR DOs where it makes sense.
+Similar to knowledge graphs, it is recommended to link to to related FAIR DOs.
+
+![Definition of the terms forward-link and back-link](./img/connecting-fair-dos/term-reference-inverse.drawio.svg)
+
+Connecting FAIR DOs is not a complicated mechanism:
+It means to put the PID of one record as a value of another record, similar to Hyperlinks in the Web.
 
 Profiles often provide attributes for such connections.
 In many cases, these will be optional, as a profile creator usually can't make assertions about the connections of a specific FAIR DO.
@@ -16,10 +21,84 @@ related data,
 or other context.
 All of which can be relevant for decision-making and navigating the FAIR DO graph.
 
+How can we connect FAIR DOs in a Design? Let's go through usual use cases, step by step.
+After the examples, the details and other frequently asked questions will be discussed.
+
+## Example 1: Linking two records from the same document
+
+Assume you want to create two records from each document.
+For example, one record for the data, and one for a metadata document.
+This means you can see two records separated in your design,
+because everything you see in the Designer will be applied *per document*.
+The solution could look similar to this:
+
+![](./img/connecting-fair-dos/connect-from-same-document.drawio.svg)
+
+This is already it.
+As you can see, in a design, we use local IDs to link records.
+This is because the PIDs of the records are still unknown while creating a design.
+The serialization (the python code export, for example) will take care of the replacement in one or another way
+([read more about the replacement](#when-will-the-local-ids-be-replaced)).
+
+## Example 2: Linking records from different documents
+
+Linking records of different documents is not very different. The same principle applies.
+The following design defines exactly one record per document. Applying 10 documents would therefore create 10 records.
+But how do you connect them if you cannot see them?
+The answer needs to be, as always, in your input data.
+But let's first look at the solution:
+
+![](./img/connecting-fair-dos/connect-between-documents.drawio.svg)
+
+Why does it work?
+Like in the first example, you assign each record a local identifier.
+We assume in our example, the "metadataID" field uses the same identifiers:
+
+- document 1
+    - *sampleID* is *data01*
+    - *metadataID* is ***metadata42***
+- ...
+- document 7
+    - *sampleID* is ***metadata42***
+    - ...
+- ...
+
+Clearly, data01 now links to a record with ID metadata42.
+Note that if document 7 is missing, the link can later not be replaced with a PID.
+Then, validation will fail before registration (during execution of the exported code),
+because the local ID is (likely) not a valid value.
+
+## Example 3: Linking to arbitrary records
+
+As with the first examples, linking to any record does not require any special handling.
+The important part is to use the local IDs:
+
+![](./img/connecting-fair-dos/connect-between-and-within-documents.drawio.svg)
+
+In the example above, we design two records per document. The "Has Metadata" link will reference whichever record has the identifier, no matter if it is in this document or another, or if it is the design on the left or the one on the right. We could even add more records without changing anything.
+
+## General summary
+
 ![](./img/connecting-fair-dos/use.drawio.svg)
 
-In a design, you can use placeholder PIDs (pseudo-pids) as a reference.
-When registering the PIDs, they will be replaced with the real, final PIDs of each object.
+
 The figure above describes how to define and assign the pseudo-pids visually.
 It also shows that inverse references can be declared using two blocks.
 These are available in the left sidebar, in the [Automatic backlinks](/docs/blocks/automatic-backlinks) category.
+
+
+## Limitations
+
+- Whichever value equals a local ID will be replaced with the PID. This can be an issue if the identifier is, say, an instrument name which is also a valid value in an "Instrument Name" attribute. Currently, it is your responsibility to find such clashes and to mitigate them. For this, there is a general recipe: Create your identifier from multiple blocks or add a prefix or suffix to it. For example, "Flux-Kompensator" can be prepended with "ID-" to generate the identifier "ID-Flux-Kompensator". Do this for all identifiers which you aim to replace.
+- You need to have this linking information in your input. You cannot add information about relations afterwards e.g. by simply "drawing a line".
+- If the identifier fits, the link is being set. There is no possibility for conditionals. All rules of the Design apply to all documents and all records.
+- If existing records should be considered, the generated code will need a file containing the mappings between the local IDs and the existing PIDs for them.
+- Linking on both directions (Backlinks, see figure 1) are only possible for connections within the same document. To work around this, [Automatic backlinks](/docs/blocks/automatic-backlinks) exist.
+
+## When will the local IDs be replaced?
+
+The current python export sends the records to an instance of the Typed PID Maker,
+which takes care of validation and registration of the records and the PIDs.
+It will also take care of the replacement.
+Other serializations may follow which handle this slightly different, in which case this documentation will be updated.
+If you find an answer to your question missing, please consider opening an issue on GitHub.
