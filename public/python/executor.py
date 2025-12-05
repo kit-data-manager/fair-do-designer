@@ -157,7 +157,7 @@ class RecordDesign:
             for lazy_value in lazy_values:
                 value = lazy_value()
                 record.addAttribute(key, value)
-                print("    to", value)
+                print("    set value", value)
 
         rules: InferenceRules = {}
         for relation in self._backlinks:
