@@ -2,6 +2,8 @@ import sys
 from typing import Dict, Set, List, Tuple, Callable, TypeVar, Any, Sequence, Mapping, Self, Optional
 import json
 
+from jsonpath import JSONPathError, JSONPathSyntaxError, JSONPointerError, RelativeJSONPointerSyntaxError
+
 Primitive = str | bool | int | float
 # ---Types-for-designs------------------------------------------- #
 JsonType = str | Sequence[Any] | Mapping[str, Any]
@@ -150,14 +152,30 @@ class RecordDesign:
             return None
         
         record: PidRecord = PidRecord()
+        # errors may occur here, but as IDs are critical, we do not catch them.
         record.setId(self._id())
         record.setPid(self._pid())
+
         for key, lazy_values in self._attributes.items():
             print("get", len(lazy_values), "potential values for attribute", key)
             for lazy_value in lazy_values:
-                value = lazy_value()
-                record.addAttribute(key, value)
-                print("    set value", value)
+                try:
+                    value = lazy_value()
+                    record.addAttribute(key, value)
+                    print("    set value", value)
+                except Exception as e:
+                    # errors known to be fatal (special cases of tolerable errors which are actually not tolerable)
+                    fatalErrors = (JSONPathSyntaxError, RelativeJSONPointerSyntaxError)
+                    # errors known to be tolerable generally (fatal subclasses of those errors may be added to fatalErrors)
+                    tolerableErrors = (JSONPathError, JSONPointerError)
+                    isFatal = any(map(lambda errorType: isinstance(e, errorType), fatalErrors))
+                    isTolerable = any(map(lambda errorType: isinstance(e, errorType), tolerableErrors))
+                    if (not isFatal) and isTolerable:
+                        print("    SKIP ATTRIBUTE: Can not retrieve value for ", key, ", because of JSONPath error: ", e)
+                    else:
+                        # all other exceptions will be propagated and stop the processing of all records.
+                        print("    ERROR: Can not retrieve value for ", key, ", because: ", e)
+                        raise e
 
         rules: InferenceRules = {}
         for relation in self._backlinks:
