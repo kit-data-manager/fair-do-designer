@@ -285,7 +285,7 @@ class Executor:
                     maybe_record = design.apply(json_data)
                     if (maybe_record != None):
                         sender, inference_rules = maybe_record
-                        print("Created record:", sender.getId())
+                        print(f'Created record with ID: "{sender.getId()}"')
                         # Store the record in the graph
                         self.RECORD_GRAPH[sender.getId()] = sender
                         # merge rules into DB
