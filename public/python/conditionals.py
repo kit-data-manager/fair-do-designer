@@ -26,8 +26,8 @@ def otherwise(either: Callable[[], Any], otherwise: Callable[[], Any]) -> Any:
         return isinstance(value, tuple)
 
     isNone = eitherResult is None
-    isEmptyArray = is_list_any(eitherResult) and len(eitherResult) < 0
-    isEmptyTuple = is_tuple_any(eitherResult) and len(eitherResult) < 0
+    isEmptyArray = is_list_any(eitherResult) and len(eitherResult) <= 0
+    isEmptyTuple = is_tuple_any(eitherResult) and len(eitherResult) <= 0
     isEmptyishString = isinstance(eitherResult, str) and eitherResult.strip().lower() in ("null", "", "()", "[]", "{}")
 
     isOk = not isNone and not isEmptyArray and not isEmptyTuple and not isEmptyishString
