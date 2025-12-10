@@ -52,16 +52,12 @@ export function Header() {
     const confirmNameChange = useCallback(() => {
         setDesignName(nameInputValue)
         setEditName(false)
-        if (workspace) saveToLocalStorage(workspace)
-    }, [nameInputValue, setDesignName, workspace])
+        saveToLocalStorage()
+    }, [nameInputValue, setDesignName])
 
     useEffect(() => {
         setNameInputValue(designName)
     }, [designName])
-
-    const doSaveToDisk = useCallback(() => {
-        if (workspace) saveToDisk(workspace)
-    }, [workspace])
 
     const triggerLoadFromDisk = useCallback(() => {
         if (fileUploadInput.current) {
@@ -72,17 +68,17 @@ export function Header() {
     const onFileUploadInputChange = useCallback(async () => {
         if (fileUploadInput.current && fileUploadInput.current.files) {
             const file = fileUploadInput.current.files.item(0)
-            if (file && workspace) {
-                saveToLocalStorage(workspace)
-                const result = await loadFromFile(file, workspace)
+            if (file) {
+                saveToLocalStorage()
+                const result = await loadFromFile(file)
                 if (result === "no-data" || result === "error") {
                     setLoadingSaveFileFailed(true)
-                    loadFromLocalStorage(workspace)
+                    loadFromLocalStorage()
                     return
                 }
             }
         }
-    }, [workspace])
+    }, [])
 
     const codeGenerator = useRef(
         new RecordMappingGenerator("PidRecordMappingPython"),
@@ -172,7 +168,7 @@ export function Header() {
                         <MenubarItem onClick={triggerLoadFromDisk}>
                             Load Design
                         </MenubarItem>
-                        <MenubarItem onClick={doSaveToDisk}>
+                        <MenubarItem onClick={saveToDisk}>
                             Save Design
                         </MenubarItem>
                         <MenubarSeparator />

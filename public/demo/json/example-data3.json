@@ -1,0 +1,28 @@
+{
+    "experiment_id": "EXP-212",
+    "title": "Soil Microbiome Response to pH Changes",
+    "researcher": {
+        "name": "Dr. Lena Cho",
+        "institution": "Earth Systems Institute"
+    },
+    "variables": {
+        "independent": "Soil pH",
+        "dependent": "Microbial diversity index",
+        "controlled": ["Temperature", "Moisture content"]
+    },
+    "equipment": ["DNA sequencer", "pH probe"],
+    "data_summary": {
+        "num_sequences": 120000,
+        "pH_levels": [4.5, 6.0, 7.5]
+    },
+    "data_access": {
+        "data_url": "https://datasets.esi.org/microbiome/exp212/raw_sequences.tar.gz",
+        "mime_type": "application/gzip"
+    },
+    "related_publications": [
+        {
+            "title": "Environmental Drivers of Soil Microbiomes",
+            "doi": "10.1234/soil-microbiome.2024"
+        }
+    ]
+}

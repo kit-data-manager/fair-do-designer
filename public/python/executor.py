@@ -2,6 +2,8 @@ import sys
 from typing import Dict, Set, List, Tuple, Callable, TypeVar, Any, Sequence, Mapping, Self, Optional
 import json
 
+from jsonpath import JSONPathError, JSONPathSyntaxError, JSONPointerError, RelativeJSONPointerSyntaxError
+
 Primitive = str | bool | int | float
 # ---Types-for-designs------------------------------------------- #
 JsonType = str | Sequence[Any] | Mapping[str, Any]
@@ -126,8 +128,8 @@ class RecordDesign:
         else:
             if key not in self._attributes.keys():
                 self._attributes[key] = [value]
-                pass
-            self._attributes[key].append(value)
+            else:
+                self._attributes[key].append(value)
         return self
     
     def setSkipCondition(self, condition: Eval[bool]) -> Self:
@@ -148,15 +150,33 @@ class RecordDesign:
 
         if (self._skipCondition()):
             return None
-
+        
         record: PidRecord = PidRecord()
+        # errors may occur here, but as IDs are critical, we do not catch them.
         record.setId(self._id())
         record.setPid(self._pid())
+
         for key, lazy_values in self._attributes.items():
+            print("get", len(lazy_values), "potential values for attribute", key)
             for lazy_value in lazy_values:
-                value = lazy_value()
-                record.addAttribute(key, value)
-        
+                try:
+                    value = lazy_value()
+                    record.addAttribute(key, value)
+                    print("    set value", value)
+                except Exception as e:
+                    # errors known to be fatal (special cases of tolerable errors which are actually not tolerable)
+                    fatalErrors = (JSONPathSyntaxError, RelativeJSONPointerSyntaxError)
+                    # errors known to be tolerable generally (fatal subclasses of those errors may be added to fatalErrors)
+                    tolerableErrors = (JSONPathError, JSONPointerError)
+                    isFatal = any(map(lambda errorType: isinstance(e, errorType), fatalErrors))
+                    isTolerable = any(map(lambda errorType: isinstance(e, errorType), tolerableErrors))
+                    if (not isFatal) and isTolerable:
+                        print("    SKIP ATTRIBUTE: Can not retrieve value for ", key, ", because of JSONPath error: ", e)
+                    else:
+                        # all other exceptions will be propagated and stop the processing of all records.
+                        print("    ERROR: Can not retrieve value for ", key, ", because: ", e)
+                        raise e
+
         rules: InferenceRules = {}
         for relation in self._backlinks:
             forward_link_type = relation[0]
@@ -283,7 +303,7 @@ class Executor:
                     maybe_record = design.apply(json_data)
                     if (maybe_record != None):
                         sender, inference_rules = maybe_record
-                        print("Created record:", sender.getId())
+                        print(f'Created record with ID: "{sender.getId()}"')
                         # Store the record in the graph
                         self.RECORD_GRAPH[sender.getId()] = sender
                         # merge rules into DB
