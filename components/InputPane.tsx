@@ -1,13 +1,10 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { useCallback, useRef, useState } from "react"
+import { useCallback, useRef } from "react"
 import * as Blockly from "blockly"
 import { useStore } from "zustand/react"
 import { workspaceStore } from "@/lib/stores/workspace"
-import { lastUsedFilesStore } from "@/lib/stores/last-used-files"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { InfoIcon } from "lucide-react"
 import {
     DataSourcePicker,
     DataSourcePickerRef,
@@ -18,13 +15,6 @@ import { InputJsonPointer } from "@/lib/blocks/input"
 export function InputPane() {
     const uploadInputRef = useRef<HTMLInputElement>(null)
     const dataSourcePicker = useRef<DataSourcePickerRef>(null)
-    const addToUsedFiles = useStore(lastUsedFilesStore, (s) => s.appendToFiles)
-    const setUsedFiles = useStore(lastUsedFilesStore, (s) => s.setFiles)
-    const clearUsedFiles = useStore(lastUsedFilesStore, (s) => s.clearFiles)
-    const lastUsedFiles = useStore(lastUsedFilesStore, (s) => s.files)
-
-    // True if user files or example files have been loaded
-    const [somethingLoaded, setSomethingLoaded] = useState(false)
 
     const workspace = useStore(workspaceStore, (s) => s.workspace)
 
@@ -40,28 +30,10 @@ export function InputPane() {
                 uploadInputRef.current.files &&
                 uploadInputRef.current.files.length > 0
             ) {
-                if (somethingLoaded) {
-                    addToUsedFiles(
-                        [...uploadInputRef.current.files].map((f) => ({
-                            name: f.name,
-                            path: f.webkitRelativePath,
-                        })),
-                    )
-                } else {
-                    setUsedFiles(
-                        [...uploadInputRef.current.files].map((f) => ({
-                            name: f.name,
-                            path: f.webkitRelativePath,
-                        })),
-                    )
-                }
-
-                // Hide notice about last used files
-                setSomethingLoaded(true)
-
                 for (const file of uploadInputRef.current.files) {
                     try {
                         dataSourcePicker.current.addFile(
+                            file.name,
                             JSON.parse(await file.text()),
                         )
                     } catch (e) {
@@ -70,7 +42,7 @@ export function InputPane() {
                 }
             }
         }
-    }, [addToUsedFiles, setUsedFiles, somethingLoaded])
+    }, [])
 
     const loadExampleFiles = useCallback(async () => {
         const basePath = process.env.NEXT_PUBLIC_BASE_PATH || ""
@@ -91,12 +63,12 @@ export function InputPane() {
             blobs.push(blob)
         }
 
-        // Hide notice about last used files
-        setSomethingLoaded(true)
-
         for (const blob of blobs) {
             try {
-                dataSourcePicker.current!.addFile(JSON.parse(await blob.text()))
+                dataSourcePicker.current!.addFile(
+                    "Example metadata",
+                    JSON.parse(await blob.text()),
+                )
             } catch (e) {
                 console.error("Failed to parse file", e)
             }
@@ -104,9 +76,8 @@ export function InputPane() {
     }, [])
 
     const reset = useCallback(() => {
-        clearUsedFiles()
         if (dataSourcePicker.current) dataSourcePicker.current.reset()
-    }, [clearUsedFiles])
+    }, [])
 
     const onEntryClick = useCallback(
         (event: DocumentEntry) => {
@@ -158,32 +129,10 @@ export function InputPane() {
                         ref={uploadInputRef}
                         onChange={onUploadInputChange}
                     />
-                    {!somethingLoaded && lastUsedFiles.length > 0 && (
-                        <Alert className="mb-2">
-                            <InfoIcon />
-                            <AlertTitle className="flex items-start justify-between">
-                                The following files were previously used with
-                                this design:
-                            </AlertTitle>
-                            <AlertDescription>
-                                {lastUsedFiles.map((file) => (
-                                    <div
-                                        key={file.path + file.name}
-                                        className="text-sm max-w-full truncate"
-                                    >
-                                        {file.path}
-                                        {file.name}
-                                    </div>
-                                ))}
-                            </AlertDescription>
-                        </Alert>
-                    )}
-                    <div>
-                        <DataSourcePicker
-                            ref={dataSourcePicker}
-                            onEntryClick={onEntryClick}
-                        />
-                    </div>
+                    <DataSourcePicker
+                        ref={dataSourcePicker}
+                        onEntryClick={onEntryClick}
+                    />
                 </div>
             </div>
         </div>
