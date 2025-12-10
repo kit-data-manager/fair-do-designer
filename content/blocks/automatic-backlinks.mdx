@@ -2,42 +2,59 @@ import {DemoWorkspace} from "../../components/demo/DemoWorkspace";
 
 # Automatic Backlinks
 
-Blocks in this category are used to automatically create ***inverse** links* between related FAIR DOs.
+Sometimes, you may want to create links in both directions using an inverse attribute.
+Blocks in this category are used to automatically create ***inverse** links*
+if a "normal" link exists.
 For normal linking, see [Linking FAIR DOs](/docs/connecting-fair-dos).
 
 ![](../img/connecting-fair-dos/term-reference-inverse.drawio.svg)
 
 ## Inverse link to attribute
 
-<DemoWorkspace className="h-12" blocks={[{"type":"backlink_declaration","id":"V]S|q{b-W+MBylN]JWW4","x":10,"y":10}]} />
+<DemoWorkspace className="h-12" blocks={[{"type":"backlink_declaration","id":"backlink123456","x":10,"y":10}]} />
 
-This block is used to automatically create backlinks to another FAIR DO that has linked to this FAIR DO. This block expects the PID of the attribute to be linked to as input.
+This block is used to automatically insert a link (e.g. using "isMetadataFor")
+to all other FAIR DOs that linked to this FAIR DO
+using a specific attribute (e.g. "hasMetadata").
 
-The attribute PID can be provided as text, but should be provided using the [Attribute PID](#attribute-pid) block.
+Which attribute this is (e.g. "hasMetadata") needs to be specified:
+On the right side, it expects the PID of the attribute.
+The attribute PID can be provided as text,
+but should be provided using the [Attribute PID](#attribute-pid) block.
 
-> [!important]
->
-> See the [Linking FAIR DOs guide](/docs/connecting-fair-dos) to understand the concept of inverse links.
+The "Inverse link to attribute block then should be attached to
+the attribute where the link should be placed (e.g. "isMetadataFor").
 
 ### Example
 
-<DemoWorkspace className="h-12" blocks={[{"type":"backlink_declaration","id":"V]S|q{b-W+MBylN]JWW4","x":10,"y":10, inputs: { ATTRIBUTE_KEY: { block: {"type":"profile_hmc_reference_block","id":"V]S|q{b-W+MBylN]JWW4","fields":{"ATTRIBUTE":"21.T11148/1c699a5d1b4ad3ba4956"}} } } }]} />
+<DemoWorkspace className="h-[4em]" blocks={[
+    {
+        "type":"backlink_declaration",
+        "id":"bl1234",
+        "x":10,
+        "y":10,
+        inputs: {
+            ATTRIBUTE_KEY: { block: {"type":"profile_hmc_reference_block","id":"hmc_ref0394","fields":{"ATTRIBUTE":"21.T11148/1c699a5d1b4ad3ba4956"}} }
+        }
+    }
+]} />
 
-This example will automatically return a backlink to any record referencing the current record from the `digitalObjectType` attribute. The following output is generated:
+This example will automatically return a backlink,
+linking to any record which is linking to the current record
+using the `digitalObjectType` attribute.
 
-```python
-BackwardLinkFor("21.T11148/1c699a5d1b4ad3ba4956")
-```
+When generating code, this will generate a marker,
+which will set this backlink in a post-processing step.
+It may look like this: `BackwardLinkFor("21.T11148/1c699a5d1b4ad3ba4956")`
 
 ## Attribute PID
 
-<DemoWorkspace className="h-12" blocks={[{"type":"profile_hmc_reference_block","id":"V]S|q{b-W+MBylN]JWW4","x":10,"y":10,"fields":{"ATTRIBUTE":"21.T11148/1c699a5d1b4ad3ba4956"}}]} />
+<DemoWorkspace className="h-12" blocks={[{"type":"profile_hmc_reference_block","id":"hmc_ref45987","x":10,"y":10,"fields":{"ATTRIBUTE":"21.T11148/1c699a5d1b4ad3ba4956"}}]} />
 
-This block returns the PID of the selected attribute. The block is linked to a fixed profile which is denoted by its name. The block shown above returns attribute PIDs for the Helmholtz Kernel Information Profile.
+Such blocks exist for every supported profile.
+They return the PID of the selected attribute.
+Each block lists the attributes of a fixed profile which is denoted by its name.
+The block shown above lists attribute PIDs for the Helmholtz Kernel Information Profile.
 Use the dropdown menu on the block to select the attribute you want to retrieve the PID for.
 
-The block above returns/generates the following output:
-
-```python
-"21.T11148/1c699a5d1b4ad3ba4956"
-```
+The block above returns the PID of "digitalObjectType", in this case `21.T11148/1c699a5d1b4ad3ba4956`:
