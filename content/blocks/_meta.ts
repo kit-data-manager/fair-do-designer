@@ -7,7 +7,7 @@ const meta: MetaRecord = {
     "checks-and-errors": "Checks and Errors",
     variables: "Variables",
     functions: "Functions",
-    "data-access": "Data Access",
+    "data-access": "Experts – Data Access",
 }
 
 export default meta
