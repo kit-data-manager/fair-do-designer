@@ -1,4 +1,23 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FAIR DO Designer
+
+[Documentation](https://kit-data-manager.github.io/fair-do-designer/docs) | [Demo (preview / main branch)](https://kit-data-manager.github.io/fair-do-designer/)
+
+The FAIR DO Designer is a fully client-side tool to create FAIR DOs. It offers a graphical user interface to build together your PID record designs, given examples of available metadata. This design can be applied repeatedly or in batch on the object you'd like to represent as a FAIR DO.
+
+The current implementation allows exporting designs as python code for integration into existing applications, either directly or as a CLI tool.
+
+## Setup and usage
+
+> Note: You may have noticed a Dockerfile and a docker-compose.yml. Those are currently only meant for development purposes. They will not offer you a production-ready container. Please read this section if you want to build and set it up yourself. We may offer more convenient deployment methods later. Contributions regarding deployment setups (or other aspects) are highly welcome.
+
+The tool can be self-hosted. We currently offer a [demo / preview on GitHub Pages](https://kit-data-manager.github.io/fair-do-designer/), which is always on the state of the main branch. The [pages workflow](.github/workflows/pages.yml) defines the deployment process, which should allow you to extract answers to more detailed questions. The short version is:
+
+1. Install [bun](https://bun.sh/).
+2. Optional: Set the path that will appear in the URL. E.g. `BASE_PATH=/fair-do-designer`
+3. run `bun run build`.
+4. Serve the `out` directory with any static HTTP server.
+
+Python projects the FAIR DO Designer currently require `uv`. We plan to lower this barrier in future. In the meanwhile it is up to you to adjust the setup to your needs.
 
 ## Development
 
@@ -20,29 +39,14 @@ The container comes pre-installed with required tooling like bun and uv.
 Otherwise, use these manual steps (install required tooling manually in beforehand):
 
 - `pipx run pre-commit install` to enable all pre-commit hooks.
-- `bun install && bun run build && bun run dev` to install dependencies and run the service. It is possible to use NPM if you prefer.
+- `bun install && bun run build && bun run dev` to install dependencies and run the service. Avoid using NPM, so we can ensure buns lock file stays up-to-date.
 
 ### Python setup
 
 We use `uv`, which handles the setup properly if you execute a command.
 For the commands, refer to `.github/workflows/build.yml`.
-It includes a sync step which can normally be skipped, as it should be executed implicitly.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Resources
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Interactive Next.js tutorial](https://nextjs.org/learn)
