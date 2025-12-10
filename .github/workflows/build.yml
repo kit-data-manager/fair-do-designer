@@ -62,7 +62,7 @@ jobs:
         run: cd public/python && uv run pytest
 
       - name: Run examples
-        run: cd public/python && uv run python example_generated-minimal.py ../demo/json/metadata*
+        run: cd public/python && uv run python example_generated-minimal.py ../demo/json/example*
 
       - name: Run mypy
         run: cd public/python && uv run mypy . --strict
