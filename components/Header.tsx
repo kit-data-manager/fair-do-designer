@@ -36,6 +36,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog"
+import { version } from "@/package.json"
 
 export function Header() {
     const designName = useStore(workspaceStore, (s) => s.designName)
@@ -46,6 +47,8 @@ export function Header() {
     const [nameInputValue, setNameInputValue] = useState(designName)
     const [editName, setEditName] = useState(false)
     const [loadingSaveFileFailed, setLoadingSaveFileFailed] = useState(false)
+
+    const [aboutModalOpen, setAboutModalOpen] = useState(false)
 
     const [, copy] = useCopyToClipboard()
 
@@ -123,6 +126,30 @@ export function Header() {
                             a valid Design.
                         </DialogDescription>
                     </DialogHeader>
+                </DialogContent>
+            </Dialog>
+            <Dialog open={aboutModalOpen} onOpenChange={setAboutModalOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>About</DialogTitle>
+                    </DialogHeader>
+                    <p>
+                        FAIR DO Designer v{version}
+                        <br /> <br />
+                        GitHub Repository:{" "}
+                        <a
+                            className="underline"
+                            href="https://github.com/kit-data-manager/fair-do-designer"
+                        >
+                            kit-data-manager/fair-do-designer
+                        </a>
+                        <br />
+                        Contact us:
+                        <br />
+                        <br />
+                        Copyright © 2025 Karlsruhe Institute of Technology
+                        (KIT)
+                    </p>
                 </DialogContent>
             </Dialog>
             {/* Dialogs End */}
@@ -207,6 +234,18 @@ export function Header() {
                         <Link href={"/docs/getting-started"} target={"_blank"}>
                             <MenubarItem>Getting Started</MenubarItem>
                         </Link>
+                        <MenubarSeparator />
+                        <Link
+                            href={
+                                "https://github.com/kit-data-manager/fair-do-designer/issues"
+                            }
+                            target={"_blank"}
+                        >
+                            <MenubarItem>Report a bug</MenubarItem>
+                        </Link>
+                        <MenubarItem onClick={() => setAboutModalOpen(true)}>
+                            About
+                        </MenubarItem>
                     </MenubarContent>
                 </MenubarMenu>
             </Menubar>
