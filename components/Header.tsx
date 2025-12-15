@@ -155,7 +155,7 @@ export function Header() {
             <Menubar>
                 <div className="flex justify-center items-center mr-1">
                     <Tooltip delayDuration={700}>
-                        <TooltipTrigger>
+                        <TooltipTrigger asChild>
                             <Button
                                 size="menubar"
                                 variant="ghost"
@@ -167,7 +167,7 @@ export function Header() {
                         <TooltipContent>Undo</TooltipContent>
                     </Tooltip>
                     <Tooltip delayDuration={700}>
-                        <TooltipTrigger>
+                        <TooltipTrigger asChild>
                             <Button
                                 size="menubar"
                                 variant="ghost"
