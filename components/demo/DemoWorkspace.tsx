@@ -8,6 +8,8 @@ import { OctagonAlert } from "lucide-react"
 import "@/lib/theme"
 import { useTheme } from "next-themes"
 import "@/lib/blocks/all"
+import { useStore } from "zustand/react"
+import { alertStore } from "@/lib/stores/alert-store"
 
 /**
  * Demo Workspace that displays blocks passed as props to this component. Use for documentation only.
@@ -29,6 +31,7 @@ export function DemoWorkspace({
     )
     const [error, setError] = useState<unknown>(undefined)
     const theme = useTheme()
+    const alert = useStore(alertStore, (s) => s.alert)
 
     useEffect(() => {
         try {
@@ -52,6 +55,7 @@ export function DemoWorkspace({
 
             workspace.registerButtonCallback("dataAccessToolboxHelp", () => {
                 alert(
+                    "Information",
                     "Use the Data Access tab on the right side to create Data Access blocks by clicking or dragging-and-dropping JSON keys",
                 )
             })
@@ -81,7 +85,7 @@ export function DemoWorkspace({
         } catch (e) {
             setError(e)
         }
-    }, [blocks, setWorkspace, theme.resolvedTheme, variables])
+    }, [alert, blocks, setWorkspace, theme.resolvedTheme, variables])
 
     // Resize the workspace if the surrounding div resizes
     useEffect(() => {
