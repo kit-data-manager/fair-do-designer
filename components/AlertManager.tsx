@@ -11,6 +11,14 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
+/**
+ * Manages and displays alert dialogs based on the alert store.
+ * This function handles the lifecycle of alerts, including opening, closing,
+ * accepting, and managing dialog-specific inputs like prompts.
+ *
+ * Can just be placed into the page at a high level. This component manages everything
+ * on its own and will render nothing if there is no dialog to show.
+ */
 export function AlertManager() {
     const alerts = useStore(alertStore, (s) => s.alerts)
     const alert = alerts.length > 0 ? alerts[0] : undefined
@@ -23,6 +31,8 @@ export function AlertManager() {
     const [alertOpen, setAlertOpen] = useState(alert !== undefined)
     const [promptResponse, setPromptResponse] = useState("")
 
+    // Detect if a new alert is in the alerts store that should be rendered now
+    // Done by comparing the activeAlert (which is or was displayed) to the current should-be-displayed alert
     if (alert && (alert.id !== activeAlert?.id || (alert && !activeAlert))) {
         setActiveAlert(alert)
         setAlertOpen(true)
@@ -33,6 +43,7 @@ export function AlertManager() {
         }
     }
 
+    // On cancel or by clicking outside the dialog, close the dialog
     const onOpenChange = useCallback(
         (open: boolean) => {
             setAlertOpen(open)

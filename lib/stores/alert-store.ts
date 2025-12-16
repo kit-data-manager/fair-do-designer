@@ -1,6 +1,9 @@
 import { create } from "zustand"
 import { ReactNode } from "react"
 
+/**
+ * Represents an alert configuration with customizable properties for display and callbacks.
+ */
 export interface Alert {
     title: string
     message: string | ReactNode
@@ -14,6 +17,10 @@ export interface Alert {
     promptPrefill?: string
 }
 
+/**
+ * AlertStore interface provides an abstraction for managing and interacting with a collection of alert messages.
+ * It includes functionality to add, remove, and interact with alerts such as showing prompts and notifications.
+ */
 export interface AlertStore {
     alerts: Alert[]
     pop: () => void
@@ -31,6 +38,12 @@ export interface AlertStore {
     ) => Promise<string | undefined>
 }
 
+/**
+ * The `alertStore` is a Zustand store that manages a collection of alerts
+ * and provides utility methods for manipulating those alerts.
+ *
+ * It supports creating and resolving alerts with optional prompts.
+ */
 export const alertStore = create<AlertStore>()((set, get) => ({
     alerts: [],
     pop() {
