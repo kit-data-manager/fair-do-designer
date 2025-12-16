@@ -11,6 +11,7 @@ export interface Alert {
     closeButtonCallback?: () => void
     closeButtonText?: string
     hasPrompt?: boolean
+    promptPrefill?: string
 }
 
 export interface AlertStore {
@@ -25,6 +26,7 @@ export interface AlertStore {
     prompt: (
         title: string,
         message: string | ReactNode,
+        prefill?: string,
         type?: Alert["type"],
     ) => Promise<string | undefined>
 }
@@ -49,7 +51,12 @@ export const alertStore = create<AlertStore>()((set, get) => ({
             acceptButtonText: "OK",
         })
     },
-    prompt(title: string, message: string | ReactNode, type?: Alert["type"]) {
+    prompt(
+        title: string,
+        message: string | ReactNode,
+        prefill?: string,
+        type?: Alert["type"],
+    ) {
         return new Promise<string | undefined>((resolve) => {
             get().addAlert({
                 title,
@@ -60,6 +67,7 @@ export const alertStore = create<AlertStore>()((set, get) => ({
                 hasPrompt: true,
                 closeButtonText: "Cancel",
                 closeButtonCallback: () => resolve(undefined),
+                promptPrefill: prefill,
             })
         })
     },

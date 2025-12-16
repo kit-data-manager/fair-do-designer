@@ -9,6 +9,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 
 export function AlertManager() {
     const alerts = useStore(alertStore, (s) => s.alerts)
@@ -25,7 +26,11 @@ export function AlertManager() {
     if (alert && (alert.id !== activeAlert?.id || (alert && !activeAlert))) {
         setActiveAlert(alert)
         setAlertOpen(true)
-        setPromptResponse("")
+        if (alert.promptPrefill) {
+            setPromptResponse(alert.promptPrefill)
+        } else {
+            setPromptResponse("")
+        }
     }
 
     const onOpenChange = useCallback(
@@ -68,6 +73,18 @@ export function AlertManager() {
                     <DialogTitle>{activeAlert?.title}</DialogTitle>
 
                     {activeAlert?.message}
+
+                    {activeAlert?.hasPrompt && (
+                        <Input
+                            autoFocus
+                            autoCorrect={"off"}
+                            value={promptResponse}
+                            onChange={(e) => setPromptResponse(e.target.value)}
+                            onKeyDown={(e) =>
+                                e.key === "Enter" && onAcceptButton()
+                            }
+                        />
+                    )}
 
                     <DialogFooter>
                         {activeAlert?.closeButtonText ||
