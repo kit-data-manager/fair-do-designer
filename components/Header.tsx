@@ -37,6 +37,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog"
 import { version } from "@/package.json"
+import Image from "next/image"
 
 export function Header() {
     const designName = useStore(workspaceStore, (s) => s.designName)
@@ -133,23 +134,44 @@ export function Header() {
                     <DialogHeader>
                         <DialogTitle>About</DialogTitle>
                     </DialogHeader>
-                    <p>
-                        FAIR DO Designer v{version}
-                        <br /> <br />
-                        GitHub Repository:{" "}
-                        <a
-                            className="underline"
-                            href="https://github.com/kit-data-manager/fair-do-designer"
-                        >
-                            kit-data-manager/fair-do-designer
-                        </a>
-                        <br />
-                        Contact us:
-                        <br />
-                        <br />
-                        Copyright © 2025 Karlsruhe Institute of Technology
-                        (KIT)
-                    </p>
+                    <div className="space-y-6">
+                        <div> FAIR DO Designer v{version}</div>
+
+                        <div>
+                            <div>
+                                GitHub Repository:{" "}
+                                <a
+                                    className="underline"
+                                    href="https://github.com/kit-data-manager/fair-do-designer"
+                                >
+                                    kit-data-manager/fair-do-designer
+                                </a>
+                            </div>
+                            <div>Contact us:</div>
+                        </div>
+
+                        <div>
+                            <Link
+                                href={"https://doi.org/10.5281/zenodo.17897665"}
+                                target={"_blank"}
+                                rel={"noopener noreferrer"}
+                            >
+                                <Image
+                                    src={
+                                        "https://zenodo.org/badge/DOI/10.5281/zenodo.17897665.svg"
+                                    }
+                                    height={20}
+                                    width={190}
+                                    alt={"10.5281/zenodo.17897666"}
+                                />
+                            </Link>
+                        </div>
+
+                        <div>
+                            Copyright © 2025 Karlsruhe Institute of Technology
+                            (KIT)
+                        </div>
+                    </div>
                 </DialogContent>
             </Dialog>
             {/* Dialogs End */}
