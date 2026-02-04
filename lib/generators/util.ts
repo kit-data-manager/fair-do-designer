@@ -39,6 +39,18 @@ export interface RecordMappingGenerator {
    */
   makeAddAttributeChainCall(key: string, value: string): string;
   /**
+   * Generates a call to resolve a JSON Pointer against the current source JSON.
+   * @param jsonPointer The JSON Pointer string
+   * @returns A string representing the function call to resolve the JSON Pointer
+   */
+  makeJsonPointerCall(jsonPointer: string): string;
+  /**
+   * Generates a call to find all matches for a JSONPath expression against the current source JSON.
+   * @param jsonpath The JSONPath expression string
+   * @returns A string representing the function call to find all matches for the JSONPath
+   */
+  makeJsonpathCall(jsonpath: string): string;
+  /**
    * Generates a line comment in the target programming language.
    * @param text The comment text to be included
    * @returns A formatted comment string according to the language syntax

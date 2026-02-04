@@ -18,6 +18,12 @@ export class RecordMappingGenerator
     extends PythonGenerator
     implements Util.RecordMappingGenerator
 {
+    makeJsonPointerCall(jsonPointer: string): string {
+        return `jsonpath.pointer.resolve(${jsonPointer}, executor.current_source_json)`
+    }
+    makeJsonpathCall(jsonPath: string): string {
+        return `jsonpath.findall(${jsonPath}, executor.current_source_json)`
+    }
     init(workspace: Blockly.Workspace) {
         super.init(workspace)
         this.addReservedWords("math,random,Number")
@@ -154,19 +160,13 @@ forBlock["attribute_key"] = function <T extends Util.FairDoCodeGenerator>(
     return code
 }
 
-const jsonPointerCall = (path: string) =>
-    `jsonpath.pointer.resolve(${path}, executor.current_source_json)`
-
-const jsonpathCall = (path: string) =>
-    `jsonpath.findall(${path}, executor.current_source_json)`
-
 forBlock["input_json_pointer"] = function <T extends Util.FairDoCodeGenerator>(
     block: Blockly.Block,
     generator: T,
 ) {
     const value_input = block.getFieldValue("QUERY")
     const quoted = generator.quote_(value_input)
-    return [jsonPointerCall(quoted), generator.getOrderAtomic()]
+    return [generator.makeJsonPointerCall(quoted), generator.getOrderAtomic()]
 }
 forBlock["input_jsonpath"] = forBlock["input_json_pointer"] // TODO remove
 
@@ -174,7 +174,7 @@ forBlock["input_custom_json_path"] = function <
     T extends Util.FairDoCodeGenerator,
 >(block: Blockly.Block, generator: T) {
     const value_block = generator.valueToCode(block, "QUERY", generator.getOrderAtomic())
-    return [jsonpathCall(value_block), generator.getOrderAtomic()]
+    return [generator.makeJsonpathCall(value_block), generator.getOrderAtomic()]
 }
 forBlock["input_custom_json"] = forBlock["input_custom_json_path"] // TODO remove
 
@@ -182,7 +182,7 @@ forBlock["input_custom_json_pointer"] = function <
     T extends Util.FairDoCodeGenerator,
 >(block: Blockly.Block, generator: T) {
     const value_block = generator.valueToCode(block, "QUERY", generator.getOrderAtomic())
-    return [jsonPointerCall(value_block), generator.getOrderAtomic()]
+    return [generator.makeJsonPointerCall(value_block), generator.getOrderAtomic()]
 }
 
 forBlock["profile_hmc"] = function <T extends Util.FairDoCodeGenerator>(
