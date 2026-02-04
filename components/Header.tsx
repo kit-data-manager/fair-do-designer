@@ -36,6 +36,11 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog"
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 export function Header() {
     const designName = useStore(workspaceStore, (s) => s.designName)
@@ -149,12 +154,30 @@ export function Header() {
 
             <Menubar>
                 <div className="flex justify-center items-center mr-1">
-                    <Button size="menubar" variant="ghost" onClick={undo}>
-                        <UndoIcon />
-                    </Button>
-                    <Button size="menubar" variant="ghost" onClick={redo}>
-                        <RedoIcon />
-                    </Button>
+                    <Tooltip delayDuration={700}>
+                        <TooltipTrigger asChild>
+                            <Button
+                                size="menubar"
+                                variant="ghost"
+                                onClick={undo}
+                            >
+                                <UndoIcon />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Undo</TooltipContent>
+                    </Tooltip>
+                    <Tooltip delayDuration={700}>
+                        <TooltipTrigger asChild>
+                            <Button
+                                size="menubar"
+                                variant="ghost"
+                                onClick={redo}
+                            >
+                                <RedoIcon />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Redo</TooltipContent>
+                    </Tooltip>
                 </div>
 
                 <MenubarMenu>
