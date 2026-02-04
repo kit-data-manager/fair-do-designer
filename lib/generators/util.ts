@@ -1,4 +1,6 @@
-import * as Blockly from "blockly/core";
+/**
+ * Utility functions for code generators.
+ */
 import * as HmcProfile from "../blocks/hmc_profile"
 
 /**
@@ -23,72 +25,6 @@ export function getPidByPrefixMap(
   console.debug(`PID not found for input ${name}`);
   return undefined;
 }
-
-export interface RecordMappingGenerator {
-  /**
-   * Generates a chain call to set the ID for a record or entity.
-   * @param id The identifier to be set
-   * @returns A string representing the chain call, e.g., ".setId('myId')"
-   */
-  makeSetIDChainCall(id: string): string;
-  /**
-   * Generates a chain call to add an attribute key-value pair to a record or entity.
-   * @param key The attribute name or identifier
-   * @param value The value to be associated with the key
-   * @returns A string representing the chain call, e.g., ".add('name', 'value')"
-   */
-  makeAddAttributeChainCall(key: string, value: string): string;
-  /**
-   * Generates a call to resolve a JSON Pointer against the current source JSON.
-   * @param jsonPointer The JSON Pointer string
-   * @returns A string representing the function call to resolve the JSON Pointer
-   */
-  makeJsonPointerCall(jsonPointer: string): string;
-  /**
-   * Generates a call to find all matches for a JSONPath expression against the current source JSON.
-   * @param jsonpath The JSONPath expression string
-   * @returns A string representing the function call to find all matches for the JSONPath
-   */
-  makeJsonpathCall(jsonpath: string): string;
-  /**
-   * Generates a line comment in the target programming language.
-   * @param text The comment text to be included
-   * @returns A formatted comment string according to the language syntax
-   */
-  makeLineComment(text: string): string;
-  /**
-   * Prefixes given lines only if the test contains relevant code,
-   * i.e. the text is not empty and is not just an empty string
-   * within the target language
-   * @param text the lines to prefix
-   * @param prefix the prefix to prepent to each line
-   */
-  prefixNonemptyLines(text: string, prefix: string): string;
-  /**
-   * Quotes a given string value according to the target language's syntax.
-   * @param value_input The string value to be quoted
-   * @returns A properly quoted string
-   */
-  quote_(value_input: string): string;
-  /**
-   * Returns the order value for atomic expressions in the target language.
-   * @returns The order value representing atomic expressions
-   */
-  getOrderAtomic(): number;
-  /**
-   * Returns the order value for collection expressions in the target language.
-   * @returns The order value representing collection expressions
-   */
-  getOrderCollection(): number;
-  /**
-   * Returns the order value for none expressions in the target language.
-   * @returns The order value representing none expressions
-   */
-  getOrderNone(): number;
-}
-
-export type FairDoCodeGenerator = RecordMappingGenerator &
-  Blockly.CodeGenerator;
 
 // Type guard for HmcBlock interface
 export function isHmcBlock(obj: unknown): obj is HmcProfile.HMCBlock {
