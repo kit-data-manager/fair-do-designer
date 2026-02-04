@@ -6,7 +6,6 @@
 
 import { Order, PythonGenerator, pythonGenerator } from "blockly/python"
 import * as Blockly from "blockly/core"
-import * as HmcProfile from "../blocks/hmc_profile"
 import * as Util from "./util"
 
 /**
@@ -33,6 +32,16 @@ export class RecordMappingGenerator
         this.definitions_["executor"] = "EXECUTOR: Executor = Executor()"
         this.addReservedWords("EXECUTOR")
         this.addReservedWords("current_source_json")
+    }
+
+    getOrderAtomic(): number {
+        return Order.ATOMIC
+    }
+    getOrderCollection(): number {
+        return Order.COLLECTION
+    }
+    getOrderNone(): number {
+        return Order.NONE
     }
 
     makeAddAttributeChainCall(key: string, value: string): string {
@@ -85,7 +94,7 @@ function genericRecord<T extends Util.FairDoCodeGenerator>(
     generator: T,
     value_skip_condition: string,
 ) {
-    const value_localid = generator.valueToCode(block, "local-id", Order.ATOMIC)
+    const value_localid = generator.valueToCode(block, "local-id", generator.getOrderAtomic())
     const statement_record = generator.statementToCode(block, "record")
 
     let code = generator.makeLineComment(`${block.type}`)
@@ -123,7 +132,7 @@ forBlock["pidrecord_skipable"] = function <T extends Util.FairDoCodeGenerator>(
     const value_skip_condition = generator.valueToCode(
         block,
         "skip-condition",
-        Order.ATOMIC,
+        generator.getOrderAtomic(),
     )
     return genericRecord(block, generator, value_skip_condition)
 }
@@ -132,8 +141,8 @@ forBlock["attribute_key"] = function <T extends Util.FairDoCodeGenerator>(
     block: Blockly.Block,
     generator: T,
 ) {
-    const value_key = generator.valueToCode(block, "KEY", Order.ATOMIC)
-    const value_value = generator.valueToCode(block, "VALUE", Order.ATOMIC)
+    const value_key = generator.valueToCode(block, "KEY", generator.getOrderAtomic())
+    const value_value = generator.valueToCode(block, "VALUE", generator.getOrderAtomic())
 
     let code = ""
     const isSomething = (thing: string | null | undefined) =>
@@ -151,56 +160,36 @@ const jsonPointerCall = (path: string) =>
 const jsonpathCall = (path: string) =>
     `jsonpath.findall(${path}, executor.current_source_json)`
 
-forBlock["input_json_pointer"] = function (
+forBlock["input_json_pointer"] = function <T extends Util.FairDoCodeGenerator>(
     block: Blockly.Block,
-    generator: PythonGenerator,
+    generator: T,
 ) {
     const value_input = block.getFieldValue("QUERY")
     const quoted = generator.quote_(value_input)
-    return [jsonPointerCall(quoted), Order.ATOMIC]
+    return [jsonPointerCall(quoted), generator.getOrderAtomic()]
 }
 forBlock["input_jsonpath"] = forBlock["input_json_pointer"] // TODO remove
 
 forBlock["input_custom_json_path"] = function <
     T extends Util.FairDoCodeGenerator,
 >(block: Blockly.Block, generator: T) {
-    const value_block = generator.valueToCode(block, "QUERY", Order.ATOMIC)
-    return [jsonpathCall(value_block), Order.ATOMIC]
+    const value_block = generator.valueToCode(block, "QUERY", generator.getOrderAtomic())
+    return [jsonpathCall(value_block), generator.getOrderAtomic()]
 }
 forBlock["input_custom_json"] = forBlock["input_custom_json_path"] // TODO remove
 
 forBlock["input_custom_json_pointer"] = function <
     T extends Util.FairDoCodeGenerator,
 >(block: Blockly.Block, generator: T) {
-    const value_block = generator.valueToCode(block, "QUERY", Order.ATOMIC)
-    return [jsonPointerCall(value_block), Order.ATOMIC]
-}
-
-// Type guard for HmcBlock interface
-function isHmcBlock(obj: unknown): obj is HmcProfile.HMCBlock {
-    return (
-        obj !== null &&
-        typeof obj === "object" &&
-        "profileAttributeKey" in obj &&
-        typeof obj.profileAttributeKey === "string" &&
-        "profile" in obj &&
-        typeof obj.profile === "object" &&
-        typeof obj.profile === "object" &&
-        obj.profile != undefined &&
-        "identifier" in obj.profile &&
-        typeof obj.profile.identifier === "string" &&
-        "inputList" in obj &&
-        Array.isArray(obj.inputList) &&
-        "extractPidFromProperty" in obj &&
-        typeof obj.extractPidFromProperty === "function"
-    )
+    const value_block = generator.valueToCode(block, "QUERY", generator.getOrderAtomic())
+    return [jsonPointerCall(value_block), generator.getOrderAtomic()]
 }
 
 forBlock["profile_hmc"] = function <T extends Util.FairDoCodeGenerator>(
     block: Blockly.Block,
     generator: T,
 ) {
-    if (!isHmcBlock(block)) {
+    if (!Util.isHmcBlock(block)) {
         throw new Error("Expected block to conform to HmcBlock interface")
     }
 
@@ -214,7 +203,7 @@ forBlock["profile_hmc"] = function <T extends Util.FairDoCodeGenerator>(
     for (const input of block.inputList) {
         const name = input.name
         const pid = block.extractPidFromProperty(name)
-        const value = generator.valueToCode(block, name, Order.ATOMIC)
+        const value = generator.valueToCode(block, name, generator.getOrderAtomic())
         if (pid !== undefined && value && value != "") {
             code += generator.makeLineComment(`attribute: ${input.name}`)
             code += generator.makeAddAttributeChainCall(`"${pid}"`, value)
@@ -227,13 +216,12 @@ forBlock["stop_design"] = function <T extends Util.FairDoCodeGenerator>(
     block: Blockly.Block,
     generator: T,
 ) {
-    // TODO: change Order.ATOMIC to the correct operator precedence strength
-    let value_message = generator.valueToCode(block, "MESSAGE", Order.ATOMIC)
+    let value_message = generator.valueToCode(block, "MESSAGE", generator.getOrderAtomic())
     if (!value_message || value_message.trim() == "") {
         value_message = '"No error message provided"'
     }
     const code = `stop_with_fail(${value_message})`
-    return [code, Order.ATOMIC]
+    return [code, generator.getOrderAtomic()]
 }
 
 forBlock["log_value"] = function <T extends Util.FairDoCodeGenerator>(
@@ -241,27 +229,20 @@ forBlock["log_value"] = function <T extends Util.FairDoCodeGenerator>(
     generator: T,
 ) {
     const text_desc = block.getFieldValue("DESC")
-    // TODO: change Order.ATOMIC to the correct operator precedence strength
-    const value_invar = generator.valueToCode(block, "INVAR", Order.ATOMIC)
+    const value_invar = generator.valueToCode(block, "INVAR", generator.getOrderAtomic())
 
     const code = `log(${value_invar}, "${text_desc}")\n`
-    // TODO: Change Order.NONE to the correct operator precedence strength
-    return [code, Order.NONE]
+    return [code, generator.getOrderNone()]
 }
 
 forBlock["otherwise"] = function <T extends Util.FairDoCodeGenerator>(
     block: Blockly.Block,
     generator: T,
 ) {
-    // TODO: change Order.ATOMIC to the correct operator precedence strength
-    const value_value = generator.valueToCode(block, "VALUE", Order.ATOMIC)
-
-    // TODO: change Order.ATOMIC to the correct operator precedence strength
-    const value_other = generator.valueToCode(block, "OTHER", Order.ATOMIC)
-
+    const value_value = generator.valueToCode(block, "VALUE", generator.getOrderAtomic())
+    const value_other = generator.valueToCode(block, "OTHER", generator.getOrderAtomic())
     const code = `otherwise(lambda: ${value_value}, lambda: ${value_other})\n`
-    // TODO: Change Order.NONE to the correct operator precedence strength
-    return [code, Order.NONE]
+    return [code, generator.getOrderNone()]
 }
 
 forBlock["backlink_declaration"] = function <
@@ -270,16 +251,19 @@ forBlock["backlink_declaration"] = function <
     const value_attribute_key = generator.valueToCode(
         block,
         "ATTRIBUTE_KEY",
-        Order.ATOMIC,
+        generator.getOrderAtomic(),
     )
     const code = "BackwardLinkFor(" + value_attribute_key + ")"
-    return [code, Order.ATOMIC]
+    return [code, generator.getOrderAtomic()]
 }
 
-forBlock["profile_hmc_reference_block"] = function (block: Blockly.Block) {
+forBlock["profile_hmc_reference_block"] = function <T extends Util.FairDoCodeGenerator>(
+    block: Blockly.Block,
+    generator: T
+) {
     const dropdown_attribute = block.getFieldValue("ATTRIBUTE")
     const code = `"${dropdown_attribute}"`
-    return [code, Order.ATOMIC]
+    return [code, generator.getOrderAtomic()]
 }
 
 forBlock["lists_create_with"] = function <T extends Util.FairDoCodeGenerator>(
@@ -290,7 +274,6 @@ forBlock["lists_create_with"] = function <T extends Util.FairDoCodeGenerator>(
     for (const input of block.inputList) {
         const block = input.connection?.targetBlock()
         if (block) {
-            // TODO: Do we have to consider the operator precedence here?
             const result = generator.blockToCode(block)
             if (typeof result === "string") {
                 values.push(result)
@@ -304,6 +287,6 @@ forBlock["lists_create_with"] = function <T extends Util.FairDoCodeGenerator>(
         "[\n" +
             generator.prefixLines(values.join(", "), generator.INDENT) +
             "]",
-        Order.COLLECTION,
+        generator.getOrderCollection(),
     ]
 }

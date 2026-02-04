@@ -1,4 +1,5 @@
 import * as Blockly from "blockly/core";
+import * as HmcProfile from "../blocks/hmc_profile"
 
 /**
  *
@@ -51,6 +52,48 @@ export interface RecordMappingGenerator {
    * @param prefix the prefix to prepent to each line
    */
   prefixNonemptyLines(text: string, prefix: string): string;
+  /**
+   * Quotes a given string value according to the target language's syntax.
+   * @param value_input The string value to be quoted
+   * @returns A properly quoted string
+   */
+  quote_(value_input: string): string;
+  /**
+   * Returns the order value for atomic expressions in the target language.
+   * @returns The order value representing atomic expressions
+   */
+  getOrderAtomic(): number;
+  /**
+   * Returns the order value for collection expressions in the target language.
+   * @returns The order value representing collection expressions
+   */
+  getOrderCollection(): number;
+  /**
+   * Returns the order value for none expressions in the target language.
+   * @returns The order value representing none expressions
+   */
+  getOrderNone(): number;
 }
+
 export type FairDoCodeGenerator = RecordMappingGenerator &
   Blockly.CodeGenerator;
+
+// Type guard for HmcBlock interface
+export function isHmcBlock(obj: unknown): obj is HmcProfile.HMCBlock {
+    return (
+        obj !== null &&
+        typeof obj === "object" &&
+        "profileAttributeKey" in obj &&
+        typeof obj.profileAttributeKey === "string" &&
+        "profile" in obj &&
+        typeof obj.profile === "object" &&
+        typeof obj.profile === "object" &&
+        obj.profile != undefined &&
+        "identifier" in obj.profile &&
+        typeof obj.profile.identifier === "string" &&
+        "inputList" in obj &&
+        Array.isArray(obj.inputList) &&
+        "extractPidFromProperty" in obj &&
+        typeof obj.extractPidFromProperty === "function"
+    )
+}
