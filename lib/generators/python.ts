@@ -59,7 +59,7 @@ export class RecordMappingGenerator
     }
 
     makeSetIDChainCall(id: string): string {
-        if (!this.isEmptyPythonString(id)) {
+        if (!isEmptyPythonString(id)) {
             return `.setId(lambda: ${id})\n`
         } else {
             return ""
@@ -70,12 +70,8 @@ export class RecordMappingGenerator
         return this.prefixLines(`${text}\n`, "# ")
     }
 
-    isEmptyPythonString(s: string): boolean {
-        return s == null || false || s.length <= 0 || s == "''" || s == '""'
-    }
-
     prefixNonemptyLines(text: string, prefix: string): string {
-        if (this.isEmptyPythonString(text)) {
+        if (isEmptyPythonString(text)) {
             return text
         } else {
             return this.prefixLines(text, prefix)
@@ -87,4 +83,8 @@ export class RecordMappingGenerator
         const suffix: string = "\nEXECUTOR.execute()\n"
         return code + suffix
     }
+}
+
+function isEmptyPythonString(s: string): boolean {
+    return s == null || false || s.length <= 0 || s == "''" || s == '""'
 }
