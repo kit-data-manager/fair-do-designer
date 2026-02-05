@@ -1,16 +1,12 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
-import { PythonMappingGenerator as PythonGen } from "@/lib/generators/python"
-import { JavascriptMappingGenerator as JsGen } from "@/lib/generators/javascript"
 import { useStore } from "zustand/react"
 import { workspaceStore } from "@/lib/stores/workspace"
 import * as Blockly from "blockly"
 import { Button } from "@/components/ui/button"
 import { useCopyToClipboard } from "usehooks-ts"
 import { CheckIcon, LoaderCircle } from "lucide-react"
-import { PythonCodeDownload } from "@/lib/python_code_download"
-import { FairDoCodeGenerator } from "@/lib/generators/common"
 import {
     Select,
     SelectContent,
@@ -19,6 +15,7 @@ import {
     SelectValue,
 } from "./ui/select"
 import { alertStore } from "@/lib/stores/alert-store"
+import { useCodeDownloader, useCodeGenerator } from "@/lib/hooks"
 
 /**
  * Runs the code generator and shows the result
@@ -26,33 +23,30 @@ import { alertStore } from "@/lib/stores/alert-store"
  */
 export function OutputPane() {
     const workspace = useStore(workspaceStore, (s) => s.workspace)
+    const setCodeGenerator = useStore(workspaceStore, (s) => s.setCodeGenerator)
     const [code, setCode] = useState("")
     const [, copy] = useCopyToClipboard()
     const alert = useStore(alertStore, (s) => s.alert)
 
-    const [codeGenerator, setCodeGenerator] = useState<FairDoCodeGenerator>(
-        new PythonGen("PidRecordMappingPython"),
-    )
+    const codeGeneratorInstance = useCodeGenerator()
+    const codeDownloader = useCodeDownloader()
 
     const generateCode = useCallback(() => {
         if (!workspace) return
-        const code = codeGenerator.workspaceToCode(workspace)
+        const code = codeGeneratorInstance.workspaceToCode(workspace)
         setCode(code)
-    }, [codeGenerator, workspace])
+    }, [codeGeneratorInstance, workspace])
 
     const chooseGenerator = useCallback(
         (value: String) => {
             if (value === "python") {
-                setCodeGenerator(new PythonGen("PidRecordMappingPython"))
+                setCodeGenerator("python")
             } else if (value === "javascript") {
-                setCodeGenerator(new JsGen("PidRecordMappingJavascript"))
+                setCodeGenerator("javascript")
             }
-            generateCode()
         },
-        [generateCode],
+        [setCodeGenerator],
     )
-
-    const [codeDownloader] = useState(new PythonCodeDownload())
 
     useEffect(() => {
         if (!workspace) return
