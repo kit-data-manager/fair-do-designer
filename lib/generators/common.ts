@@ -5,6 +5,65 @@
 import * as Blockly from "blockly/core"
 import * as Util from "./util"
 
+export interface BlocklyGenerator {
+    /**
+     * The method of indenting.  Defaults to two spaces, but language generators
+     * may override this to increase indent or change to tabs.
+     */
+    INDENT: string;
+
+    /**
+     * Generate code for all blocks in the workspace to the specified language.
+     *
+     * @param workspace Workspace to generate code from.
+     * @returns Generated code.
+     */
+    workspaceToCode(workspace?: Blockly.Workspace): string;
+    /**
+     * Generate code for the specified block (and attached blocks).
+     * The generator must be initialized before calling this function.
+     *
+     * @param block The block to generate code for.
+     * @param opt_thisOnly True to generate code for only this statement.
+     * @returns For statement blocks, the generated code.
+     *     For value blocks, an array containing the generated code and an
+     * operator order value.  Returns '' if block is null.
+     */
+    blockToCode(block: Blockly.Block | null, opt_thisOnly?: boolean): string | [string, number];
+    /**
+     * Generate code representing the specified value input.
+     *
+     * @param block The block containing the input.
+     * @param name The name of the input.
+     * @param outerOrder The maximum binding strength (minimum order value) of any
+     *     operators adjacent to "block".
+     * @returns Generated code or '' if no blocks are connected.
+     * @throws ReferenceError if the specified input does not exist.
+     */
+    valueToCode(block: Blockly.Block, name: string, outerOrder: number): string;
+    /**
+     * Generate a code string representing the blocks attached to the named
+     * statement input. Indent the code.
+     * This is mainly used in generators. When trying to generate code to evaluate
+     * look at using workspaceToCode or blockToCode.
+     *
+     * @param block The block containing the input.
+     * @param name The name of the input.
+     * @returns Generated code or '' if no blocks are connected.
+     * @throws ReferenceError if the specified input does not exist.
+     */
+    statementToCode(block: Blockly.Block, name: string): string;
+    /**
+     * Prepend a common prefix onto each line of code.
+     * Intended for indenting code or adding comment markers.
+     *
+     * @param text The lines of code.
+     * @param prefix The common prefix.
+     * @returns The prefixed lines of code.
+     */
+    prefixLines(text: string, prefix: string): string;
+}
+
 export interface RecordMappingGenerator {
   /**
    * Generates a chain call to set the ID for a record or entity.
@@ -68,8 +127,7 @@ export interface RecordMappingGenerator {
   getOrderNone(): number;
 }
 
-export type FairDoCodeGenerator = RecordMappingGenerator &
-  Blockly.CodeGenerator;
+export type FairDoCodeGenerator = BlocklyGenerator & RecordMappingGenerator
 
 /**
  * The generator will import all the definitions
@@ -77,9 +135,9 @@ export type FairDoCodeGenerator = RecordMappingGenerator &
  */
 export const forBlock = Object.create(null)
 
-function genericRecord<T extends FairDoCodeGenerator>(
+function genericRecord(
     block: Blockly.Block,
-    generator: T,
+    generator: FairDoCodeGenerator,
     value_skip_condition: string,
 ) {
     const value_localid = generator.valueToCode(block, "local-id", generator.getOrderAtomic())
@@ -106,16 +164,16 @@ function genericRecord<T extends FairDoCodeGenerator>(
     return code
 }
 
-forBlock["pidrecord"] = function <T extends FairDoCodeGenerator>(
+forBlock["pidrecord"] = function(
     block: Blockly.Block,
-    generator: T,
+    generator: FairDoCodeGenerator,
 ) {
     return genericRecord(block, generator, "")
 }
 
-forBlock["pidrecord_skipable"] = function <T extends FairDoCodeGenerator>(
+forBlock["pidrecord_skipable"] = function(
     block: Blockly.Block,
-    generator: T,
+    generator: FairDoCodeGenerator,
 ) {
     const value_skip_condition = generator.valueToCode(
         block,
@@ -125,9 +183,9 @@ forBlock["pidrecord_skipable"] = function <T extends FairDoCodeGenerator>(
     return genericRecord(block, generator, value_skip_condition)
 }
 
-forBlock["attribute_key"] = function <T extends FairDoCodeGenerator>(
+forBlock["attribute_key"] = function(
     block: Blockly.Block,
-    generator: T,
+    generator: FairDoCodeGenerator,
 ) {
     const value_key = generator.valueToCode(block, "KEY", generator.getOrderAtomic())
     const value_value = generator.valueToCode(block, "VALUE", generator.getOrderAtomic())
@@ -142,9 +200,9 @@ forBlock["attribute_key"] = function <T extends FairDoCodeGenerator>(
     return code
 }
 
-forBlock["input_json_pointer"] = function <T extends FairDoCodeGenerator>(
+forBlock["input_json_pointer"] = function(
     block: Blockly.Block,
-    generator: T,
+    generator: FairDoCodeGenerator,
 ) {
     const value_input = block.getFieldValue("QUERY")
     const quoted = generator.quote_(value_input)
@@ -152,24 +210,26 @@ forBlock["input_json_pointer"] = function <T extends FairDoCodeGenerator>(
 }
 forBlock["input_jsonpath"] = forBlock["input_json_pointer"] // TODO remove
 
-forBlock["input_custom_json_path"] = function <
-    T extends FairDoCodeGenerator,
->(block: Blockly.Block, generator: T) {
+forBlock["input_custom_json_path"] = function(
+    block: Blockly.Block,
+    generator: FairDoCodeGenerator
+) {
     const value_block = generator.valueToCode(block, "QUERY", generator.getOrderAtomic())
     return [generator.makeJsonpathCall(value_block), generator.getOrderAtomic()]
 }
 forBlock["input_custom_json"] = forBlock["input_custom_json_path"] // TODO remove
 
-forBlock["input_custom_json_pointer"] = function <
-    T extends FairDoCodeGenerator,
->(block: Blockly.Block, generator: T) {
+forBlock["input_custom_json_pointer"] = function(
+    block: Blockly.Block,
+    generator: FairDoCodeGenerator
+) {
     const value_block = generator.valueToCode(block, "QUERY", generator.getOrderAtomic())
     return [generator.makeJsonPointerCall(value_block), generator.getOrderAtomic()]
 }
 
-forBlock["profile_hmc"] = function <T extends FairDoCodeGenerator>(
+forBlock["profile_hmc"] = function(
     block: Blockly.Block,
-    generator: T,
+    generator: FairDoCodeGenerator,
 ) {
     if (!Util.isHmcBlock(block)) {
         throw new Error("Expected block to conform to HmcBlock interface")
@@ -194,9 +254,9 @@ forBlock["profile_hmc"] = function <T extends FairDoCodeGenerator>(
     return code
 }
 
-forBlock["stop_design"] = function <T extends FairDoCodeGenerator>(
+forBlock["stop_design"] = function(
     block: Blockly.Block,
-    generator: T,
+    generator: FairDoCodeGenerator,
 ) {
     let value_message = generator.valueToCode(block, "MESSAGE", generator.getOrderAtomic())
     if (!value_message || value_message.trim() == "") {
@@ -206,9 +266,9 @@ forBlock["stop_design"] = function <T extends FairDoCodeGenerator>(
     return [code, generator.getOrderAtomic()]
 }
 
-forBlock["log_value"] = function <T extends FairDoCodeGenerator>(
+forBlock["log_value"] = function(
     block: Blockly.Block,
-    generator: T,
+    generator: FairDoCodeGenerator,
 ) {
     const text_desc = block.getFieldValue("DESC")
     const value_invar = generator.valueToCode(block, "INVAR", generator.getOrderAtomic())
@@ -217,9 +277,9 @@ forBlock["log_value"] = function <T extends FairDoCodeGenerator>(
     return [code, generator.getOrderNone()]
 }
 
-forBlock["otherwise"] = function <T extends FairDoCodeGenerator>(
+forBlock["otherwise"] = function(
     block: Blockly.Block,
-    generator: T,
+    generator: FairDoCodeGenerator,
 ) {
     const value_value = generator.valueToCode(block, "VALUE", generator.getOrderAtomic())
     const value_other = generator.valueToCode(block, "OTHER", generator.getOrderAtomic())
@@ -227,9 +287,10 @@ forBlock["otherwise"] = function <T extends FairDoCodeGenerator>(
     return [code, generator.getOrderNone()]
 }
 
-forBlock["backlink_declaration"] = function <
-    T extends FairDoCodeGenerator,
->(block: Blockly.Block, generator: T) {
+forBlock["backlink_declaration"] = function(
+    block: Blockly.Block,
+    generator: FairDoCodeGenerator
+) {
     const value_attribute_key = generator.valueToCode(
         block,
         "ATTRIBUTE_KEY",
@@ -239,18 +300,18 @@ forBlock["backlink_declaration"] = function <
     return [code, generator.getOrderAtomic()]
 }
 
-forBlock["profile_hmc_reference_block"] = function <T extends FairDoCodeGenerator>(
+forBlock["profile_hmc_reference_block"] = function(
     block: Blockly.Block,
-    generator: T
+    generator: FairDoCodeGenerator
 ) {
     const dropdown_attribute = block.getFieldValue("ATTRIBUTE")
     const code = `"${dropdown_attribute}"`
     return [code, generator.getOrderAtomic()]
 }
 
-forBlock["lists_create_with"] = function <T extends FairDoCodeGenerator>(
+forBlock["lists_create_with"] = function(
     block: Blockly.Block,
-    generator: T,
+    generator: FairDoCodeGenerator,
 ) {
     const values: string[] = []
     for (const input of block.inputList) {
