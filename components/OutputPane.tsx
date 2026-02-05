@@ -12,6 +12,7 @@ import { CheckIcon, LoaderCircle } from "lucide-react"
 import { PythonCodeDownload } from "@/lib/python_code_download"
 import { FairDoCodeGenerator, RecordMappingGenerator } from "@/lib/generators/common"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "./ui/select"
+import { alertStore } from "@/lib/stores/alert-store"
 
 /**
  * Runs the code generator and shows the result
@@ -21,6 +22,7 @@ export function OutputPane() {
     const workspace = useStore(workspaceStore, (s) => s.workspace)
     const [code, setCode] = useState("")
     const [, copy] = useCopyToClipboard()
+    const alert = useStore(alertStore, (s) => s.alert)
 
     let codeGenerator = useRef<FairDoCodeGenerator>(
         new PythonGen("PidRecordMappingPython"),
@@ -33,6 +35,7 @@ export function OutputPane() {
         }
         generateCode()
     }, [code])
+
     const codeDownloader = useRef(new PythonCodeDownload())
 
     const generateCode = useCallback(() => {
@@ -79,11 +82,11 @@ export function OutputPane() {
             await codeDownloader.current.downloadCodeZip(code)
         } catch (e) {
             console.error("Failed to download code", e)
-            alert("Failed to download code")
+            alert("Error", "Failed to download code", "error")
         } finally {
             setPreparingDownload(false)
         }
-    }, [code])
+    }, [alert, code])
 
     return (
         <div className="flex flex-col grow max-w-full">

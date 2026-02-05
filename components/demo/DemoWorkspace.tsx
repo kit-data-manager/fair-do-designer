@@ -50,12 +50,6 @@ export function DemoWorkspace({
             setWorkspace(workspace)
             setLoading(false)
 
-            workspace.registerButtonCallback("dataAccessToolboxHelp", () => {
-                alert(
-                    "Use the Data Access tab on the right side to create Data Access blocks by clicking or dragging-and-dropping JSON keys",
-                )
-            })
-
             Blockly.serialization.workspaces.load(
                 {
                     blocks: {
