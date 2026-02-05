@@ -1,7 +1,8 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
-import { RecordMappingGenerator } from "@/lib/generators/python"
+import { PythonMappingGenerator as PythonGen } from "@/lib/generators/python"
+import { JavascriptMappingGenerator as JsGen } from "@/lib/generators/javascript"
 import { useStore } from "zustand/react"
 import { workspaceStore } from "@/lib/stores/workspace"
 import * as Blockly from "blockly"
@@ -9,6 +10,8 @@ import { Button } from "@/components/ui/button"
 import { useCopyToClipboard } from "usehooks-ts"
 import { CheckIcon, LoaderCircle } from "lucide-react"
 import { PythonCodeDownload } from "@/lib/python_code_download"
+import { FairDoCodeGenerator, RecordMappingGenerator } from "@/lib/generators/common"
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "./ui/select"
 
 /**
  * Runs the code generator and shows the result
@@ -19,9 +22,17 @@ export function OutputPane() {
     const [code, setCode] = useState("")
     const [, copy] = useCopyToClipboard()
 
-    const codeGenerator = useRef(
-        new RecordMappingGenerator("PidRecordMappingPython"),
+    let codeGenerator = useRef<FairDoCodeGenerator>(
+        new PythonGen("PidRecordMappingPython"),
     )
+    const chooseGenerator = useCallback((value: String) => {
+        if (value === "python") {
+            codeGenerator.current = new PythonGen("PidRecordMappingPython")
+        } else if (value === "javascript") {
+            codeGenerator.current = new JsGen("PidRecordMappingJavascript")
+        }
+        generateCode()
+    }, [code])
     const codeDownloader = useRef(new PythonCodeDownload())
 
     const generateCode = useCallback(() => {
@@ -100,8 +111,25 @@ export function OutputPane() {
                         "Download Generated Code"
                     )}
                 </Button>
-                <div className="p-1 text-muted-foreground">
-                    Language: Python
+                <div className="flex items-center">
+                    <label
+                        htmlFor="language-select"
+                        className="p-2 text-muted-foreground"
+                    >Language:</label>
+
+                    <Select
+                        defaultValue="python"
+                        onValueChange={chooseGenerator}
+                    >
+                        <SelectTrigger className="w-full max-w-48">
+                            <SelectValue/>
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="python">Python</SelectItem>
+                            <SelectItem value="javascript">Javascript (Browser)</SelectItem>
+                        </SelectContent>
+                    </Select>
+
                 </div>
             </div>
             <pre className="overflow-auto grow p-2">
