@@ -10,8 +10,14 @@ import { Button } from "@/components/ui/button"
 import { useCopyToClipboard } from "usehooks-ts"
 import { CheckIcon, LoaderCircle } from "lucide-react"
 import { PythonCodeDownload } from "@/lib/python_code_download"
-import { FairDoCodeGenerator, RecordMappingGenerator } from "@/lib/generators/common"
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "./ui/select"
+import { FairDoCodeGenerator } from "@/lib/generators/common"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "./ui/select"
 import { alertStore } from "@/lib/stores/alert-store"
 
 /**
@@ -24,25 +30,29 @@ export function OutputPane() {
     const [, copy] = useCopyToClipboard()
     const alert = useStore(alertStore, (s) => s.alert)
 
-    let codeGenerator = useRef<FairDoCodeGenerator>(
+    const [codeGenerator, setCodeGenerator] = useState<FairDoCodeGenerator>(
         new PythonGen("PidRecordMappingPython"),
     )
-    const chooseGenerator = useCallback((value: String) => {
-        if (value === "python") {
-            codeGenerator.current = new PythonGen("PidRecordMappingPython")
-        } else if (value === "javascript") {
-            codeGenerator.current = new JsGen("PidRecordMappingJavascript")
-        }
-        generateCode()
-    }, [code])
-
-    const codeDownloader = useRef(new PythonCodeDownload())
 
     const generateCode = useCallback(() => {
         if (!workspace) return
-        const code = codeGenerator.current.workspaceToCode(workspace)
+        const code = codeGenerator.workspaceToCode(workspace)
         setCode(code)
-    }, [workspace])
+    }, [codeGenerator, workspace])
+
+    const chooseGenerator = useCallback(
+        (value: String) => {
+            if (value === "python") {
+                setCodeGenerator(new PythonGen("PidRecordMappingPython"))
+            } else if (value === "javascript") {
+                setCodeGenerator(new JsGen("PidRecordMappingJavascript"))
+            }
+            generateCode()
+        },
+        [generateCode],
+    )
+
+    const [codeDownloader] = useState(new PythonCodeDownload())
 
     useEffect(() => {
         if (!workspace) return
@@ -79,14 +89,14 @@ export function OutputPane() {
     const downloadCode = useCallback(async () => {
         try {
             setPreparingDownload(true)
-            await codeDownloader.current.downloadCodeZip(code)
+            await codeDownloader.downloadCodeZip(code)
         } catch (e) {
             console.error("Failed to download code", e)
             alert("Error", "Failed to download code", "error")
         } finally {
             setPreparingDownload(false)
         }
-    }, [alert, code])
+    }, [alert, code, codeDownloader])
 
     return (
         <div className="flex flex-col grow max-w-full">
@@ -118,21 +128,24 @@ export function OutputPane() {
                     <label
                         htmlFor="language-select"
                         className="p-2 text-muted-foreground"
-                    >Language:</label>
+                    >
+                        Language:
+                    </label>
 
                     <Select
                         defaultValue="python"
                         onValueChange={chooseGenerator}
                     >
                         <SelectTrigger className="w-full max-w-48">
-                            <SelectValue/>
+                            <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="python">Python</SelectItem>
-                            <SelectItem value="javascript">Javascript (Browser)</SelectItem>
+                            <SelectItem value="javascript">
+                                Javascript (Browser)
+                            </SelectItem>
                         </SelectContent>
                     </Select>
-
                 </div>
             </div>
             <pre className="overflow-auto grow p-2">
