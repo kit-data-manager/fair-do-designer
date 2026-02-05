@@ -24,7 +24,7 @@ import {
     saveToLocalStorage,
 } from "@/lib/serialization"
 import Link from "next/link"
-import { RecordMappingGenerator } from "@/lib/generators/python"
+import { PythonMappingGenerator } from "@/lib/generators/python"
 import { PythonCodeDownload } from "@/lib/python_code_download"
 import { useCopyToClipboard } from "usehooks-ts"
 import { ThemeToggle } from "@/components/ThemeToggle"
@@ -86,7 +86,7 @@ export function Header() {
     }, [])
 
     const codeGenerator = useRef(
-        new RecordMappingGenerator("PidRecordMappingPython"),
+        new PythonMappingGenerator("PidRecordMappingPython"),
     )
     const codeDownloader = useRef(new PythonCodeDownload())
 

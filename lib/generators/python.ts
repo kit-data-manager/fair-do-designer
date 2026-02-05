@@ -14,7 +14,7 @@ import * as Common from "./common"
  * we should not override the existing methods but write new ones
  * (possibly reusing the existing functionality).
  */
-export class RecordMappingGenerator
+export class PythonMappingGenerator
     extends PythonGenerator
     implements Common.RecordMappingGenerator
 {
