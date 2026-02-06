@@ -38,13 +38,13 @@ export default function Home() {
                     >
                         <TabsList>
                             <TabsTrigger value={"input"}>
-                                <DatabaseIcon /> Data Access
+                                <DatabaseIcon /> Input
                             </TabsTrigger>
                             <TabsTrigger value={"preview"}>
                                 <PlayIcon /> Preview
                             </TabsTrigger>
                             <TabsTrigger value={"output"}>
-                                <CodeIcon /> Generated Code
+                                <BracesIcon /> Code
                             </TabsTrigger>
                         </TabsList>
 
