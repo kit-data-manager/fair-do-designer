@@ -4,50 +4,60 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Order, PythonGenerator, pythonGenerator } from "blockly/python"
+import {
+    Order,
+    JavascriptGenerator,
+    javascriptGenerator,
+} from "blockly/javascript"
 import * as Blockly from "blockly/core"
 import * as Common from "./common"
 
 /**
- * Specialized generator for our code.
- * In order to make the basic blocks reusable and generate proper code,
- * we should not override the existing methods but write new ones
- * (possibly reusing the existing functionality).
+ * Specialized generator for generating JS code to generate records.
+ * Target runtime is the acorn interpreter (sandboxed) within the browser.
+ *
+ * The acorn interpreter does not implement newer JS features (ES6+).
+ * Translating to ES5 can be done quickly with babel or here:
+ * https://neil.fraser.name/software/JS-Interpreter/demos/babel.html
  */
-export class PythonMappingGenerator
-    extends PythonGenerator
+export class JavascriptMappingGenerator
+    extends JavascriptGenerator
     implements Common.RecordMappingGenerator
 {
-    makeJsonPointerCall(jsonPointer: string): string {
-        return `jsonpath.pointer.resolve(${jsonPointer}, executor.current_source_json)`
-    }
-    makeJsonpathCall(jsonPath: string): string {
-        return `jsonpath.findall(${jsonPath}, executor.current_source_json)`
-    }
     init(workspace: Blockly.Workspace) {
         super.init(workspace)
-        this.addReservedWords("math,random,Number")
-        Object.assign(this.forBlock, pythonGenerator.forBlock)
+        Object.assign(this.forBlock, javascriptGenerator.forBlock)
         Object.assign(this.forBlock, Common.forBlock)
-        this.definitions_["import-main"] = "import executor"
+        /* TODO
+        this.definitions_["import-main"] = "import js_executor"
         this.definitions_["import-from-main"] =
-            "from executor import RecordDesign, Executor, log"
+        "from executor import RecordDesign, Executor, log"
         this.definitions_["import-from-conditionals"] =
-            "from conditionals import *"
+        "from conditionals import *"
         this.definitions_["import-jsonpath"] = "import jsonpath"
         this.definitions_["executor"] = "EXECUTOR: Executor = Executor()"
+        this.addReservedWords("math,random,Number")
         this.addReservedWords("EXECUTOR")
         this.addReservedWords("current_source_json")
+        */
     }
 
     getOrderAtomic(): number {
         return Order.ATOMIC
     }
     getOrderCollection(): number {
-        return Order.COLLECTION
+        return Order.MEMBER
     }
     getOrderNone(): number {
         return Order.NONE
+    }
+
+    makeJsonPointerCall(jsonPointer: string): string {
+        return `jsonpointer.get(executor.current_source_json, ${jsonPointer});`
+    }
+
+    makeJsonpathCall(jsonpath: string): string {
+        return `jsonpath.get(executor.current_source_json, ${jsonpath});`
     }
 
     makeAddAttributeChainCall(key: string, value: string): string {

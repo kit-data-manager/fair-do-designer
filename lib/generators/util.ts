@@ -1,4 +1,7 @@
-import * as Blockly from "blockly/core";
+/**
+ * Utility functions for code generators.
+ */
+import * as HmcProfile from "../blocks/hmc_profile"
 
 /**
  *
@@ -23,34 +26,22 @@ export function getPidByPrefixMap(
   return undefined;
 }
 
-export interface RecordMappingGenerator {
-  /**
-   * Generates a chain call to set the ID for a record or entity.
-   * @param id The identifier to be set
-   * @returns A string representing the chain call, e.g., ".setId('myId')"
-   */
-  makeSetIDChainCall(id: string): string;
-  /**
-   * Generates a chain call to add an attribute key-value pair to a record or entity.
-   * @param key The attribute name or identifier
-   * @param value The value to be associated with the key
-   * @returns A string representing the chain call, e.g., ".add('name', 'value')"
-   */
-  makeAddAttributeChainCall(key: string, value: string): string;
-  /**
-   * Generates a line comment in the target programming language.
-   * @param text The comment text to be included
-   * @returns A formatted comment string according to the language syntax
-   */
-  makeLineComment(text: string): string;
-  /**
-   * Prefixes given lines only if the test contains relevant code,
-   * i.e. the text is not empty and is not just an empty string
-   * within the target language
-   * @param text the lines to prefix
-   * @param prefix the prefix to prepent to each line
-   */
-  prefixNonemptyLines(text: string, prefix: string): string;
+// Type guard for HmcBlock interface
+export function isHmcBlock(obj: unknown): obj is HmcProfile.HMCBlock {
+    return (
+        obj !== null &&
+        typeof obj === "object" &&
+        "profileAttributeKey" in obj &&
+        typeof obj.profileAttributeKey === "string" &&
+        "profile" in obj &&
+        typeof obj.profile === "object" &&
+        typeof obj.profile === "object" &&
+        obj.profile != undefined &&
+        "identifier" in obj.profile &&
+        typeof obj.profile.identifier === "string" &&
+        "inputList" in obj &&
+        Array.isArray(obj.inputList) &&
+        "extractPidFromProperty" in obj &&
+        typeof obj.extractPidFromProperty === "function"
+    )
 }
-export type FairDoCodeGenerator = RecordMappingGenerator &
-  Blockly.CodeGenerator;
