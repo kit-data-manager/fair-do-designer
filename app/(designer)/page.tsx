@@ -13,6 +13,7 @@ import {
 import { CodeIcon, DatabaseIcon } from "lucide-react"
 import { Header } from "@/components/Header"
 import { RemoteDesignImport } from "@/components/RemoteDesignImport"
+import { AlertManager } from "@/components/AlertManager"
 
 export default function Home() {
     const [tab, setTab] = useState("input")
@@ -20,6 +21,7 @@ export default function Home() {
     return (
         <div className="h-screen w-screen">
             <RemoteDesignImport />
+            <AlertManager />
 
             <ResizablePanelGroup direction={"horizontal"}>
                 <ResizablePanel defaultSize={70} className={"flex flex-col"}>

@@ -24,8 +24,6 @@ import {
     saveToLocalStorage,
 } from "@/lib/serialization"
 import Link from "next/link"
-import { RecordMappingGenerator } from "@/lib/generators/python"
-import { PythonCodeDownload } from "@/lib/python_code_download"
 import { useCopyToClipboard } from "usehooks-ts"
 import { ThemeToggle } from "@/components/ThemeToggle"
 import { Button } from "@/components/ui/button"
@@ -36,6 +34,12 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog"
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { useCodeDownloader, useCodeGenerator } from "@/lib/hooks"
 
 export function Header() {
     const designName = useStore(workspaceStore, (s) => s.designName)
@@ -80,20 +84,18 @@ export function Header() {
         }
     }, [])
 
-    const codeGenerator = useRef(
-        new RecordMappingGenerator("PidRecordMappingPython"),
-    )
-    const codeDownloader = useRef(new PythonCodeDownload())
+    const codeGenerator = useCodeGenerator()
+    const codeDownloader = useCodeDownloader()
 
     const exportCode = useCallback(() => {
-        const code = codeGenerator.current.workspaceToCode(workspace)
-        codeDownloader.current.downloadCodeZip(code).then()
-    }, [workspace])
+        const code = codeGenerator.workspaceToCode(workspace)
+        codeDownloader.downloadCodeZip(code).then()
+    }, [codeDownloader, codeGenerator, workspace])
 
     const copyCodeSnippet = useCallback(() => {
-        const code = codeGenerator.current.workspaceToCode(workspace)
+        const code = codeGenerator.workspaceToCode(workspace)
         copy(code).then()
-    }, [copy, workspace])
+    }, [codeGenerator, copy, workspace])
 
     const undo = useCallback(() => {
         workspace?.undo(false)
@@ -149,12 +151,30 @@ export function Header() {
 
             <Menubar>
                 <div className="flex justify-center items-center mr-1">
-                    <Button size="menubar" variant="ghost" onClick={undo}>
-                        <UndoIcon />
-                    </Button>
-                    <Button size="menubar" variant="ghost" onClick={redo}>
-                        <RedoIcon />
-                    </Button>
+                    <Tooltip delayDuration={700}>
+                        <TooltipTrigger asChild>
+                            <Button
+                                size="menubar"
+                                variant="ghost"
+                                onClick={undo}
+                            >
+                                <UndoIcon />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Undo</TooltipContent>
+                    </Tooltip>
+                    <Tooltip delayDuration={700}>
+                        <TooltipTrigger asChild>
+                            <Button
+                                size="menubar"
+                                variant="ghost"
+                                onClick={redo}
+                            >
+                                <RedoIcon />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Redo</TooltipContent>
+                    </Tooltip>
                 </div>
 
                 <MenubarMenu>

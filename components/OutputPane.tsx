@@ -1,14 +1,21 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
-import { RecordMappingGenerator } from "@/lib/generators/python"
 import { useStore } from "zustand/react"
 import { workspaceStore } from "@/lib/stores/workspace"
 import * as Blockly from "blockly"
 import { Button } from "@/components/ui/button"
 import { useCopyToClipboard } from "usehooks-ts"
 import { CheckIcon, LoaderCircle } from "lucide-react"
-import { PythonCodeDownload } from "@/lib/python_code_download"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "./ui/select"
+import { alertStore } from "@/lib/stores/alert-store"
+import { useCodeDownloader, useCodeGenerator } from "@/lib/hooks"
 
 /**
  * Runs the code generator and shows the result
@@ -16,19 +23,30 @@ import { PythonCodeDownload } from "@/lib/python_code_download"
  */
 export function OutputPane() {
     const workspace = useStore(workspaceStore, (s) => s.workspace)
+    const setCodeGenerator = useStore(workspaceStore, (s) => s.setCodeGenerator)
     const [code, setCode] = useState("")
     const [, copy] = useCopyToClipboard()
+    const alert = useStore(alertStore, (s) => s.alert)
 
-    const codeGenerator = useRef(
-        new RecordMappingGenerator("PidRecordMappingPython"),
-    )
-    const codeDownloader = useRef(new PythonCodeDownload())
+    const codeGeneratorInstance = useCodeGenerator()
+    const codeDownloader = useCodeDownloader()
 
     const generateCode = useCallback(() => {
         if (!workspace) return
-        const code = codeGenerator.current.workspaceToCode(workspace)
+        const code = codeGeneratorInstance.workspaceToCode(workspace)
         setCode(code)
-    }, [workspace])
+    }, [codeGeneratorInstance, workspace])
+
+    const chooseGenerator = useCallback(
+        (value: String) => {
+            if (value === "python") {
+                setCodeGenerator("python")
+            } else if (value === "javascript") {
+                setCodeGenerator("javascript")
+            }
+        },
+        [setCodeGenerator],
+    )
 
     useEffect(() => {
         if (!workspace) return
@@ -65,14 +83,14 @@ export function OutputPane() {
     const downloadCode = useCallback(async () => {
         try {
             setPreparingDownload(true)
-            await codeDownloader.current.downloadCodeZip(code)
+            await codeDownloader.downloadCodeZip(code)
         } catch (e) {
             console.error("Failed to download code", e)
-            alert("Failed to download code")
+            alert("Error", "Failed to download code", "error")
         } finally {
             setPreparingDownload(false)
         }
-    }, [code])
+    }, [alert, code, codeDownloader])
 
     return (
         <div className="flex flex-col grow max-w-full">
@@ -100,8 +118,28 @@ export function OutputPane() {
                         "Download Generated Code"
                     )}
                 </Button>
-                <div className="p-1 text-muted-foreground">
-                    Language: Python
+                <div className="flex items-center">
+                    <label
+                        htmlFor="language-select"
+                        className="p-2 text-muted-foreground"
+                    >
+                        Language:
+                    </label>
+
+                    <Select
+                        defaultValue="python"
+                        onValueChange={chooseGenerator}
+                    >
+                        <SelectTrigger className="w-full max-w-48">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="python">Python</SelectItem>
+                            <SelectItem value="javascript">
+                                Javascript (Browser)
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
             </div>
             <pre className="overflow-auto grow p-2">

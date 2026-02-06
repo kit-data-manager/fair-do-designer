@@ -71,13 +71,21 @@ export function Entry({
                 {isInViewport && (
                     <Fragment>
                         <div className="flex items-center gap-1 mr-2">
-                            <Button
-                                onClick={onSelfClick}
-                                variant="ghost"
-                                className="shrink-0 p-0 text-muted-foreground h-5.5"
-                            >
-                                <ArrowLeft />
-                            </Button>
+                            <Tooltip delayDuration={700}>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        onClick={onSelfClick}
+                                        variant="ghost"
+                                        className="shrink-0 p-0 text-muted-foreground h-5.5"
+                                    >
+                                        <ArrowLeft />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    Add to Design (also possible with
+                                    drag-and-drop)
+                                </TooltipContent>
+                            </Tooltip>
                             <AvailabilityScale
                                 total={totalDocuments}
                                 current={entry.timesObserved}
