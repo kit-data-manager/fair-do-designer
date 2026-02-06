@@ -13,7 +13,7 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "./ui/select"
+} from "@/components/ui/select"
 import { alertStore } from "@/lib/stores/alert-store"
 import { useCodeDownloader, useCodeGenerator } from "@/lib/hooks"
 
@@ -121,7 +121,7 @@ export function OutputPane() {
                 <div className="flex items-center">
                     <label
                         htmlFor="language-select"
-                        className="p-2 text-muted-foreground"
+                        className="p-2 text-muted-foreground text-sm"
                     >
                         Language:
                     </label>
