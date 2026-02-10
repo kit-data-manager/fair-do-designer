@@ -44,6 +44,10 @@
   --color-success: var(--success);
   --color-info: var(--info);
   --color-warn: var(--warn);
+  --color-record: var(--record);
+  --color-record-foreground: var(--primary-foreground);
+  --color-profile: var(--profile);
+  --color-profile-foreground: var(--primary-foreground);
 }
 
 body {
@@ -163,6 +167,8 @@ g > image.red-icon {
   --success: rgb(63, 197, 112);
   --info: rgb(58, 83, 196);
   --warn: rgb(237, 123, 9);
+  --record: #a55ba5;
+  --profile: #5b67a5;
 }
 
 /*---break---*/

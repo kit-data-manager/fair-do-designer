@@ -8,8 +8,8 @@ import { ErrorDisplay } from "@/components/ErrorDisplay"
 
 export function PIDRecordDisplay({ record }: { record: PIDRecord }) {
     return (
-        <div className="rounded-md border shadow-xs">
-            <div className="bg-blue-500/30 p-2 rounded-t-md truncate">
+        <div className="rounded-md shadow-xs bg-profile text-profile-foreground">
+            <div className="bg-record text-record-foreground border-b border-white/20 p-2 rounded-t-md truncate">
                 <div>PID: {record.pid}</div>
                 <div className="text-xs">Input Document: doc.example</div>
             </div>
@@ -48,7 +48,7 @@ export function PIDRecordEntry({
 
     return (
         <div className="contents">
-            <div className="p-2 border-b border-r truncate font-medium text-sm text-right h-full w-full">
+            <div className="p-2 border-b border-r border-white/20 truncate font-medium text-sm text-right h-full w-full">
                 {keyPIDDataTypeIsLoading ? (
                     <Skeleton className="h-6 w-56" />
                 ) : keyPIDDataType ? (
@@ -62,7 +62,7 @@ export function PIDRecordEntry({
                     className="mt-1 bg-destructive/40"
                 />
             </div>
-            <div className="border-b p-2 truncate h-full w-full text-sm">
+            <div className="border-b border-white/20 p-2 truncate h-full w-full text-sm">
                 <div>{value}</div>
             </div>
         </div>
