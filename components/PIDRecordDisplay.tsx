@@ -50,7 +50,9 @@ export function PIDRecordEntry({
         <div className="contents">
             <div className="p-2 border-b border-r border-white/20 truncate font-medium text-sm text-right h-full w-full">
                 {keyPIDDataTypeIsLoading ? (
-                    <Skeleton className="h-6 w-56" />
+                    <div className="flex justify-end items-center h-full">
+                        <Skeleton className="bg-profile-foreground/50 h-2 w-24" />
+                    </div>
                 ) : keyPIDDataType ? (
                     <div>{camelToTitleCase(keyPIDDataType.name)}</div>
                 ) : (

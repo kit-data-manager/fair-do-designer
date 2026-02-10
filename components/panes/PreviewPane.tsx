@@ -26,6 +26,10 @@ const exampleRecords: PIDRecord[] = [
                 key: "21.T11148/b8457812905b83046284",
                 value: "https://location.com",
             },
+            {
+                key: "21.T11148/aafd5fb4c7222e2d950a",
+                value: "10.02.2026",
+            },
         ],
     },
     {
@@ -141,7 +145,8 @@ export function PreviewPane() {
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="outline">
-                                <DatabaseIcon /> Choose Documents
+                                <DatabaseIcon /> Choose Documents (
+                                {selectedDocuments.length}/{documents.length})
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
