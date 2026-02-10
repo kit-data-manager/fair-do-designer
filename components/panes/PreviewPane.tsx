@@ -16,7 +16,7 @@ const exampleRecords: PIDRecord[] = [
         pid: "12345",
         record: [
             {
-                key: "21.DigitalObjectType",
+                key: "21.T11148/1c699a5d1b4ad3ba4956",
                 value: "application/json",
             },
             {

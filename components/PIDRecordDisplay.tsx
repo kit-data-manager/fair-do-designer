@@ -1,4 +1,7 @@
 import { PIDRecord } from "@/lib/types"
+import { useCallback } from "react"
+import { PID } from "@kit-data-manager/pid-component"
+import useSWR from "swr"
 
 export function PIDRecordDisplay({ record }: { record: PIDRecord }) {
     return (
@@ -26,6 +29,21 @@ export function PIDRecordEntry({
     entryKey: string
     value: string
 }) {
+    const resolveKeyPID = useCallback(async (key: string) => {
+        if (PID.isPID(key)) {
+            const pid = PID.getPIDFromString(key)
+            return await pid.resolve()
+        }
+    }, [])
+
+    const {
+        data: keyPIDRecord,
+        isLoading: keyPIDRecordIsLoading,
+        error: keyPIDRecordError,
+    } = useSWR(entryKey, resolveKeyPID)
+
+    console.log(keyPIDRecord)
+
     return (
         <div>
             <div>{entryKey}</div>
