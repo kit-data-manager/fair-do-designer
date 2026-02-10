@@ -20,7 +20,7 @@ const exampleRecords: PIDRecord[] = [
                 value: "application/json",
             },
             {
-                key: "21.DigitalObjectLocation",
+                key: "21.T11148/b8457812905b83046284",
                 value: "https://location.com",
             },
         ],
@@ -29,11 +29,11 @@ const exampleRecords: PIDRecord[] = [
         pid: "67",
         record: [
             {
-                key: "21.DigitalObjectType",
+                key: "21.T11148/1c699a5d1b4ad3ba4956",
                 value: "text/plain",
             },
             {
-                key: "21.DigitalObjectLocation",
+                key: "21.T11148/b8457812905b83046284",
                 value: "https://example.org",
             },
         ],
@@ -42,11 +42,11 @@ const exampleRecords: PIDRecord[] = [
         pid: "123451",
         record: [
             {
-                key: "21.DigitalObjectType",
+                key: "21.T11148/1c699a5d1b4ad3ba4956",
                 value: "application/json",
             },
             {
-                key: "21.DigitalObjectLocation",
+                key: "21.T11148/b8457812905b83046284",
                 value: "https://location.com",
             },
         ],
@@ -55,11 +55,11 @@ const exampleRecords: PIDRecord[] = [
         pid: "671",
         record: [
             {
-                key: "21.DigitalObjectType",
+                key: "21.T11148/1c699a5d1b4ad3ba4956",
                 value: "text/plain",
             },
             {
-                key: "21.DigitalObjectLocation",
+                key: "21.T11148/b8457812905b83046284",
                 value: "https://example.org",
             },
         ],
@@ -68,11 +68,11 @@ const exampleRecords: PIDRecord[] = [
         pid: "123452",
         record: [
             {
-                key: "21.DigitalObjectType",
+                key: "21.T11148/1c699a5d1b4ad3ba4956",
                 value: "application/json",
             },
             {
-                key: "21.DigitalObjectLocation",
+                key: "21.T11148/b8457812905b83046284",
                 value: "https://location.com",
             },
         ],
@@ -81,11 +81,11 @@ const exampleRecords: PIDRecord[] = [
         pid: "672",
         record: [
             {
-                key: "21.DigitalObjectType",
+                key: "21.T11148/1c699a5d1b4ad3ba4956",
                 value: "text/plain",
             },
             {
-                key: "21.DigitalObjectLocation",
+                key: "21.T11148/b8457812905b83046284",
                 value: "https://example.org",
             },
         ],

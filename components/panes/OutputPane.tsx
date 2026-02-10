@@ -86,7 +86,7 @@ export function OutputPane() {
             await codeDownloader.downloadCodeZip(code)
         } catch (e) {
             console.error("Failed to download code", e)
-            alert("Error", "Failed to download code", "error")
+            alert("ErrorDisplay", "Failed to download code", "error")
         } finally {
             setPreparingDownload(false)
         }

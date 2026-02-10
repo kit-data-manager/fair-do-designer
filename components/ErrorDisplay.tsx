@@ -1,19 +1,23 @@
 import { CircleAlert, TriangleAlert, XIcon } from "lucide-react"
 import { PropsWithChildren, useMemo } from "react"
 
-function cn(size?: "md" | "xl") {
+function cn(size?: "md" | "xl" | "sm") {
     if (!size || size == "md") {
         return "text-destructive-foreground bg-destructive rounded p-2 flex items-center text-sm"
-    } else {
+    } else if (size == "xl") {
         return "text-destructive-foreground bg-destructive rounded p-4 flex items-center text-xl"
+    } else {
+        return "text-destructive-foreground bg-destructive rounded p-1 flex items-center text-xs"
     }
 }
 
-function cnIcon(size?: "md" | "xl") {
+function cnIcon(size?: "md" | "xl" | "sm") {
     if (!size || size == "md") {
         return "size-4 mr-2 shrink-0"
-    } else {
+    } else if (size == "xl") {
         return "w-8 h-8 mr-4 shrink-0"
+    } else {
+        return "size-3 mr-1 shrink-0"
     }
 }
 
@@ -29,7 +33,7 @@ export function handleError(e: unknown) {
     else return JSON.stringify(e)
 }
 
-export function Error(
+export function ErrorDisplay(
     props: (
         | {
               title?: string
@@ -38,7 +42,7 @@ export function Error(
           }
         | PropsWithChildren
     ) & {
-        size?: "md" | "xl"
+        size?: "md" | "xl" | "sm"
         className?: string
         warn?: boolean
         onClear?: () => void
