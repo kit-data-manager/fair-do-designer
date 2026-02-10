@@ -9,8 +9,9 @@ import { ErrorDisplay } from "@/components/ErrorDisplay"
 export function PIDRecordDisplay({ record }: { record: PIDRecord }) {
     return (
         <div className="rounded-md border shadow-xs">
-            <div className="bg-blue-500/30 p-2 rounded-t-md">
-                PID: {record.pid}
+            <div className="bg-blue-500/30 p-2 rounded-t-md truncate">
+                <div>PID: {record.pid}</div>
+                <div className="text-xs">Input Document: doc.example</div>
             </div>
             <div className="grid grid-cols-2">
                 {record.record.map((entry) => (

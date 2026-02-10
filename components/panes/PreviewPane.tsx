@@ -1,14 +1,17 @@
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectSeparator,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
-import { LoaderCircleIcon } from "lucide-react"
+import { DatabaseIcon, LoaderCircleIcon } from "lucide-react"
 import { PIDRecord } from "@/lib/types"
 import { PIDRecordDisplay } from "@/components/PIDRecordDisplay"
+import {
+    DropdownMenu,
+    DropdownMenuCheckboxItem,
+    DropdownMenuContent,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Button } from "@/components/ui/button"
+import { useStore } from "zustand/react"
+import { dataSourcePickerStore } from "@/lib/stores/data-source-picker-store"
+import { useCallback, useMemo, useState } from "react"
 
 // Please generate some example PID records for me
 const exampleRecords: PIDRecord[] = [
@@ -93,6 +96,38 @@ const exampleRecords: PIDRecord[] = [
 ]
 
 export function PreviewPane() {
+    const unifier = useStore(dataSourcePickerStore, (s) => s.unifier)
+    const totalDocumentCount = useStore(
+        dataSourcePickerStore,
+        (s) => s.totalDocumentCount,
+    )
+    const documents = useMemo(() => {
+        return unifier
+            .getDocuments()
+            .slice(0, totalDocumentCount)
+            .map((d) => d.name)
+    }, [unifier, totalDocumentCount])
+
+    const [selectedDocuments, setSelectedDocuments] = useState<string[]>([])
+
+    const toggleSelectDocument = useCallback(
+        (doc: string) => {
+            setSelectedDocuments((prev) => {
+                if (!prev.includes(doc))
+                    return [...prev.filter((d) => documents.includes(d)), doc]
+                else return [...prev.filter((d) => d !== doc)]
+            })
+        },
+        [documents],
+    )
+
+    const toggleSelectAllDocuments = useCallback(() => {
+        setSelectedDocuments((prev) => {
+            if (prev.length === documents.length) return []
+            else return [...documents]
+        })
+    }, [documents])
+
     return (
         <div className="min-h-0 w-full justify-stretch flex flex-col">
             <div className="p-2 bg-muted w-full flex flex-wrap gap-2">
@@ -103,20 +138,36 @@ export function PreviewPane() {
                     >
                         Input:
                     </label>
-                    <Select>
-                        <SelectTrigger id={"preview-document-select"}>
-                            <SelectValue placeholder={"Select a Document"} />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value={"doc0"}>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline">
+                                <DatabaseIcon /> Choose Documents
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <DropdownMenuCheckboxItem
+                                onClick={toggleSelectAllDocuments}
+                                checked={
+                                    selectedDocuments.length ===
+                                    documents.length
+                                }
+                                onSelect={(e) => e.preventDefault()}
+                            >
                                 All Documents
-                            </SelectItem>
-                            <SelectSeparator />
-                            <SelectItem value={"doc1"}>Document 1</SelectItem>
-                            <SelectItem value={"doc2"}>Document 2</SelectItem>
-                            <SelectItem value={"doc3"}>Document 3</SelectItem>
-                        </SelectContent>
-                    </Select>
+                            </DropdownMenuCheckboxItem>
+                            <DropdownMenuSeparator />
+                            {documents.map((d) => (
+                                <DropdownMenuCheckboxItem
+                                    key={d}
+                                    checked={selectedDocuments.includes(d)}
+                                    onClick={() => toggleSelectDocument(d)}
+                                    onSelect={(e) => e.preventDefault()}
+                                >
+                                    {d}
+                                </DropdownMenuCheckboxItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
                 <div className="flex items-center justify-center gap-2">
                     <LoaderCircleIcon className="size-4 animate-spin" />
