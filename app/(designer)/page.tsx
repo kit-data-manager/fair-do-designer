@@ -1,8 +1,8 @@
 "use client"
 
 import { Workspace } from "@/components/Workspace"
-import { OutputPane } from "@/components/OutputPane"
-import { InputPane } from "@/components/InputPane"
+import { OutputPane } from "@/components/panes/OutputPane"
+import { InputPane } from "@/components/panes/InputPane"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useState } from "react"
 import {
@@ -10,10 +10,11 @@ import {
     ResizablePanel,
     ResizablePanelGroup,
 } from "@/components/ui/resizable"
-import { CodeIcon, DatabaseIcon } from "lucide-react"
+import { BracesIcon, DatabaseIcon, PlayIcon } from "lucide-react"
 import { Header } from "@/components/Header"
 import { RemoteDesignImport } from "@/components/RemoteDesignImport"
 import { AlertManager } from "@/components/AlertManager"
+import { PreviewPane } from "@/components/panes/PreviewPane"
 
 export default function Home() {
     const [tab, setTab] = useState("input")
@@ -37,10 +38,13 @@ export default function Home() {
                     >
                         <TabsList>
                             <TabsTrigger value={"input"}>
-                                <DatabaseIcon /> Data Access
+                                <DatabaseIcon /> Input
+                            </TabsTrigger>
+                            <TabsTrigger value={"preview"}>
+                                <PlayIcon /> Preview
                             </TabsTrigger>
                             <TabsTrigger value={"output"}>
-                                <CodeIcon /> Generated Code
+                                <BracesIcon /> Code
                             </TabsTrigger>
                         </TabsList>
 
@@ -53,6 +57,17 @@ export default function Home() {
                             forceMount
                         >
                             <InputPane />
+                        </TabsContent>
+
+                        <TabsContent
+                            className={
+                                "min-h-0 max-h-full flex " +
+                                (tab === "preview" ? "" : "hidden")
+                            }
+                            value={"preview"}
+                            forceMount
+                        >
+                            <PreviewPane />
                         </TabsContent>
 
                         <TabsContent

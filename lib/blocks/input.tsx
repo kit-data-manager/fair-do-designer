@@ -73,7 +73,11 @@ export const input_json_pointer: InputJsonPointer = {
                 if (!result || result.length === 0)
                     alertStore
                         .getState()
-                        .alert("Error", "The query returned no result", "error")
+                        .alert(
+                            "ErrorDisplay",
+                            "The query returned no result",
+                            "error",
+                        )
                 else {
                     alertStore.getState().alert(
                         "Results",
