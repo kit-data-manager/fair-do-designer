@@ -86,7 +86,7 @@ export class JavascriptMappingGenerator
     }
 
     makeLineComment(text: string): string {
-        return this.prefixLines(`${text}\n`, "# ")
+        return this.prefixLines(`${text}\n`, "// ")
     }
 
     prefixNonemptyLines(text: string, prefix: string): string {
