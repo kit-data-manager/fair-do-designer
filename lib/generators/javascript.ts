@@ -73,13 +73,13 @@ export class JavascriptMappingGenerator
         if (value.startsWith("BackwardLinkFor(")) {
             return `.addAttribute(${key}, ${value})\n`
         } else {
-            return `.addAttribute(${key}, lambda: ${value})\n`
+            return `.addAttribute(${key}, ${this.makeLambda(value)})\n`
         }
     }
 
     makeSetIDChainCall(id: string): string {
         if (!isEmptyPythonString(id)) {
-            return `.setId(lambda: ${id})\n`
+            return `.setId(${this.makeLambda(id)})\n`
         } else {
             return ""
         }
