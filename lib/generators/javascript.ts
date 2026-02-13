@@ -25,22 +25,56 @@ export class JavascriptMappingGenerator
     extends JavascriptGenerator
     implements Common.RecordMappingGenerator
 {
-    init(workspace: Blockly.Workspace) {
-        super.init(workspace)
+    constructor(name: string) {
+        super(name)
         Object.assign(this.forBlock, javascriptGenerator.forBlock)
         Object.assign(this.forBlock, Common.forBlock)
+
+        Object.keys(this.forBlock).forEach((key) => {
+            if (without_trace.includes(key)) {
+                return
+            }
+            let oldFunc = this.forBlock[key]
+            this.forBlock[key] = function (
+                block: Blockly.Block,
+                generator /*: this*/,
+            ) {
+                let result = oldFunc.call(this, block, generator)
+                if (result == null) {
+                    return `trace_block("${block.id}", () => null)`
+                } else if (typeof result === "string") {
+                    return `trace_block("${block.id}", () => ${result})`
+                } else {
+                    result[0] = `trace_block("${block.id}", () => ${result[0]})`
+                    return result
+                }
+            }
+        })
+        //console.log("Key in forBlock: ", Object.keys(this.forBlock))
+    }
+
+    /**
+     * Hook for code to run before code generation starts.
+     * Subclasses may override this, e.g. to initialise the database of variable
+     * names.
+     *
+     * @param _workspace Workspace to generate code from.
+     */
+    init(workspace: Blockly.Workspace) {
+        super.init(workspace)
         /* TODO
+        this.definitions_["boilerplate"] = `TODO add executor, error handling code, ...`
         this.definitions_["import-main"] = "import js_executor"
         this.definitions_["import-from-main"] =
         "from executor import RecordDesign, Executor, log"
         this.definitions_["import-from-conditionals"] =
         "from conditionals import *"
         this.definitions_["import-jsonpath"] = "import jsonpath"
-        this.definitions_["executor"] = "EXECUTOR: Executor = Executor()"
         this.addReservedWords("math,random,Number")
-        this.addReservedWords("EXECUTOR")
-        this.addReservedWords("current_source_json")
         */
+       this.definitions_["executor"] = "const EXECUTOR: Executor = new Executor()"
+       this.addReservedWords("current_source_json")
+       this.addReservedWords("EXECUTOR")
     }
 
     getOrderAtomic(): number {
@@ -107,3 +141,23 @@ export class JavascriptMappingGenerator
 function isEmptyJavascriptString(s: string): boolean {
     return s == null || false || s.length <= 0 || s == "``" || s == '""' || s == "''"
 }
+
+const without_trace = [
+    // use `console.log("Key in forBlock: ", Object.keys(this.forBlock))` in the constructor
+    // to get an up-to-date list of all available block types.
+    // --------------------------------------------------------------------------------------
+    "pidrecord",
+    "pidrecord_skipable",
+    "attribute_key",
+    //"input_json_pointer",
+    //"input_jsonpath",
+    //"input_custom_json_path",
+    //"input_custom_json",
+    //"input_custom_json_pointer",
+    "profile_hmc",
+    //"stop_design",
+    //"log_value",
+    //"otherwise",
+    //"backlink_declaration",
+    "profile_hmc_reference_block",
+]
