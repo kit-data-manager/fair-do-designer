@@ -54,11 +54,11 @@ export class JavascriptMappingGenerator
     }
 
     makeJsonPointerCall(jsonPointer: string): string {
-        return `jsonpointer.get(executor.current_source_json, ${jsonPointer});`
+        return `jsonpointer.get(executor.current_source_json, ${jsonPointer})`
     }
 
     makeJsonpathCall(jsonpath: string): string {
-        return `jsonpath.get(executor.current_source_json, ${jsonpath});`
+        return `jsonpath.get(executor.current_source_json, ${jsonpath})`
     }
 
     makeLambda(body: string): string {
