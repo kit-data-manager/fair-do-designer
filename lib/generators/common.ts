@@ -66,6 +66,11 @@ export interface BlocklyGenerator {
 
 export interface RecordMappingGenerator {
   /**
+   * Generates a parameter-less lambda function in the target language with the provided body.
+   * @param body The code to be included in the body of the lambda function
+   */
+  makeLambda(body: string): string
+  /**
    * Generates a chain call to set the ID for a record or entity.
    * @param id The identifier to be set
    * @returns A string representing the chain call, e.g., ".setId('myId')"
@@ -154,7 +159,7 @@ function genericRecord(
         value_skip_condition && value_skip_condition.trim() != ""
     if (hasCondition) {
         code += generator.prefixNonemptyLines(
-            `.setSkipCondition(lambda: ${value_skip_condition})\n`,
+            `.setSkipCondition(${generator.makeLambda(value_skip_condition)})\n`,
             generator.INDENT,
         )
     }
@@ -283,7 +288,7 @@ forBlock["otherwise"] = function(
 ) {
     const value_value = generator.valueToCode(block, "VALUE", generator.getOrderAtomic())
     const value_other = generator.valueToCode(block, "OTHER", generator.getOrderAtomic())
-    const code = `otherwise(lambda: ${value_value}, lambda: ${value_other})\n`
+    const code = `otherwise(${generator.makeLambda(value_value)}, ${generator.makeLambda(value_other)})\n`
     return [code, generator.getOrderNone()]
 }
 

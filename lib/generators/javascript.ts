@@ -60,6 +60,10 @@ export class JavascriptMappingGenerator
         return `jsonpath.get(executor.current_source_json, ${jsonpath});`
     }
 
+    makeLambda(body: string): string {
+        return `() => ${body}`
+    }
+
     makeAddAttributeChainCall(key: string, value: string): string {
         if (value.startsWith("BackwardLinkFor(")) {
             return `.addAttribute(${key}, ${value})\n`
