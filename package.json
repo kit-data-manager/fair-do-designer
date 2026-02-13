@@ -3,6 +3,7 @@
   "version": "0.0.1-preview",
   "license": "Apache-2.0",
   "scripts": {
+    "prebuild": "bunx --bun tsc -p tsconfig.js-boilerplate.json",
     "dev": "bun --bun next dev --turbopack",
     "build": "bun --bun next build --turbopack",
     "start": "bunx --bun serve@latest out",
