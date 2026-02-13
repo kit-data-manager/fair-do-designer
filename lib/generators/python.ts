@@ -54,6 +54,10 @@ export class PythonMappingGenerator
         return `lambda: ${body}`
     }
 
+    makeNewInstanceCall(className: string, args: string[]): string {
+        return `${className}(${args.join(", ")})`
+    }
+
     makeAddAttributeChainCall(key: string, value: string): string {
         if (value.startsWith("BackwardLinkFor(")) {
             return `.addAttribute(${key}, ${value})\n`

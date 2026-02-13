@@ -65,6 +65,10 @@ export class JavascriptMappingGenerator
         return `() => ${body}`
     }
 
+    makeNewInstanceCall(className: string, args: string[]): string {
+        return `new ${className}(${args.join(", ")})`
+    }
+
     makeAddAttributeChainCall(key: string, value: string): string {
         if (value.startsWith("BackwardLinkFor(")) {
             return `.addAttribute(${key}, ${value})\n`
