@@ -14,11 +14,12 @@ import * as Common from "./common"
 
 /**
  * Specialized generator for generating JS code to generate records.
- * Target runtime is the acorn interpreter (sandboxed) within the browser.
- *
- * The acorn interpreter does not implement newer JS features (ES6+).
- * Translating to ES5 can be done quickly with babel or here:
- * https://neil.fraser.name/software/JS-Interpreter/demos/babel.html
+ * Target runtime: Sandboxed interpreter (quickjs) in Browser.
+ * 
+ * This generator is intended to generate code that will output records within the
+ * FAIR DO Designer, either for preview or for direct use. This means it
+ * (or the generated code) might contain special handling, like specialized
+ * logging for communication with the designer.
  */
 export class JavascriptMappingGenerator
     extends JavascriptGenerator
