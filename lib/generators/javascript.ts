@@ -78,7 +78,7 @@ export class JavascriptMappingGenerator
     }
 
     makeSetIDChainCall(id: string): string {
-        if (!isEmptyPythonString(id)) {
+        if (!isEmptyJavascriptString(id)) {
             return `.setId(${this.makeLambda(id)})\n`
         } else {
             return ""
@@ -90,7 +90,7 @@ export class JavascriptMappingGenerator
     }
 
     prefixNonemptyLines(text: string, prefix: string): string {
-        if (isEmptyPythonString(text)) {
+        if (isEmptyJavascriptString(text)) {
             return text
         } else {
             return this.prefixLines(text, prefix)
@@ -104,6 +104,6 @@ export class JavascriptMappingGenerator
     }
 }
 
-function isEmptyPythonString(s: string): boolean {
-    return s == null || false || s.length <= 0 || s == "''" || s == '""'
+function isEmptyJavascriptString(s: string): boolean {
+    return s == null || false || s.length <= 0 || s == "``" || s == '""' || s == "''"
 }
