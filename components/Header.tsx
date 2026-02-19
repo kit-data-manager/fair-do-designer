@@ -152,7 +152,15 @@ export function Header() {
                                     kit-data-manager/fair-do-designer
                                 </a>
                             </div>
-                            <div>Contact us:</div>
+                            <div>
+                                Contact us:{" "}
+                                <a
+                                    className="underline"
+                                    href="mailto:support@datamanager.kit.edu"
+                                >
+                                    support@datamanager.kit.edu
+                                </a>
+                            </div>
                         </div>
 
                         <div>
@@ -173,8 +181,8 @@ export function Header() {
                         </div>
 
                         <div>
-                            Copyright © 2025 Karlsruhe Institute of Technology
-                            (KIT)
+                            Copyright © {new Date().getFullYear()} Karlsruhe
+                            Institute of Technology (KIT)
                         </div>
                     </div>
                 </DialogContent>
