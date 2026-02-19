@@ -9,6 +9,7 @@ import {
 } from "@/lib/data-source-picker/json-path"
 import { dataSourcePickerStore } from "@/lib/stores/data-source-picker-store"
 import { JSONValues } from "@/lib/data-source-picker/json-unifier"
+import { alertStore } from "@/lib/stores/alert-store"
 
 export interface InputJsonPointer extends Blockly.BlockSvg {
     path: PathSegment[]
@@ -69,24 +70,44 @@ export const input_json_pointer: InputJsonPointer = {
             text: "Execute Query",
             callback: () => {
                 const result = this.executeQuery()
-                if (!result) alert("The query returned no result")
-                else
-                    alert(
-                        `The query returned results on ${result.length} documents:\n  - ` +
-                            result
-                                .map(([name, value]) => name + ": " + value)
-                                .join("\n  - "),
+                if (!result || result.length === 0)
+                    alertStore
+                        .getState()
+                        .alert("Error", "The query returned no result", "error")
+                else {
+                    alertStore.getState().alert(
+                        "Results",
+                        <div>
+                            <div className="mb-4">
+                                The query returned results on {result.length}{" "}
+                                documents:
+                            </div>
+                            <div>
+                                {result.map(([name, value], i) => (
+                                    <div key={i} className="mb-2">
+                                        <span className="text-primary">
+                                            {name}
+                                        </span>
+                                        {": " + value}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>,
                     )
+                }
             },
             enabled: true,
         })
         menu.splice(0, 0, {
             text: "Edit Label",
-            callback: () => {
-                const result = prompt(
-                    "⭐️ Enter the new Label below:",
-                    this.getField("DISPLAY_QUERY")?.getValue() ?? "",
-                )
+            callback: async () => {
+                const result = await alertStore
+                    .getState()
+                    .prompt(
+                        "Edit Label",
+                        "Enter the new Label below:",
+                        this.getField("DISPLAY_QUERY")?.getValue() ?? "",
+                    )
                 if (result) {
                     this.updateQuery(this.path, result)
                 }
@@ -95,11 +116,14 @@ export const input_json_pointer: InputJsonPointer = {
         })
         menu.splice(0, 0, {
             text: "Edit Query",
-            callback: () => {
-                const result = prompt(
-                    "⭐️ Enter the new Query below:",
-                    this.getField("QUERY")?.getValue() ?? "",
-                )
+            callback: async () => {
+                const result = await alertStore
+                    .getState()
+                    .prompt(
+                        "Edit Query",
+                        "Enter the new Query below:",
+                        this.getField("QUERY")?.getValue() ?? "",
+                    )
                 if (result) {
                     const pathSegments = pointerToPathSegments(result)
                     this.updateQuery(pathSegments)
@@ -111,9 +135,13 @@ export const input_json_pointer: InputJsonPointer = {
         menu.splice(0, 0, {
             text: "Show full Query",
             callback: () => {
-                alert(
-                    this.getField("QUERY")?.getValue() ?? "Failed to get query",
-                )
+                alertStore
+                    .getState()
+                    .alert(
+                        "Full Query",
+                        this.getField("QUERY")?.getValue() ??
+                            "Failed to get query",
+                    )
             },
             enabled: true,
         })
