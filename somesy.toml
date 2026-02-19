@@ -1,6 +1,6 @@
 [project]
 name = "fair-do-designer"
-version = "0.0.1-preview"
+version = "0.10.0-preview"
 description = "A client-side web application to generate code for generating PID Records for FAIR DOs."
 license = "Apache-2.0"
 repository = "https://github.com/kit-data-manager/fair-do-designer"

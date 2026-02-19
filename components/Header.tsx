@@ -36,6 +36,8 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog"
+import { version } from "@/package.json"
+import Image from "next/image"
 import {
     Tooltip,
     TooltipContent,
@@ -51,6 +53,8 @@ export function Header() {
     const [nameInputValue, setNameInputValue] = useState(designName)
     const [editName, setEditName] = useState(false)
     const [loadingSaveFileFailed, setLoadingSaveFileFailed] = useState(false)
+
+    const [aboutModalOpen, setAboutModalOpen] = useState(false)
 
     const [, copy] = useCopyToClipboard()
 
@@ -128,6 +132,59 @@ export function Header() {
                             a valid Design.
                         </DialogDescription>
                     </DialogHeader>
+                </DialogContent>
+            </Dialog>
+            <Dialog open={aboutModalOpen} onOpenChange={setAboutModalOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>About</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-6">
+                        <div> FAIR DO Designer v{version}</div>
+
+                        <div>
+                            <div>
+                                GitHub Repository:{" "}
+                                <a
+                                    className="underline"
+                                    href="https://github.com/kit-data-manager/fair-do-designer"
+                                >
+                                    kit-data-manager/fair-do-designer
+                                </a>
+                            </div>
+                            <div>
+                                Contact us:{" "}
+                                <a
+                                    className="underline"
+                                    href="mailto:support@datamanager.kit.edu"
+                                >
+                                    support@datamanager.kit.edu
+                                </a>
+                            </div>
+                        </div>
+
+                        <div>
+                            <Link
+                                href={"https://doi.org/10.5281/zenodo.17897665"}
+                                target={"_blank"}
+                                rel={"noopener noreferrer"}
+                            >
+                                <Image
+                                    src={
+                                        "https://zenodo.org/badge/DOI/10.5281/zenodo.17897665.svg"
+                                    }
+                                    height={20}
+                                    width={190}
+                                    alt={"10.5281/zenodo.17897666"}
+                                />
+                            </Link>
+                        </div>
+
+                        <div>
+                            Copyright © {new Date().getFullYear()} Karlsruhe
+                            Institute of Technology (KIT)
+                        </div>
+                    </div>
                 </DialogContent>
             </Dialog>
             {/* Dialogs End */}
@@ -230,6 +287,18 @@ export function Header() {
                         <Link href={"/docs/getting-started"} target={"_blank"}>
                             <MenubarItem>Getting Started</MenubarItem>
                         </Link>
+                        <MenubarSeparator />
+                        <Link
+                            href={
+                                "https://github.com/kit-data-manager/fair-do-designer/issues"
+                            }
+                            target={"_blank"}
+                        >
+                            <MenubarItem>Report a bug</MenubarItem>
+                        </Link>
+                        <MenubarItem onClick={() => setAboutModalOpen(true)}>
+                            About
+                        </MenubarItem>
                     </MenubarContent>
                 </MenubarMenu>
             </Menubar>
