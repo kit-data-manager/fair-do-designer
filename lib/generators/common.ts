@@ -66,6 +66,27 @@ export interface BlocklyGenerator {
 
 export interface RecordMappingGenerator {
   /**
+   * Configures the generator with the provided flags.
+   * This method should be called before generating code.
+   * 
+   * @param flags A dictionary of boolean flags that can be used to enable or
+   *    disable specific features or behaviors in the generator. The exact flags
+   *    and their effects depend on the implementation of the generator.
+   */
+  configure(options: Dict<any>): void
+  /**
+   * Generates a parameter-less lambda function in the target language with the provided body.
+   * @param body The code to be included in the body of the lambda function
+   */
+  makeLambda(body: string): string
+  /**
+   * Generates a call to create a new instance of a class with the specified arguments.
+   * @param className The name of the class to instantiate
+   * @param args An array of strings representing the arguments to be passed to the class constructor
+   * @returns A string representing the code to create a new instance of the class, e.g., "new ClassName(arg1, arg2)"
+   */
+  makeNewInstanceCall(className: string, args: string[]): string
+  /**
    * Generates a chain call to set the ID for a record or entity.
    * @param id The identifier to be set
    * @returns A string representing the chain call, e.g., ".setId('myId')"
@@ -142,25 +163,21 @@ function genericRecord(
 ) {
     const value_localid = generator.valueToCode(block, "local-id", generator.getOrderAtomic())
     const statement_record = generator.statementToCode(block, "record")
-
+    
     let code = generator.makeLineComment(`${block.type}`)
-    code += `EXECUTOR.addDesign( RecordDesign()\n`
-    code += generator.prefixNonemptyLines(
+    const newInstance = generator.makeNewInstanceCall("RecordDesign", [])
+    const setIdChainCall = generator.prefixNonemptyLines(
         generator.makeSetIDChainCall(`str(${value_localid})`),
         generator.INDENT,
     )
-
+    
     const hasCondition =
-        value_skip_condition && value_skip_condition.trim() != ""
-    if (hasCondition) {
-        code += generator.prefixNonemptyLines(
-            `.setSkipCondition(lambda: ${value_skip_condition})\n`,
-            generator.INDENT,
-        )
-    }
-
-    code += statement_record
-    code += ")\n"
+    value_skip_condition && value_skip_condition.trim() != ""
+    const conditionCode = hasCondition ? generator.prefixNonemptyLines(
+        `.setSkipCondition(${generator.makeLambda(value_skip_condition)})\n`,
+        generator.INDENT,
+    ) : ""
+    code += `EXECUTOR.addDesign( ${newInstance}\n${setIdChainCall}${conditionCode}${statement_record})\n`
     return code
 }
 
@@ -283,7 +300,7 @@ forBlock["otherwise"] = function(
 ) {
     const value_value = generator.valueToCode(block, "VALUE", generator.getOrderAtomic())
     const value_other = generator.valueToCode(block, "OTHER", generator.getOrderAtomic())
-    const code = `otherwise(lambda: ${value_value}, lambda: ${value_other})\n`
+    const code = `otherwise(${generator.makeLambda(value_value)}, ${generator.makeLambda(value_other)})\n`
     return [code, generator.getOrderNone()]
 }
 

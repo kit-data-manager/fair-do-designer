@@ -18,6 +18,9 @@ export class PythonMappingGenerator
     extends PythonGenerator
     implements Common.RecordMappingGenerator
 {
+    configure(options: Dict<any>): void {
+        // No special configuration for now
+    }
     makeJsonPointerCall(jsonPointer: string): string {
         return `jsonpath.pointer.resolve(${jsonPointer}, executor.current_source_json)`
     }
@@ -48,6 +51,14 @@ export class PythonMappingGenerator
     }
     getOrderNone(): number {
         return Order.NONE
+    }
+
+    makeLambda(body: string): string {
+        return `lambda: ${body}`
+    }
+
+    makeNewInstanceCall(className: string, args: string[]): string {
+        return `${className}(${args.join(", ")})`
     }
 
     makeAddAttributeChainCall(key: string, value: string): string {
