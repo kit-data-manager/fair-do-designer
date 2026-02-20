@@ -66,6 +66,15 @@ export interface BlocklyGenerator {
 
 export interface RecordMappingGenerator {
   /**
+   * Configures the generator with the provided flags.
+   * This method should be called before generating code.
+   * 
+   * @param flags A dictionary of boolean flags that can be used to enable or
+   *    disable specific features or behaviors in the generator. The exact flags
+   *    and their effects depend on the implementation of the generator.
+   */
+  configure(flags: Dict<boolean>): void
+  /**
    * Generates a parameter-less lambda function in the target language with the provided body.
    * @param body The code to be included in the body of the lambda function
    */

@@ -15,7 +15,7 @@ import * as Common from "./common"
 /**
  * Specialized generator for generating JS code to generate records.
  * Target runtime: Sandboxed interpreter (quickjs) in Browser.
- * 
+ *
  * This generator is intended to generate code that will output records within the
  * FAIR DO Designer, either for preview or for direct use. This means it
  * (or the generated code) might contain special handling, like specialized
@@ -25,32 +25,19 @@ export class JavascriptMappingGenerator
     extends JavascriptGenerator
     implements Common.RecordMappingGenerator
 {
-    constructor(name: string) {
+    generate_trace_calls: boolean = true
+
+    constructor(name: string, flags?: Dict<boolean>) {
         super(name)
         Object.assign(this.forBlock, javascriptGenerator.forBlock)
         Object.assign(this.forBlock, Common.forBlock)
+        if (flags) {
+            this.configure(flags)
+        }
+    }
 
-        Object.keys(this.forBlock).forEach((key) => {
-            if (without_trace.includes(key)) {
-                return
-            }
-            let oldFunc = this.forBlock[key]
-            this.forBlock[key] = function (
-                block: Blockly.Block,
-                generator /*: this*/,
-            ) {
-                let result = oldFunc.call(this, block, generator)
-                if (result == null) {
-                    return `trace_block("${block.id}", () => null)`
-                } else if (typeof result === "string") {
-                    return `trace_block("${block.id}", () => ${result})`
-                } else {
-                    result[0] = `trace_block("${block.id}", () => ${result[0]})`
-                    return result
-                }
-            }
-        })
-        //console.log("Key in forBlock: ", Object.keys(this.forBlock))
+    configure(flags: Dict<boolean>) {
+        this.generate_trace_calls = flags.generate_trace_calls === true
     }
 
     /**
@@ -72,9 +59,33 @@ export class JavascriptMappingGenerator
         this.definitions_["import-jsonpath"] = "import jsonpath"
         this.addReservedWords("math,random,Number")
         */
-       this.definitions_["executor"] = "const EXECUTOR: Executor = new Executor()"
-       this.addReservedWords("current_source_json")
-       this.addReservedWords("EXECUTOR")
+        this.definitions_["executor"] =
+            "const EXECUTOR: Executor = new Executor()"
+        this.addReservedWords("current_source_json")
+        this.addReservedWords("EXECUTOR")
+
+        if (this.generate_trace_calls) {
+            Object.keys(this.forBlock).forEach((key) => {
+                if (without_trace.includes(key)) {
+                    return
+                }
+                let oldFunc = this.forBlock[key]
+                this.forBlock[key] = function (
+                    block: Blockly.Block,
+                    generator /*: this*/,
+                ) {
+                    let result = oldFunc.call(this, block, generator)
+                    if (result == null) {
+                        return `trace_block("${block.id}", () => null)`
+                    } else if (typeof result === "string") {
+                        return `trace_block("${block.id}", () => ${result})`
+                    } else {
+                        result[0] = `trace_block("${block.id}", () => ${result[0]})`
+                        return result
+                    }
+                }
+            })
+        }
     }
 
     getOrderAtomic(): number {
@@ -139,7 +150,14 @@ export class JavascriptMappingGenerator
 }
 
 function isEmptyJavascriptString(s: string): boolean {
-    return s == null || false || s.length <= 0 || s == "``" || s == '""' || s == "''"
+    return (
+        s == null ||
+        false ||
+        s.length <= 0 ||
+        s == "``" ||
+        s == '""' ||
+        s == "''"
+    )
 }
 
 const without_trace = [

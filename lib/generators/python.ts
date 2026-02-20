@@ -18,6 +18,9 @@ export class PythonMappingGenerator
     extends PythonGenerator
     implements Common.RecordMappingGenerator
 {
+    configure(flags: Dict<boolean>): void {
+        // No special configuration for now
+    }
     makeJsonPointerCall(jsonPointer: string): string {
         return `jsonpath.pointer.resolve(${jsonPointer}, executor.current_source_json)`
     }
