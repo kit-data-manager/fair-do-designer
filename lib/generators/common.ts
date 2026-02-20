@@ -73,7 +73,7 @@ export interface RecordMappingGenerator {
    *    disable specific features or behaviors in the generator. The exact flags
    *    and their effects depend on the implementation of the generator.
    */
-  configure(flags: Dict<boolean>): void
+  configure(options: Dict<any>): void
   /**
    * Generates a parameter-less lambda function in the target language with the provided body.
    * @param body The code to be included in the body of the lambda function

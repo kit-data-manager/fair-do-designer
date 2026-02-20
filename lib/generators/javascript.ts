@@ -26,6 +26,7 @@ export class JavascriptMappingGenerator
     implements Common.RecordMappingGenerator
 {
     generate_trace_calls: boolean = true
+    boilerplate: Dict<string> = {}
 
     constructor(name: string, flags?: Dict<boolean>) {
         super(name)
@@ -36,8 +37,9 @@ export class JavascriptMappingGenerator
         }
     }
 
-    configure(flags: Dict<boolean>) {
-        this.generate_trace_calls = flags.generate_trace_calls === true
+    configure(options: Dict<any>): void {
+        this.generate_trace_calls = options.generate_trace_calls === true
+        this.boilerplate = options.boilerplate
     }
 
     /**
@@ -50,17 +52,15 @@ export class JavascriptMappingGenerator
     init(workspace: Blockly.Workspace) {
         super.init(workspace)
         /* TODO
-        this.definitions_["boilerplate"] = `TODO add executor, error handling code, ...`
-        this.definitions_["import-main"] = "import js_executor"
-        this.definitions_["import-from-main"] =
-        "from executor import RecordDesign, Executor, log"
-        this.definitions_["import-from-conditionals"] =
-        "from conditionals import *"
         this.definitions_["import-jsonpath"] = "import jsonpath"
         this.addReservedWords("math,random,Number")
         */
-        this.definitions_["executor"] =
-            "const EXECUTOR: Executor = new Executor()"
+        for (const [key, value] of Object.entries(this.boilerplate)) {
+            if (!value) {
+                continue
+            }
+            this.definitions_[`boilerplate-${key}`] = value
+        }
         this.addReservedWords("current_source_json")
         this.addReservedWords("EXECUTOR")
 
