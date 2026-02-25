@@ -16,6 +16,8 @@ import {
 } from "./ui/select"
 import { alertStore } from "@/lib/stores/alert-store"
 import { useCodeDownloader, useCodeGenerator } from "@/lib/hooks"
+import { FunctionWorker } from "@/lib/function-worker"
+import { jsSandboxFunctions } from "@/lib/workers/js-sandbox/functions"
 
 /**
  * Runs the code generator and shows the result
@@ -92,6 +94,19 @@ export function OutputPane() {
         }
     }, [alert, code, codeDownloader])
 
+    const [sandbox] = useState(
+        new FunctionWorker(jsSandboxFunctions, { localFallback: false }),
+    )
+
+    if (!sandbox.workerMounted) sandbox.mount("./workers/js-sandbox.js")
+
+    const runLongCode = useCallback(async () => {
+        console.time("runLongCode")
+        const result = await sandbox.execute("executeCode", "test")
+        console.timeEnd("runLongCode")
+        console.log(result)
+    }, [sandbox])
+
     return (
         <div className="flex flex-col grow max-w-full">
             <div className="p-2 bg-muted w-full flex flex-wrap gap-2 shrink-0 items-center">
@@ -141,6 +156,9 @@ export function OutputPane() {
                         </SelectContent>
                     </Select>
                 </div>
+                <Button variant="outline" onClick={runLongCode}>
+                    Run code
+                </Button>
             </div>
             <pre className="overflow-auto grow p-2">
                 <code>{code}</code>

@@ -1,7 +1,4 @@
-import {
-    newQuickJSAsyncWASMModule,
-    QuickJSAsyncWASMModule,
-} from "quickjs-emscripten"
+import { newQuickJSWASMModule, QuickJSWASMModule } from "quickjs-emscripten"
 
 /**
  * Runtime for executing generated code in a sandboxed environment using
@@ -10,7 +7,7 @@ import {
  * for each execution to ensure isolation.
  */
 export class JsSandboxRuntime {
-    private quickjs: QuickJSAsyncWASMModule | null
+    private quickjs: QuickJSWASMModule | null
 
     constructor() {
         this.quickjs = null
@@ -22,7 +19,7 @@ export class JsSandboxRuntime {
      * @returns this
      */
     async init(): Promise<JsSandboxRuntime> {
-        this.quickjs = await newQuickJSAsyncWASMModule()
+        this.quickjs = await newQuickJSWASMModule()
         console.log("QuickJS runtime initialized")
         return this
     }
@@ -32,11 +29,11 @@ export class JsSandboxRuntime {
      * @param code The code to run.
      * @returns The result of the code execution.
      */
-    async run(code: string): Promise<{ value?: any; error?: any }> {
+    async run(code: string): Promise<{ error?: unknown; value?: unknown }> {
         if (!this.quickjs) {
             const error_message = "Failed to initialize QuickJS runtime"
             try {
-                let result = await this.init()
+                await this.init()
             } catch (error) {
                 let with_error = error_message + ": " + error
                 console.error(with_error)
@@ -52,33 +49,24 @@ export class JsSandboxRuntime {
         console.log("Running code in sandbox:", code)
 
         try {
-            const result = context
-                .evalCodeAsync(code)
-                .then((result) => {
-                    console.log("Code execution result: ", result)
-                    let info: any = {}
-                    if (result.error) {
-                        const error = context.dump(result.error)
-                        console.log("Execution failed:", error)
-                        info = { error: error }
-                        result.error.dispose()
-                    } else {
-                        const value = context.dump(result.value)
-                        console.log("Execution succeeded:", value)
-                        info = { value: value }
-                        result.value.dispose()
-                    }
-                    context.dispose()
-                    return info
-                })
-                .catch((error) => {
-                    console.error("Error during code execution:", error)
-                    return { error: error.toString() }
-                })
-            return result
+            const result = context.evalCode(code)
+
+            console.log("Code execution result: ", result)
+
+            if (result.error) {
+                const error = context.dump(result.error)
+                console.log("Execution failed:", error)
+                result.error.dispose()
+                return { error: error, value: undefined }
+            } else {
+                const value = context.dump(result.value)
+                console.log("Success:", value)
+                result.value.dispose()
+                return { value: value }
+            }
         } catch (error) {
             console.error("Unexpected error during code execution:", error)
-            return { error: error }
+            return { error: error, value: undefined }
         }
     }
 }
