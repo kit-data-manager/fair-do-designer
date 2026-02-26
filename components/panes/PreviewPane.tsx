@@ -1,10 +1,11 @@
-import { DatabaseIcon, LoaderCircleIcon } from "lucide-react"
+import { ChevronDown, DatabaseIcon } from "lucide-react"
 import { PIDRecord } from "@/lib/types"
 import { PIDRecordDisplay } from "@/components/PIDRecordDisplay"
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
     DropdownMenuContent,
+    DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
@@ -12,6 +13,7 @@ import { Button } from "@/components/ui/button"
 import { useStore } from "zustand/react"
 import { dataSourcePickerStore } from "@/lib/stores/data-source-picker-store"
 import { useCallback, useMemo, useState } from "react"
+import { useCopyToClipboard } from "usehooks-ts"
 
 // Please generate some example PID records for me
 const exampleRecords: PIDRecord[] = [
@@ -132,51 +134,80 @@ export function PreviewPane() {
         })
     }, [documents])
 
+    const [, copy] = useCopyToClipboard()
+
+    const exportPreviewToClipboard = useCallback(() => {
+        const data = {
+            records: exampleRecords,
+        }
+        copy(JSON.stringify(data)).then()
+    }, [copy])
+
+    const exportPreviewToDownload = useCallback(() => {
+        const data = {
+            records: exampleRecords,
+        }
+        const blob = new Blob([JSON.stringify(data)], {
+            type: "application/json",
+        })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement("a")
+        a.href = url
+        a.download = "preview-export.json"
+        a.click()
+        URL.revokeObjectURL(url)
+    }, [])
+
     return (
         <div className="min-h-0 w-full justify-stretch flex flex-col">
             <div className="p-2 bg-muted w-full flex flex-wrap gap-2">
-                <div className="flex items-center">
-                    <label
-                        htmlFor="preview-document-select"
-                        className="p-2 text-muted-foreground text-sm"
-                    >
-                        Input:
-                    </label>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="outline">
-                                <DatabaseIcon /> Choose Documents (
-                                {selectedDocuments.length}/{documents.length})
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="outline">
+                            <DatabaseIcon /> Select Input (
+                            {selectedDocuments.length}/{documents.length})
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                        <DropdownMenuCheckboxItem
+                            onClick={toggleSelectAllDocuments}
+                            checked={
+                                selectedDocuments.length === documents.length
+                            }
+                            onSelect={(e) => e.preventDefault()}
+                        >
+                            All Documents
+                        </DropdownMenuCheckboxItem>
+                        <DropdownMenuSeparator />
+                        {documents.map((d) => (
                             <DropdownMenuCheckboxItem
-                                onClick={toggleSelectAllDocuments}
-                                checked={
-                                    selectedDocuments.length ===
-                                    documents.length
-                                }
+                                key={d}
+                                checked={selectedDocuments.includes(d)}
+                                onClick={() => toggleSelectDocument(d)}
                                 onSelect={(e) => e.preventDefault()}
                             >
-                                All Documents
+                                {d}
                             </DropdownMenuCheckboxItem>
-                            <DropdownMenuSeparator />
-                            {documents.map((d) => (
-                                <DropdownMenuCheckboxItem
-                                    key={d}
-                                    checked={selectedDocuments.includes(d)}
-                                    onClick={() => toggleSelectDocument(d)}
-                                    onSelect={(e) => e.preventDefault()}
-                                >
-                                    {d}
-                                </DropdownMenuCheckboxItem>
-                            ))}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </div>
-                <div className="flex items-center justify-center gap-2">
-                    <LoaderCircleIcon className="size-4 animate-spin" />
-                </div>
+                        ))}
+                    </DropdownMenuContent>
+                </DropdownMenu>
+
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="outline">
+                            Export Preview{" "}
+                            <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                        <DropdownMenuItem onClick={exportPreviewToClipboard}>
+                            Copy to Clipboard (.json)
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={exportPreviewToDownload}>
+                            Download (.json)
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
 
             <div className="flex flex-col p-2 gap-2 overflow-auto">
