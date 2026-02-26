@@ -102,7 +102,7 @@ export function OutputPane() {
 
     const runLongCode = useCallback(async () => {
         console.time("runLongCode")
-        const result = await sandbox.execute("executeCode", "test")
+        const result = await sandbox.execute("executeCode", "'test'")
         console.timeEnd("runLongCode")
         console.log(result)
     }, [sandbox])

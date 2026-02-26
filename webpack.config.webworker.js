@@ -3,10 +3,15 @@ const path = require("path")
 // const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin
 
 const config = {
+    target: "webworker",
     entry: { "js-sandbox": "./lib/workers/js-sandbox/index.ts" },
     output: {
         path: path.resolve(__dirname, "public/workers"),
         filename: "[name].js",
+        globalObject: "self",
+        environment: {
+            document: false,
+        },
     },
     module: {
         rules: [
