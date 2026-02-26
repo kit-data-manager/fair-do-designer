@@ -100,7 +100,7 @@ export function OutputPane() {
 
     if (!sandbox.workerMounted)
         sandbox.mount(
-            (process.env.NEXT_PUBLIC_BASE_PATH ?? "") + "workers/js-sandbox.js",
+            (process.env.NEXT_PUBLIC_BASE_PATH ?? "") + "/workers/js-sandbox.js",
         )
 
     const runLongCode = useCallback(async () => {
