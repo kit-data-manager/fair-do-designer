@@ -98,7 +98,10 @@ export function OutputPane() {
         new FunctionWorker(jsSandboxFunctions, { localFallback: false }),
     )
 
-    if (!sandbox.workerMounted) sandbox.mount("./workers/js-sandbox.js")
+    if (!sandbox.workerMounted)
+        sandbox.mount(
+            (process.env.NEXT_PUBLIC_BASE_PATH ?? "") + "workers/js-sandbox.js",
+        )
 
     const runLongCode = useCallback(async () => {
         console.time("runLongCode")
