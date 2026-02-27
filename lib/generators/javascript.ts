@@ -64,6 +64,8 @@ export class JavascriptMappingGenerator
         this.addReservedWords("current_source_json")
         this.addReservedWords("EXECUTOR")
 
+        this.definitions_["executor"] = "const EXECUTOR = new Executor()"
+
         if (this.generate_trace_calls) {
             Object.keys(this.forBlock).forEach((key) => {
                 if (without_trace.includes(key)) {
