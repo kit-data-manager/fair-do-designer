@@ -12,6 +12,11 @@ import {
 import * as Blockly from "blockly/core"
 import * as Common from "./common"
 
+type Options = {
+    generate_trace_calls?: boolean
+    boilerplate?: Dict<string>
+}
+
 /**
  * Specialized generator for generating JS code to generate records.
  * Target runtime: Sandboxed interpreter (quickjs) in Browser.
@@ -25,8 +30,7 @@ export class JavascriptMappingGenerator
     extends JavascriptGenerator
     implements Common.RecordMappingGenerator
 {
-    generate_trace_calls: boolean = true
-    boilerplate: Dict<string> = {}
+    options: Options = {}
 
     constructor(name: string, flags?: Dict<boolean>) {
         super(name)
@@ -38,8 +42,7 @@ export class JavascriptMappingGenerator
     }
 
     configure(options: Dict<any>): void {
-        this.generate_trace_calls = options.generate_trace_calls === true
-        this.boilerplate = options.boilerplate
+        this.options = options
     }
 
     /**
@@ -55,7 +58,13 @@ export class JavascriptMappingGenerator
         this.definitions_["import-jsonpath"] = "import jsonpath"
         this.addReservedWords("math,random,Number")
         */
-        for (const [key, value] of Object.entries(this.boilerplate)) {
+        if (!this.options.boilerplate) {
+            this.options.boilerplate = {}
+        }
+        if (this.options.generate_trace_calls == null) {
+            this.options.generate_trace_calls = false
+        }
+        for (const [key, value] of Object.entries(this.options.boilerplate)) {
             if (!value) {
                 continue
             }
@@ -64,9 +73,9 @@ export class JavascriptMappingGenerator
         this.addReservedWords("current_source_json")
         this.addReservedWords("EXECUTOR")
 
-        this.definitions_["executor"] = "const EXECUTOR = new Executor()"
+        this.definitions_["executor"] = "const EXECUTOR = new Executor(INPUT)"
 
-        if (this.generate_trace_calls) {
+        if (this.options.generate_trace_calls) {
             Object.keys(this.forBlock).forEach((key) => {
                 if (without_trace.includes(key)) {
                     return

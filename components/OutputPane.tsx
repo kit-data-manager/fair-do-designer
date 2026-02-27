@@ -19,6 +19,7 @@ import { useCodeDownloader, useCodeGenerator } from "@/lib/hooks"
 import { FunctionWorker } from "@/lib/function-worker"
 import { jsSandboxFunctions } from "@/lib/workers/js-sandbox/functions"
 import { JavascriptMappingGenerator } from "@/lib/generators/javascript"
+import { dataSourcePickerStore } from "@/lib/stores/data-source-picker-store"
 
 /**
  * Runs the code generator and shows the result
@@ -34,6 +35,7 @@ export function OutputPane() {
     const codeGeneratorInstance = useCodeGenerator()
     const codeDownloader = useCodeDownloader()
     const [jsStandaloneCodeGenerator, setJsStandaloneCodeGenerator] = useState(new JavascriptMappingGenerator("tmp"));
+    const unifier = useStore(dataSourcePickerStore, s => s.unifier)
 
     useEffect(() => {
         const generator = async () => {
@@ -125,6 +127,14 @@ export function OutputPane() {
 
     const runLongCode = useCallback(async () => {
         console.time("runLongCode")
+        const docs = unifier.getDocuments()
+        const input_code: string = `const INPUT = [\n${docs.map(v => `${JSON.stringify(v.doc)}`).join(",\n")}\n];\n`
+        let withNewData = jsStandaloneCodeGenerator.options
+        if (!withNewData.boilerplate) {
+            withNewData.boilerplate = {}
+        }
+        withNewData.boilerplate.input = input_code
+        jsStandaloneCodeGenerator.configure(withNewData)
         const fullCode = jsStandaloneCodeGenerator.workspaceToCode(workspace)
         sandbox.execute("executeCode", fullCode).then((result => {
             console.timeEnd("runLongCode")

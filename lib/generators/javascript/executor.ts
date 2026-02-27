@@ -265,6 +265,7 @@ class Executor {
     private INFERENCE_MATCHES_DB: InferenceRules = new Map()
 
     constructor(args: InputProvider) {
+        console.log("Executor args", args)
         this.INPUT = args
     }
 
@@ -310,7 +311,16 @@ class Executor {
             for (const input_file of this.INPUT) {
                 try {
                     console.log("Processing input file", input_file)
-                    const json_data: JsonType = JSON.parse(input_file) // Assuming input_file is JSON string
+                    let json_data: JsonType
+                    if (typeof input_file === "string") {
+                        json_data = JSON.parse(input_file)
+                    } else if (typeof input_file === "object") {
+                        json_data = input_file
+                    } else {
+                        throw new Error(
+                            "Invalid input file type: " + typeof input_file,
+                        )
+                    }
 
                     const maybe_record = design.apply(json_data)
                     if (maybe_record !== null) {
