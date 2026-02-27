@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useStore } from "zustand/react"
 import { workspaceStore } from "@/lib/stores/workspace"
 import * as Blockly from "blockly"
@@ -18,6 +18,7 @@ import { alertStore } from "@/lib/stores/alert-store"
 import { useCodeDownloader, useCodeGenerator } from "@/lib/hooks"
 import { FunctionWorker } from "@/lib/function-worker"
 import { jsSandboxFunctions } from "@/lib/workers/js-sandbox/functions"
+import { JavascriptMappingGenerator } from "@/lib/generators/javascript"
 
 /**
  * Runs the code generator and shows the result
@@ -32,6 +33,25 @@ export function OutputPane() {
 
     const codeGeneratorInstance = useCodeGenerator()
     const codeDownloader = useCodeDownloader()
+    const [jsStandaloneCodeGenerator, setJsStandaloneCodeGenerator] = useState(new JavascriptMappingGenerator("tmp"));
+
+    useEffect(() => {
+        const generator = async () => {
+            const basepath = process.env.NEXT_PUBLIC_BASE_PATH ?? ""
+            const prefix = `${window.location.origin}/${basepath}`
+            const executor_boilerplate = await fetch(`${prefix}/js/executor.js`).then((res) => res.text())
+            const error_boilerplate = await fetch(`${prefix}/js/error_handling.js`).then((res) => res.text())
+            const flags: Dict<any> = {
+                generate_trace_calls: true,
+                boilerplate: {
+                    "executor": executor_boilerplate,
+                    "error-handling": error_boilerplate,
+                }
+            }
+            return new JavascriptMappingGenerator("PidRecordMappingJavascriptStandalone", flags)
+        }
+        generator().then(g => setJsStandaloneCodeGenerator(g))
+    }, [])
 
     const generateCode = useCallback(() => {
         if (!workspace) return
@@ -105,10 +125,12 @@ export function OutputPane() {
 
     const runLongCode = useCallback(async () => {
         console.time("runLongCode")
-        const result = await sandbox.execute("executeCode", "'test'")
-        console.timeEnd("runLongCode")
-        console.log(result)
-    }, [sandbox])
+        const fullCode = jsStandaloneCodeGenerator.workspaceToCode(workspace)
+        sandbox.execute("executeCode", fullCode).then((result => {
+            console.timeEnd("runLongCode")
+            console.log(result)
+        }))
+    }, [sandbox, code, workspace, jsStandaloneCodeGenerator])
 
     return (
         <div className="flex flex-col grow max-w-full">
