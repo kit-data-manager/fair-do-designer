@@ -4,7 +4,8 @@
   "license": "Apache-2.0",
   "scripts": {
     "prebuild": "bunx --bun tsc -p tsconfig.js-boilerplate.json",
-    "dev": "npm-run-all -p dev-webworker dev-next",
+    "predev": "bunx --bun tsc -p tsconfig.js-boilerplate.json",
+    "dev": "npm-run-all -p dev-boilerplate dev-webworker dev-next",
     "build": "npm-run-all -p build-webworker build-next",
     "dev-next": "bun --bun next dev --turbopack",
     "build-next": "bun --bun next build --turbopack",
@@ -12,7 +13,8 @@
     "lint": "bun --bun eslint .",
     "postbuild": "pagefind --site out --glob docs/**/*.{html} --output-path out/_pagefind",
     "dev-webworker": "webpack --config webpack.config.webworker.js --mode=development --watch",
-    "build-webworker": "webpack --config webpack.config.webworker.js --mode=production"
+    "build-webworker": "webpack --config webpack.config.webworker.js --mode=production",
+    "dev-boilerplate": "bunx --bun tsc --watch -p tsconfig.js-boilerplate.json"
   },
   "dependencies": {
     "@blockly/block-plus-minus": "^9.0.2",
