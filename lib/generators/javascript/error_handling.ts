@@ -11,7 +11,7 @@ function otherwise<T = any>(either: () => any, otherwiseFn: () => any): T {
     try {
         eitherResult = either()
     } catch (e) {
-        logging.log(
+        console.log(
             "    USE OTHER: First value in otherwise block threw exception: ",
             e,
         )
@@ -50,10 +50,10 @@ function stopWithFail(message: string | null | undefined) {
 function trace(block_id: string, callback: () => any): any {
     // Intention: Easy to parse format in case we want to know which block
     // caused certain logs, even if not an error.
-    logging.log("fdodesigner::trace-block-start=", block_id)
+    console.log("fdodesigner::trace-block-start=", block_id)
     try {
         const result = callback()
-        logging.log("fdodesigner::trace-block-end=", block_id, result)
+        console.log("fdodesigner::trace-block-end=", block_id, result)
         return result
     } catch (e) {
         // Build stacktrace so we can easily get back to the causing block.

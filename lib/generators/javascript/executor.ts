@@ -1,36 +1,3 @@
-/**
- * We execute this in a sandboxed environment, so we cannot use console.
- * Instead, we use this logging class to collect logs and display them in the UI after execution.
- */
-class Console {
-    lines: Array<{ level: string; content: string }> = []
-
-    private concat_stringified(...args: any[]): string {
-        const stringifiedArgs = args.map((arg) => {
-            if (typeof arg === "object") {
-                try {
-                    return JSON.stringify(arg)
-                } catch (e) {
-                    return String(arg)
-                }
-            } else {
-                return String(arg)
-            }
-        })
-        return stringifiedArgs.join(" ")
-    }
-
-    log(...args: any[]): void {
-        this.lines.push({ level: "log", content: this.concat_stringified(...args) })
-    }
-
-    error(...args: any[]): void {
-        this.lines.push({ level: "error", content: this.concat_stringified(...args) })
-    }
-}
-
-const logging = new Console()
-
 // ---Basic-types-------------------------------------------------
 type Primitive = string | boolean | number
 // ---Types-for-designs-------------------------------------------
@@ -68,7 +35,7 @@ class BackwardLinkFor {
 // -------------------------------------------------------------------- //
 
 function log(value: any, desc: any): void {
-    logging.log(desc, value)
+    console.log(desc, value)
 }
 
 type JsonDocument = any
@@ -205,7 +172,7 @@ class RecordDesign {
         record.setPid(this._pid())
 
         for (const [key, lazyValues] of this._attributes.entries()) {
-            logging.log(
+            console.log(
                 "get",
                 lazyValues.length,
                 "potential values for attribute",
@@ -215,7 +182,7 @@ class RecordDesign {
                 try {
                     const value: any = lazyValue()
                     record.addAttribute(key, value)
-                    logging.log("    set value", value)
+                    console.log("    set value", value)
                 } catch (e) {
                     // Errors known to be fatal
                     const fatalErrors: any[] = [
@@ -234,7 +201,7 @@ class RecordDesign {
                     )
 
                     if (!isFatal && isTolerable) {
-                        logging.log(
+                        console.log(
                             "    SKIP ATTRIBUTE: Can not retrieve value for",
                             key,
                             ", because of JSONPath error:",
@@ -242,7 +209,7 @@ class RecordDesign {
                         )
                     } else {
                         // all other exceptions will be propagated and stop the processing of all records.
-                        logging.log(
+                        console.log(
                             "    ERROR: Can not retrieve value for",
                             key,
                             ", because:",
@@ -312,15 +279,12 @@ class Executor {
     /**
      * Executes the designs and creates records from the input JSON files.
      */
-    execute(): Record<string, Array<Record<string, any>>> {
-        logging.log("Amount of designs:", this.RECORD_DESIGNS.length)
+    execute(): Array<Record<string, any>> {
+        console.log("Amount of designs:", this.RECORD_DESIGNS.length)
 
         this._apply_inputs_to_designs()
         this._apply_inference_rules_to_records()
-        return {
-            "result": Object.values(this.RECORD_GRAPH).map((record) => record.toSimpleJSON()),
-            "logs": logging.lines
-        }
+        return Object.values(this.RECORD_GRAPH).map((record) => record.toSimpleJSON())
     }
 
     private _apply_inference_rules_to_records(): void {
@@ -345,13 +309,13 @@ class Executor {
         for (const design of this.RECORD_DESIGNS) {
             for (const input_file of this.INPUT) {
                 try {
-                    logging.log("Processing input file", input_file)
+                    console.log("Processing input file", input_file)
                     const json_data: JsonType = JSON.parse(input_file) // Assuming input_file is JSON string
 
                     const maybe_record = design.apply(json_data)
                     if (maybe_record !== null) {
                         const [sender, inference_rules] = maybe_record
-                        logging.log(
+                        console.log(
                             `Created record with ID: "${sender.getId()}"`,
                         )
                         // Store the record in the graph
@@ -362,11 +326,11 @@ class Executor {
                         }
                     }
                 } catch (error) {
-                    logging.error("Error processing file:", error)
+                    console.error("Error processing file:", error)
                     throw error
                 }
             }
-            logging.log("No more input files.")
+            console.log("No more input files.")
         }
     }
 }

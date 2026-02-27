@@ -46,6 +46,27 @@ export class JsSandboxRuntime {
         }
         // Take a fresh context for each run
         const context = this.quickjs.newContext()
+
+        // Make console partially available inside the sandbox
+        // `console.log`
+        const logHandle = context.newFunction("log", (...args) => {
+            const nativeArgs = args.map(context.dump)
+            console.log("QuickJS:", ...nativeArgs)
+        })
+        // `console.error`
+        const errorHandle = context.newFunction("error", (...args) => {
+            const nativeArgs = args.map(context.dump)
+            console.log("QuickJS error:", ...nativeArgs)
+        })
+        // Partially implement `console` object
+        const consoleHandle = context.newObject()
+        context.setProp(consoleHandle, "log", logHandle)
+        context.setProp(consoleHandle, "error", errorHandle)
+        context.setProp(context.global, "console", consoleHandle)
+        consoleHandle.dispose()
+        logHandle.dispose()
+        errorHandle.dispose()
+
         console.log("Running code in sandbox:", code)
 
         try {
@@ -67,6 +88,8 @@ export class JsSandboxRuntime {
         } catch (error) {
             console.error("Unexpected error during code execution:", error)
             return { error: error, value: undefined }
+        } finally {
+            context.dispose()
         }
     }
 }
