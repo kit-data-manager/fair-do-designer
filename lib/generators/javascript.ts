@@ -135,7 +135,7 @@ export class JavascriptMappingGenerator
 
     makeSetIDChainCall(id: string): string {
         if (!isEmptyJavascriptString(id)) {
-            return `.setId(${this.makeLambda(id)})\n`
+            return `.setId(${this.makeLambda(String(id))})\n`
         } else {
             return ""
         }

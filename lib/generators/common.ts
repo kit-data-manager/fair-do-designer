@@ -167,7 +167,7 @@ function genericRecord(
     let code = generator.makeLineComment(`${block.type}`)
     const newInstance = generator.makeNewInstanceCall("RecordDesign", [])
     const setIdChainCall = generator.prefixNonemptyLines(
-        generator.makeSetIDChainCall(`str(${value_localid})`),
+        generator.makeSetIDChainCall(`${value_localid}`),
         generator.INDENT,
     )
     

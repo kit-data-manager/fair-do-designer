@@ -71,7 +71,7 @@ export class PythonMappingGenerator
 
     makeSetIDChainCall(id: string): string {
         if (!isEmptyPythonString(id)) {
-            return `.setId(lambda: ${id})\n`
+            return `.setId(lambda: str(${id}))\n`
         } else {
             return ""
         }
