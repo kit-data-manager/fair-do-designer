@@ -76,11 +76,11 @@ export class JavascriptMappingGenerator
                 ) {
                     let result = oldFunc.call(this, block, generator)
                     if (result == null) {
-                        return `trace_block("${block.id}", () => null)`
+                        return `trace("${block.id}", () => null)`
                     } else if (typeof result === "string") {
-                        return `trace_block("${block.id}", () => ${result})`
+                        return `trace("${block.id}", () => ${result})`
                     } else {
-                        result[0] = `trace_block("${block.id}", () => ${result[0]})`
+                        result[0] = `trace("${block.id}", () => ${result[0]})`
                         return result
                     }
                 }
