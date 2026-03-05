@@ -166,6 +166,67 @@ export function PreviewPane() {
         URL.revokeObjectURL(url)
     }, [])
 
+    const recordsToCsv = useCallback((records: PIDRecord[]): string => {
+        // Collect all unique attribute keys
+        const attributes = new Set<string>()
+        for (const record of records) {
+            for (const entry of record.record) {
+                attributes.add(entry.key)
+            }
+        }
+        const attributeList = Array.from(attributes)
+
+        // Helper to escape a CSV field (RFC 4180 compliant)
+        const escapeField = (value: string): string => {
+            // If field contains comma, double quote, or newline, wrap in quotes
+            // and escape internal double quotes by doubling them
+            if (
+                value.includes(",") ||
+                value.includes('"') ||
+                value.includes("\n") ||
+                value.includes("\r")
+            ) {
+                return `"${value.replace(/"/g, '""')}"`
+            }
+            return value
+        }
+
+        // Build header row: PID + all attribute keys
+        const headerRow = ["PID", ...attributeList].map(escapeField).join(",")
+
+        // Build data rows
+        const dataRows = records.map((record) => {
+            const row = [
+                record.pid,
+                ...attributeList.map((attr) => {
+                    const entry = record.record.find((e) => e.key === attr)
+                    return entry?.value ?? ""
+                }),
+            ]
+            return row.map(escapeField).join(",")
+        })
+
+        return [headerRow, ...dataRows].join("\n")
+    }, [])
+
+    const exportPreviewToCsvClipboard = useCallback(() => {
+        const csv = recordsToCsv(exampleRecords)
+        copy(csv).then()
+    }, [copy, recordsToCsv])
+
+    const exportPreviewToCsvDownload = useCallback(() => {
+        const csv = recordsToCsv(exampleRecords)
+        const blob = new Blob([csv], {
+            type: "text/csv;charset=utf-8;",
+        })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement("a")
+        a.href = url
+        a.download = "preview-export.csv"
+        a.click()
+        URL.revokeObjectURL(url)
+    }, [recordsToCsv])
+
     return (
         <div className="min-h-0 w-full justify-stretch flex flex-col">
             <div className="p-2 bg-muted w-full flex flex-wrap gap-2">
@@ -213,6 +274,13 @@ export function PreviewPane() {
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={exportPreviewToDownload}>
                             Download (.json)
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={exportPreviewToCsvClipboard}>
+                            Copy to Clipboard (.csv)
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={exportPreviewToCsvDownload}>
+                            Download (.csv)
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
