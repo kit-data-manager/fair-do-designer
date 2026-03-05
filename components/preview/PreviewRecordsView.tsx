@@ -1,15 +1,23 @@
 import { PIDRecord } from "@/lib/types"
-import { useCallback } from "react"
-import { PID, PIDDataType } from "@kit-data-manager/pid-component"
-import useSWR from "swr"
 import { Skeleton } from "@/components/ui/skeleton"
 import { camelToTitleCase } from "@/lib/utils"
 import { ErrorDisplay } from "@/components/ErrorDisplay"
+import { useResolvedAttributePID } from "@/lib/hooks"
 
-export function PIDRecordDisplay({ record }: { record: PIDRecord }) {
+export function PreviewRecordsView({ records }: { records: PIDRecord[] }) {
+    return (
+        <div className="grid grid-cols-1 gap-4">
+            {records.map((record) => (
+                <PreviewRecordView key={record.pid} record={record} />
+            ))}
+        </div>
+    )
+}
+
+export function PreviewRecordView({ record }: { record: PIDRecord }) {
     return (
         <div className="rounded-md shadow-xs bg-profile text-profile-foreground">
-            <div className="bg-record text-record-foreground border-b border-white/20 p-2 rounded-t-md truncate">
+            <div className="bg-record text-record-foreground p-2 rounded-t-md truncate">
                 <div>PID: {record.pid}</div>
                 <div className="text-xs">Input Document: doc.example</div>
             </div>
@@ -33,22 +41,15 @@ export function PIDRecordEntry({
     entryKey: string
     value: string
 }) {
-    const resolveKeyPID = useCallback(async (key: string) => {
-        if (PID.isPID(key)) {
-            const pid = PID.getPIDFromString(key)
-            return await PIDDataType.resolveDataType(pid)
-        } else throw new Error("Invalid PID")
-    }, [])
-
     const {
         data: keyPIDDataType,
         isLoading: keyPIDDataTypeIsLoading,
         error: keyPIDDataTypeError,
-    } = useSWR(entryKey, resolveKeyPID)
+    } = useResolvedAttributePID(entryKey)
 
     return (
         <div className="contents">
-            <div className="p-2 border-b border-r border-white/20 truncate font-medium text-sm text-right h-full w-full">
+            <div className="p-2 border-t border-r border-white/20 truncate font-medium text-sm text-right h-full w-full">
                 {keyPIDDataTypeIsLoading ? (
                     <div className="flex justify-end items-center h-full">
                         <Skeleton className="bg-profile-foreground/50 h-2 w-24" />
@@ -64,7 +65,7 @@ export function PIDRecordEntry({
                     className="mt-1 bg-destructive/40"
                 />
             </div>
-            <div className="border-b border-white/20 p-2 truncate h-full w-full text-sm">
+            <div className="border-t border-white/20 p-2 truncate h-full w-full text-sm">
                 <div>{value}</div>
             </div>
         </div>

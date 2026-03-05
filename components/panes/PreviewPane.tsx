@@ -1,6 +1,11 @@
-import { ChevronDown, DatabaseIcon } from "lucide-react"
+import {
+    ChevronDown,
+    DatabaseIcon,
+    RectangleHorizontal,
+    TableIcon,
+} from "lucide-react"
 import { PIDRecord } from "@/lib/types"
-import { PIDRecordDisplay } from "@/components/PIDRecordDisplay"
+import { PreviewRecordsView } from "@/components/preview/PreviewRecordsView"
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
@@ -14,6 +19,8 @@ import { useStore } from "zustand/react"
 import { dataSourcePickerStore } from "@/lib/stores/data-source-picker-store"
 import { useCallback, useMemo, useState } from "react"
 import { useCopyToClipboard } from "usehooks-ts"
+import { PreviewTableView } from "@/components/preview/PreviewTableView"
+import { ButtonGroup } from "@/components/ui/button-group"
 
 // Please generate some example PID records for me
 const exampleRecords: PIDRecord[] = [
@@ -102,6 +109,7 @@ const exampleRecords: PIDRecord[] = [
 ]
 
 export function PreviewPane() {
+    const [viewType, setViewType] = useState<"records" | "table">("records")
     const unifier = useStore(dataSourcePickerStore, (s) => s.unifier)
     const totalDocumentCount = useStore(
         dataSourcePickerStore,
@@ -208,13 +216,36 @@ export function PreviewPane() {
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
+
+                <div className="grow" />
+
+                <ButtonGroup>
+                    <Button
+                        className={"border"}
+                        variant={viewType === "records" ? "default" : "outline"}
+                        onClick={() => setViewType("records")}
+                    >
+                        <RectangleHorizontal />
+                    </Button>
+                    <Button
+                        className="border"
+                        variant={viewType === "table" ? "default" : "outline"}
+                        onClick={() => setViewType("table")}
+                    >
+                        <TableIcon />
+                    </Button>
+                </ButtonGroup>
             </div>
 
-            <div className="flex flex-col p-2 gap-2 overflow-auto">
-                {exampleRecords.map((record) => (
-                    <PIDRecordDisplay record={record} key={record.pid} />
-                ))}
-            </div>
+            {viewType === "records" ? (
+                <div className="overflow-auto p-3">
+                    <PreviewRecordsView records={exampleRecords} />
+                </div>
+            ) : (
+                <div className="overflow-auto">
+                    <PreviewTableView records={exampleRecords} />
+                </div>
+            )}
         </div>
     )
 }
