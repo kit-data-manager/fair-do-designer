@@ -8,7 +8,7 @@ import { AttributePIDHelp } from "@/components/preview/AttributePIDHelp"
 
 export function PreviewRecordsView({ records }: { records: PIDRecord[] }) {
     return (
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 gap-3">
             {records.map((record) => (
                 <PreviewRecordView key={record.pid} record={record} />
             ))}
