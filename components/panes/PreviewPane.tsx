@@ -151,21 +151,6 @@ export function PreviewPane() {
         copy(JSON.stringify(data)).then()
     }, [copy])
 
-    const exportPreviewToDownload = useCallback(() => {
-        const data = {
-            records: exampleRecords,
-        }
-        const blob = new Blob([JSON.stringify(data)], {
-            type: "application/json",
-        })
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement("a")
-        a.href = url
-        a.download = "preview-export.json"
-        a.click()
-        URL.revokeObjectURL(url)
-    }, [])
-
     const recordsToCsv = useCallback((records: PIDRecord[]): string => {
         // Collect all unique attribute keys
         const attributes = new Set<string>()
@@ -214,18 +199,36 @@ export function PreviewPane() {
         copy(csv).then()
     }, [copy, recordsToCsv])
 
+    const downloadFile = useCallback(
+        (content: string, mimeType: string, fileName: string) => {
+            const blob = new Blob([content], {
+                type: mimeType,
+            })
+            const url = URL.createObjectURL(blob)
+            const a = document.createElement("a")
+            a.href = url
+            a.download = fileName
+            a.click()
+            URL.revokeObjectURL(url)
+        },
+        [],
+    )
+
+    const exportPreviewToDownload = useCallback(() => {
+        const data = {
+            records: exampleRecords,
+        }
+        downloadFile(
+            JSON.stringify(data),
+            "application/json",
+            "preview-export.json",
+        )
+    }, [downloadFile])
+
     const exportPreviewToCsvDownload = useCallback(() => {
         const csv = recordsToCsv(exampleRecords)
-        const blob = new Blob([csv], {
-            type: "text/csv;charset=utf-8;",
-        })
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement("a")
-        a.href = url
-        a.download = "preview-export.csv"
-        a.click()
-        URL.revokeObjectURL(url)
-    }, [recordsToCsv])
+        downloadFile(csv, "text/csv;charset=utf-8;", "preview-export.csv")
+    }, [downloadFile, recordsToCsv])
 
     return (
         <div className="min-h-0 w-full justify-stretch flex flex-col">
