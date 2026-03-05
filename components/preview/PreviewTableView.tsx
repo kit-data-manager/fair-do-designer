@@ -10,7 +10,8 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { cn } from "@/lib/utils"
+import { camelToTitleCase, cn } from "@/lib/utils"
+import { AttributePIDHelp } from "@/components/preview/AttributePIDHelp"
 
 const tdStyle = "break-keep text-nowrap whitespace-nowrap"
 
@@ -83,7 +84,10 @@ export function PreviewTableHeaderCell({
             {error ? (
                 attributePID
             ) : !isLoading && data ? (
-                data.name
+                <div className="flex gap-1 items-center">
+                    {camelToTitleCase(data.name)}
+                    <AttributePIDHelp data={data} />
+                </div>
             ) : (
                 <Skeleton className="h-4 w-20" />
             )}
