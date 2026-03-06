@@ -1,6 +1,6 @@
 {
   "name": "fair-do-designer",
-  "version": "0.0.1-preview",
+  "version": "0.10.0-preview",
   "license": "Apache-2.0",
   "scripts": {
     "dev": "bun --bun next dev --turbopack",
