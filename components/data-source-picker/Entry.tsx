@@ -1,6 +1,6 @@
 import { DocumentEntry } from "@/lib/data-source-picker/json-unifier"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, StarIcon } from "lucide-react"
+import { ArrowLeft, FingerprintIcon } from "lucide-react"
 import { ValueRenderer } from "@/components/data-source-picker/ValueRenderer"
 import {
     useCallback,
@@ -101,13 +101,13 @@ export function Entry({
                                 current={entry.timesObserved}
                             />
                             {isUnique && (
-                                <Tooltip delayDuration={700}>
+                                <Tooltip>
                                     <TooltipTrigger asChild>
-                                        <StarIcon className="size-3.5 shrink-0 text-primary" />
+                                        <FingerprintIcon className="ml-1 size-4 shrink-0 text-primary" />
                                     </TooltipTrigger>
                                     <TooltipContent>
-                                        All found entries in this field are
-                                        unique
+                                        The values of this entry are unique in
+                                        each provided file
                                     </TooltipContent>
                                 </Tooltip>
                             )}
