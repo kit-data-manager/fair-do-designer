@@ -81,6 +81,7 @@ export const DataSourcePicker = forwardRef<
 
     const filtered = useMemo(() => {
         return withFullPointers
+            .filter((doc) => doc.key !== "$")
             .filter(
                 (doc) =>
                     doc.key.includes(search) ||

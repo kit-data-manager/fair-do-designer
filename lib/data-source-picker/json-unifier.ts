@@ -69,9 +69,9 @@ export class Unifier {
 
         do {
             const current = stack.shift()!
-            if (current.observedValues.size > 0) {
-                flattened.push(current)
-            }
+
+            flattened.push(current)
+
             if (current.children.length > 0) {
                 stack.push(...current.children)
             }

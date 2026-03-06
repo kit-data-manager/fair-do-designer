@@ -105,6 +105,7 @@ export function Entry({
             {isInViewport ? (
                 <ValueRenderer
                     values={entry.observedValues}
+                    documentChildren={entry.children}
                     timesObserved={entry.timesObserved}
                 />
             ) : (

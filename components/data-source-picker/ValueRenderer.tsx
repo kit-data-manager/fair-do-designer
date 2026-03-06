@@ -1,4 +1,7 @@
-import { JSONValuesSingle } from "@/lib/data-source-picker/json-unifier"
+import {
+    DocumentEntry,
+    JSONValuesSingle,
+} from "@/lib/data-source-picker/json-unifier"
 import { useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
@@ -10,9 +13,11 @@ import { EllipsisIcon, XIcon } from "lucide-react"
 
 export function ValueRenderer({
     values,
+    documentChildren,
     timesObserved,
 }: {
     values: Map<JSONValuesSingle, number>
+    documentChildren: DocumentEntry[]
     timesObserved: number
 }) {
     const [showAll, setShowAll] = useState(false)
@@ -32,6 +37,18 @@ export function ValueRenderer({
             return arr.slice(0, 1)
         }
     }, [arr, showAll])
+
+    if (sliced.length === 0 && documentChildren.length === 0) {
+        return <div className="p-1">Empty</div>
+    }
+
+    if (documentChildren.length > 0 && sliced.length > 0) {
+        return <div className="p-1">Mixed</div>
+    }
+
+    if (documentChildren.length > 0) {
+        return <div className="p-1">Object/Array</div>
+    }
 
     return (
         <div
