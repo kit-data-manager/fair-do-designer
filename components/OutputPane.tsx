@@ -126,7 +126,7 @@ export function OutputPane() {
         )
 
     const runLongCode = useCallback(async () => {
-        console.time("runLongCode")
+        console.time("JS sandbox execution")
         const docs = unifier.getDocuments()
         const input_code: string = `const INPUT = [\n${docs.map(v => `${JSON.stringify(v.doc)}`).join(",\n")}\n];\n`
         let withNewData = jsStandaloneCodeGenerator.options
@@ -137,8 +137,8 @@ export function OutputPane() {
         jsStandaloneCodeGenerator.configure(withNewData)
         const fullCode = jsStandaloneCodeGenerator.workspaceToCode(workspace)
         sandbox.execute("executeCode", fullCode).then((result => {
-            console.timeEnd("runLongCode")
-            console.log(result)
+            console.timeEnd("JS sandbox execution")
+            console.log("Sandbox result:", result)
         }))
     }, [sandbox, code, workspace, jsStandaloneCodeGenerator])
 

@@ -1,4 +1,4 @@
-import { newQuickJSWASMModule, QuickJSWASMModule } from "quickjs-emscripten"
+import { JSModuleLoadResult, newQuickJSWASMModule, QuickJSWASMModule } from "quickjs-emscripten"
 
 /**
  * Runtime for executing generated code in a sandboxed environment using
@@ -8,6 +8,7 @@ import { newQuickJSWASMModule, QuickJSWASMModule } from "quickjs-emscripten"
  */
 export class JsSandboxRuntime {
     private quickjs: QuickJSWASMModule | null
+    private moduleCache: Map<string, string> = new Map()
 
     constructor() {
         this.quickjs = null
@@ -20,6 +21,8 @@ export class JsSandboxRuntime {
      */
     async init(): Promise<JsSandboxRuntime> {
         this.quickjs = await newQuickJSWASMModule()
+        await this.preloadModule("jsonpointer.js")
+        await this.preloadModule("jsonpath.js")
         console.log("QuickJS runtime initialized")
         return this
     }
@@ -44,8 +47,22 @@ export class JsSandboxRuntime {
                 return { error: error_message }
             }
         }
+
         // Take a fresh context for each run
         const context = this.quickjs.newContext()
+        context.runtime.setModuleLoader((moduleName, context) => {
+            console.log("Module loader called for:", moduleName)
+            const code = this.getModule(moduleName)
+            if (code) {
+                console.log(`Module ${moduleName} loaded from cache`)
+                return code
+            } else {
+                const error_message: string = `Module not found: ${moduleName}`
+                console.error(error_message)
+                const e = { error: error_message }
+                return e as unknown as JSModuleLoadResult
+            }
+        })
 
         // Make console partially available inside the sandbox
         // `console.log`
@@ -70,20 +87,26 @@ export class JsSandboxRuntime {
         console.log("Running code in sandbox:", code)
 
         try {
-            const result = context.evalCode(code)
-
-            console.log("Code execution result: ", result)
-
+            const result = context.evalCode(
+                code,
+                "generated.js",
+                {
+                    // required because we import dependencies with import statements.
+                    type: "module"
+                },
+            )
+            
             if (result.error) {
                 const error = context.dump(result.error)
                 console.log("Execution failed:", error)
                 result.error.dispose()
                 return { error: error, value: undefined }
             } else {
-                const value = context.dump(result.value)
-                console.log("Success:", value)
+                // extract value as in https://github.com/justjake/quickjs-emscripten?tab=readme-ov-file#runtime
+                context.dump(context.unwrapResult(result))
+                const extracted = context.getProp(context.global, "result").consume(context.dump)
                 result.value.dispose()
-                return { value: value }
+                return { value: extracted }
             }
         } catch (error) {
             console.error("Unexpected error during code execution:", error)
@@ -91,5 +114,31 @@ export class JsSandboxRuntime {
         } finally {
             context.dispose()
         }
+    }
+
+    async preloadModule(moduleName: string): Promise<void> {
+        // fetch modules into cache
+        console.log("Preloading module:", moduleName)
+        const basepath = process.env.BASE_PATH ?? ""
+        const prefix = `${globalThis.location.origin}${basepath}`
+        if (!this.moduleCache.has(moduleName)) {
+            try {
+                const response = await fetch(`${prefix}/js/${moduleName}`)
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch module ${moduleName}: ${response.statusText}`)
+                }
+                const code = await response.text()
+                this.moduleCache.set(moduleName, code)
+                console.log(`Module ${moduleName} loaded and cached`)
+            } catch (error) {
+                console.error(`Error loading module ${moduleName}:`, error)
+            }
+        } else {
+            console.log(`Module ${moduleName} already in cache`)
+        }
+    }
+
+    getModule(moduleName: string): string | undefined {
+        return this.moduleCache.get(moduleName)
     }
 }
