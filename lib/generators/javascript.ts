@@ -31,6 +31,7 @@ export class JavascriptMappingGenerator
     implements Common.RecordMappingGenerator
 {
     options: Options = {}
+    hasTraceCalls: boolean = false
 
     constructor(name: string, flags?: Dict<boolean>) {
         super(name)
@@ -75,7 +76,7 @@ export class JavascriptMappingGenerator
 
         this.definitions_["executor"] = "const EXECUTOR = new Executor(INPUT)"
 
-        if (this.options.generate_trace_calls) {
+        if (this.options.generate_trace_calls && !this.hasTraceCalls) {
             Object.keys(this.forBlock).forEach((key) => {
                 if (without_trace.includes(key)) {
                     return
@@ -96,6 +97,7 @@ export class JavascriptMappingGenerator
                     }
                 }
             })
+            this.hasTraceCalls = true
         }
     }
 
