@@ -76,6 +76,7 @@ export class JavascriptMappingGenerator
 
         this.definitions_["executor"] = "const EXECUTOR = new Executor(INPUT)"
         this.definitions_["import-jsonpointer"] = "import { JsonPointer } from 'jsonpointer.js';"
+        this.definitions_["import-jsonpath"] = "import { JSONPath } from 'jsonpath.js';"
 
         if (this.options.generate_trace_calls && !this.hasTraceCalls) {
             Object.keys(this.forBlock).forEach((key) => {
@@ -117,7 +118,7 @@ export class JavascriptMappingGenerator
     }
 
     makeJsonpathCall(jsonpath: string): string {
-        return `jsonpath.get(current_source_json, ${jsonpath})`
+        return `JSONPath({ path: ${jsonpath}, json: current_source_json})`
     }
 
     makeLambda(body: string): string {
