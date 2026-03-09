@@ -158,7 +158,11 @@ export class JavascriptMappingGenerator
 
     finish(code: string): string {
         code = super.finish(code)
-        const suffix: string = "\nEXECUTOR.execute()\n"
+        const suffix: string = [
+            "\n",
+            "const result = EXECUTOR.execute()",
+            "globalThis.result = result"
+        ].join("\n")
         return code + suffix
     }
 }
