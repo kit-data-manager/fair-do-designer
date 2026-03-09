@@ -169,7 +169,9 @@ class RecordDesign {
         const record: PidRecord = new PidRecord()
         // errors may occur here, but as IDs are critical, we do not catch them.
         record.setId(this._id())
+        console.log("set id", this._id())
         record.setPid(this._pid())
+        console.log("set pid", this._pid())
 
         for (const [key, lazyValues] of this._attributes.entries()) {
             console.log(
@@ -282,10 +284,18 @@ class Executor {
      */
     execute(): Array<Record<string, any>> {
         console.log("Amount of designs:", this.RECORD_DESIGNS.length)
+        console.log("Amount of input files:", this.INPUT.length)
 
         this._apply_inputs_to_designs()
+        console.log("Resulting amount of records:", this.RECORD_GRAPH.size)
+        
         this._apply_inference_rules_to_records()
-        return Object.values(this.RECORD_GRAPH).map((record) => record.toSimpleJSON())
+
+        let result: Array<Record<string, any>> = []
+        for (const record of this.RECORD_GRAPH.values()) {
+            result.push(record.toSimpleJSON())
+        }
+        return result
     }
 
     private _apply_inference_rules_to_records(): void {
