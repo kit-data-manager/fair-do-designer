@@ -4,7 +4,7 @@ import {
     ValidationField,
     ValidationFieldOptions,
 } from "../fields/ValidationField"
-import { RecordMappingGenerator } from "../generators/python"
+import { PythonMappingGenerator } from "../generators/python"
 
 const handleCache = new Map<string, boolean | string>()
 
@@ -129,7 +129,7 @@ const attributePIDCheckFunction: ValidationFieldOptions["customCheck"] = async (
     if (conn.targetBlock()?.isInsertionMarker()) return false
 
     const connectedBlock = conn.targetBlock()
-    const g = new RecordMappingGenerator("PidRecordMappingPython")
+    const g = new PythonMappingGenerator("PidRecordMappingPython")
 
     g.init(workspace)
     let code = g.blockToCode(connectedBlock)
