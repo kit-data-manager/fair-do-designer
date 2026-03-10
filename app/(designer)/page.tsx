@@ -23,13 +23,21 @@ export default function Home() {
             <RemoteDesignImport />
             <AlertManager />
 
-            <ResizablePanelGroup direction={"horizontal"}>
-                <ResizablePanel defaultSize={70} className={"flex flex-col"}>
+            <ResizablePanelGroup orientation={"horizontal"}>
+                <ResizablePanel
+                    defaultSize={"70%"}
+                    minSize={400}
+                    className={"flex flex-col"}
+                >
                     <Header />
                     <Workspace />
                 </ResizablePanel>
-                <ResizableHandle hitAreaMargins={{ fine: 5, coarse: 10 }} />
-                <ResizablePanel defaultSize={30} className={"flex flex-col"}>
+                <ResizableHandle />
+                <ResizablePanel
+                    defaultSize={"30%"}
+                    minSize={400}
+                    className={"flex flex-col"}
+                >
                     <Tabs
                         className="max-h-full grow"
                         value={tab}
