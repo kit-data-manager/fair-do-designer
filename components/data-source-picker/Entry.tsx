@@ -1,4 +1,3 @@
-import { DocumentEntry } from "@/lib/data-source-picker/json-unifier"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import { ValueRenderer } from "@/components/data-source-picker/ValueRenderer"
@@ -17,6 +16,7 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { pathSegmentsToPointer } from "@/lib/data-source-picker/json-path"
+import { IUnifiedDocumentEntry } from "@/lib/data-source-picker/types"
 
 export function Entry({
     entry,
@@ -24,9 +24,9 @@ export function Entry({
     onEntryClick,
     shortened,
 }: {
-    entry: DocumentEntry
+    entry: IUnifiedDocumentEntry
     totalDocuments: number
-    onEntryClick?: (entry: DocumentEntry, label: string) => void
+    onEntryClick?: (entry: IUnifiedDocumentEntry, label: string) => void
     shortened: string
 }) {
     // Optimization to only render entries that are visible on screen. Otherwise, the number

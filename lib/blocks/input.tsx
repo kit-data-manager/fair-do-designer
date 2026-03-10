@@ -8,8 +8,8 @@ import {
     pointerToPathSegments,
 } from "@/lib/data-source-picker/json-path"
 import { dataSourcePickerStore } from "@/lib/stores/data-source-picker-store"
-import { JSONValues } from "@/lib/data-source-picker/json-unifier"
 import { alertStore } from "@/lib/stores/alert-store"
+import { JSONValues } from "@/lib/data-source-picker/types"
 
 export interface InputJsonPointer extends Blockly.BlockSvg {
     path: PathSegment[]

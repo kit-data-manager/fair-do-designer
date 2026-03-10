@@ -8,8 +8,8 @@ import {
     DataSourcePicker,
     DataSourcePickerRef,
 } from "@/components/data-source-picker/DataSourcePicker"
-import { DocumentEntry } from "@/lib/data-source-picker/json-unifier"
 import { addQueryBlockToWorkspace } from "@/lib/utils"
+import { IUnifiedDocumentEntry } from "@/lib/data-source-picker/types"
 
 export function InputPane() {
     const uploadInputRef = useRef<HTMLInputElement>(null)
@@ -79,7 +79,7 @@ export function InputPane() {
     }, [])
 
     const onEntryClick = useCallback(
-        (entry: DocumentEntry, label: string) => {
+        (entry: IUnifiedDocumentEntry, label: string) => {
             if (!workspace) return
 
             addQueryBlockToWorkspace(workspace, entry.path, label)

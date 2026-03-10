@@ -1,32 +1,22 @@
 import { PathSegment, pathSegmentsToPath } from "./json-path"
 import { JSONPath } from "jsonpath-plus"
+import {
+    IUnifiedDocumentEntry,
+    JSONValues,
+} from "@/lib/data-source-picker/types"
+import { UnifiedDocumentEntry } from "@/lib/data-source-picker/unified-document-entry"
 
-export type JSONValuesSingle = string | boolean | number | null | undefined
-export type JSONValues =
-    | JSONValuesSingle
-    | { [index: string]: JSONValues }
-    | JSONValues[]
-
-export type DocumentEntry = {
-    key: string
-    path: PathSegment[]
-    observedValues: Map<JSONValuesSingle, number>
-    children: DocumentEntry[]
-    timesObserved: number
-    arrayElement: boolean
-}
-
-const starterDoc: DocumentEntry = {
+const starterDoc: IUnifiedDocumentEntry = new UnifiedDocumentEntry({
     key: "$",
     path: [{ type: "key", value: "$" }],
     observedValues: new Map(),
     children: [],
     timesObserved: 0,
     arrayElement: false,
-}
+})
 
 export class Unifier {
-    private root: DocumentEntry = structuredClone(starterDoc)
+    private root: IUnifiedDocumentEntry = starterDoc
     private documents: Record<string, JSONValues> = {}
 
     process(name: string, doc: JSONValues) {
@@ -55,17 +45,17 @@ export class Unifier {
     }
 
     reset() {
-        this.root = structuredClone(starterDoc)
+        this.root = starterDoc
         this.documents = {}
     }
 
     getUnifiedDocument() {
-        return structuredClone(this.root)
+        return this.root
     }
 
     getFlattenedDocument() {
-        const flattened: DocumentEntry[] = []
-        const stack: DocumentEntry[] = [this.getUnifiedDocument()]
+        const flattened: IUnifiedDocumentEntry[] = []
+        const stack: IUnifiedDocumentEntry[] = [this.getUnifiedDocument()]
 
         do {
             const current = stack.shift()!
@@ -86,7 +76,7 @@ export class Unifier {
         )
     }
 
-    private processChild(unified: DocumentEntry, content: JSONValues) {
+    private processChild(unified: IUnifiedDocumentEntry, content: JSONValues) {
         const asArray = Array.isArray(content) ? content : undefined
         const asObject =
             typeof content === "object" &&
@@ -110,14 +100,14 @@ export class Unifier {
                     const newPath = unified.path.slice()
                     newPath.push({ type: "key", value: subkey })
 
-                    const newEntry = {
+                    const newEntry = new UnifiedDocumentEntry({
                         key: subkey,
                         children: [],
                         timesObserved: 1,
                         observedValues: new Map(),
                         path: newPath,
                         arrayElement: false,
-                    }
+                    })
 
                     unified.children.push(newEntry)
                     this.processChild(newEntry, asObject[subkey])
@@ -141,14 +131,14 @@ export class Unifier {
                     const newPath = unified.path.slice()
                     newPath.push({ type: "index", value: i })
 
-                    const newEntry = {
+                    const newEntry = new UnifiedDocumentEntry({
                         key: i,
                         children: [],
                         timesObserved: 1,
                         observedValues: new Map(),
                         path: newPath,
                         arrayElement: true,
-                    }
+                    })
 
                     unified.children.push(newEntry)
                     this.processChild(newEntry, entry)

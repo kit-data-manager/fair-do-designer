@@ -5,10 +5,6 @@ import {
     useMemo,
     useState,
 } from "react"
-import {
-    DocumentEntry,
-    JSONValues,
-} from "@/lib/data-source-picker/json-unifier"
 import { Entry } from "@/components/data-source-picker/Entry"
 import { Input } from "@/components/ui/input"
 import { SearchIcon } from "lucide-react"
@@ -19,6 +15,10 @@ import {
 import { saveToLocalStorage } from "@/lib/serialization"
 import { useStore } from "zustand/react"
 import { dataSourcePickerStore } from "@/lib/stores/data-source-picker-store"
+import {
+    IUnifiedDocumentEntry,
+    JSONValues,
+} from "@/lib/data-source-picker/types"
 
 export type DataSourcePickerRef = {
     addFile: (name: string, doc: JSONValues) => void
@@ -27,7 +27,9 @@ export type DataSourcePickerRef = {
 
 export const DataSourcePicker = forwardRef<
     DataSourcePickerRef,
-    { onEntryClick?: (entry: DocumentEntry, label: string) => void }
+    {
+        onEntryClick?: (entry: IUnifiedDocumentEntry, label: string) => void
+    }
 >(function DataSourcePicker({ onEntryClick }, ref) {
     const {
         unifier: jsonUnifier,
@@ -36,6 +38,10 @@ export const DataSourcePicker = forwardRef<
         totalDocumentCount,
     } = useStore(dataSourcePickerStore)
     const [search, setSearch] = useState("")
+
+    const onlyShowLeaves = useMemo(() => {
+        return search === ""
+    }, [search])
 
     const addFile = useCallback(
         (name: string, doc: JSONValues) => {
@@ -75,28 +81,31 @@ export const DataSourcePicker = forwardRef<
     const withFullPointers = useMemo(() => {
         return flat.map((p) => ({
             fullPointer: pathSegmentsToPointer(p.path),
-            ...p,
+            entry: p,
         }))
     }, [flat])
 
     const filtered = useMemo(() => {
         return withFullPointers
-            .filter((doc) => doc.key !== "$")
+            .filter((withFullPointer) =>
+                onlyShowLeaves ? withFullPointer.entry.isLeaf() : true,
+            )
+            .filter((withFullPointer) => withFullPointer.entry.key !== "$")
             .filter(
-                (doc) =>
-                    doc.key.includes(search) ||
-                    [...doc.observedValues.keys()].some((e) =>
+                (withFullPointer) =>
+                    withFullPointer.entry.key.includes(search) ||
+                    [...withFullPointer.entry.observedValues.keys()].some((e) =>
                         (e + "").includes(search),
                     ) ||
-                    doc.fullPointer.includes(search),
+                    withFullPointer.fullPointer.includes(search),
             )
-            .sort((a, b) => a.key.localeCompare(b.key))
+            .sort((a, b) => a.entry.key.localeCompare(b.entry.key))
             .sort(
                 (a, b) =>
-                    b.timesObserved / totalDocumentCount -
-                    a.timesObserved / totalDocumentCount,
+                    b.entry.timesObserved / totalDocumentCount -
+                    a.entry.timesObserved / totalDocumentCount,
             )
-    }, [search, totalDocumentCount, withFullPointers])
+    }, [onlyShowLeaves, search, totalDocumentCount, withFullPointers])
 
     const searchNoResults = useMemo(() => {
         return flat.length > 0 && filtered.length === 0
@@ -131,16 +140,19 @@ export const DataSourcePicker = forwardRef<
                         No Results
                     </div>
                 )}
-                {filtered.map((entry, i) => (
+                {filtered.map((withFullPointer, i) => (
                     <Entry
-                        entry={entry}
+                        entry={withFullPointer.entry}
                         key={i}
                         totalDocuments={totalDocumentCount}
                         onEntryClick={onEntryClick}
                         shortened={
                             shortenedPaths.get(
-                                pathSegmentsToPointer(entry.path),
-                            ) ?? pathSegmentsToPointer(entry.path)
+                                pathSegmentsToPointer(
+                                    withFullPointer.entry.path,
+                                ),
+                            ) ??
+                            pathSegmentsToPointer(withFullPointer.entry.path)
                         }
                     />
                 ))}

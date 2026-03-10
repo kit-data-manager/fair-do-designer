@@ -1,7 +1,3 @@
-import {
-    DocumentEntry,
-    JSONValuesSingle,
-} from "@/lib/data-source-picker/json-unifier"
 import { useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
@@ -10,14 +6,18 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { EllipsisIcon, XIcon } from "lucide-react"
+import {
+    IUnifiedDocumentEntry,
+    JSONValuesPrimitive,
+} from "@/lib/data-source-picker/types"
 
 export function ValueRenderer({
     values,
     documentChildren,
     timesObserved,
 }: {
-    values: Map<JSONValuesSingle, number>
-    documentChildren: DocumentEntry[]
+    values: Map<JSONValuesPrimitive, number>
+    documentChildren: IUnifiedDocumentEntry[]
     timesObserved: number
 }) {
     const [showAll, setShowAll] = useState(false)
@@ -88,7 +88,7 @@ export function SingleValueRenderer({
     observedTimes,
     timesObserved,
 }: {
-    value: JSONValuesSingle
+    value: JSONValuesPrimitive
     showAll: boolean
     observedTimes: number
     timesObserved: number
