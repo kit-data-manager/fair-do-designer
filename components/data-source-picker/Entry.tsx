@@ -101,13 +101,15 @@ export function Entry({
                                 current={entry.timesObserved}
                             />
                             {isUnique && (
-                                <Tooltip>
+                                <Tooltip delayDuration={700}>
                                     <TooltipTrigger asChild>
                                         <FingerprintIcon className="ml-1 size-4 shrink-0 text-primary" />
                                     </TooltipTrigger>
-                                    <TooltipContent>
-                                        The values of this entry are unique in
-                                        each provided file
+                                    <TooltipContent className="max-w-96">
+                                        The values of this entry are different
+                                        in each provided file. Therefore, this
+                                        value might be suitable as an
+                                        identifier.
                                     </TooltipContent>
                                 </Tooltip>
                             )}
