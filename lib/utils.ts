@@ -1,6 +1,9 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import * as Blockly from "blockly"
+import { PathSegment } from "@/lib/data-source-picker/json-path"
+import { InputJsonPointer } from "@/lib/blocks/input"
+import React from "react"
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs))
@@ -47,5 +50,46 @@ export function isValidUrl(url: string) {
         return true
     } catch {
         return false
+    }
+}
+
+export function addQueryBlockToWorkspace(
+    workspace: Blockly.WorkspaceSvg,
+    query: PathSegment[],
+    label: string,
+    srcEvent?: React.DragEvent,
+) {
+    Blockly.Events.setGroup(true)
+
+    try {
+        const block = workspace.newBlock("input_json_pointer")
+
+        if ("updateQuery" in block && typeof block.updateQuery === "function") {
+            ;(block as InputJsonPointer).updateQuery(query, label)
+        }
+
+        block.initSvg()
+        const offset = workspace.getOriginOffsetInPixels()
+        if (srcEvent) {
+            block.moveTo(
+                new Blockly.utils.Coordinate(
+                    srcEvent.nativeEvent.offsetX - offset.x,
+                    srcEvent.nativeEvent.offsetY - offset.y,
+                ),
+            )
+        } else {
+            const offset = workspace.getOriginOffsetInPixels()
+            block.moveTo(
+                new Blockly.utils.Coordinate(
+                    (workspace.getInjectionDiv().offsetWidth * 2) / 3 -
+                        offset.x,
+                    workspace.getInjectionDiv().offsetHeight / 3 - offset.y,
+                ),
+            )
+        }
+
+        block.render()
+    } finally {
+        Blockly.Events.setGroup(false)
     }
 }

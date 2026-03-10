@@ -4,7 +4,7 @@ type: software
 title: fair-do-designer
 abstract: A client-side web application to generate code for generating PID 
   Records for FAIR DOs.
-version: 0.0.1-preview
+version: 0.10.0-preview
 keywords:
   - fair
   - do
