@@ -31,15 +31,21 @@ export default function Home() {
                 <ResizableHandle hitAreaMargins={{ fine: 5, coarse: 10 }} />
                 <ResizablePanel defaultSize={30} className={"flex flex-col"}>
                     <Tabs
-                        className="max-h-full grow"
+                        className="max-h-full grow gap-0"
                         value={tab}
                         onValueChange={setTab}
                     >
-                        <TabsList>
-                            <TabsTrigger value={"input"}>
+                        <TabsList variant={"large-blocky"}>
+                            <TabsTrigger
+                                value={"input"}
+                                variant={"large-blocky"}
+                            >
                                 <DatabaseIcon /> Data Access
                             </TabsTrigger>
-                            <TabsTrigger value={"output"}>
+                            <TabsTrigger
+                                value={"output"}
+                                variant={"large-blocky"}
+                            >
                                 <CodeIcon /> Generated Code
                             </TabsTrigger>
                         </TabsList>

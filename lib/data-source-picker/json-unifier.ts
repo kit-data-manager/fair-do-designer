@@ -163,7 +163,7 @@ export class Unifier {
                     json: doc as {},
                     resultType: "value",
                 }),
-            ] satisfies [string, JSONValues]
+            ] satisfies [string, JSONValues[]]
         })
         return results.filter(
             ([_, result]) => !Array.isArray(result) || result.length > 0,

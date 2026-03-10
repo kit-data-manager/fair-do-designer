@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useDataSourcePickerSettings } from "@/lib/settings/data-source-picker-settings"
 import { shortenPathsUnique } from "@/lib/data-source-picker/shorten-path"
+import { InspectNonPrimitiveModal } from "@/components/data-source-picker/InspectNonPrimitiveModal"
 
 export type DataSourcePickerRef = {
     addFile: (name: string, doc: JSONValues) => void
@@ -54,6 +55,19 @@ export const DataSourcePicker = forwardRef<
         setShowFullPath,
         showFullPath,
     } = useDataSourcePickerSettings()
+
+    const [inspectNonPrimitiveModalOpen, setInspectNonPrimitiveModalOpen] =
+        useState(false)
+    const [inspectNonPrimitiveEntry, setInspectNonPrimitiveEntry] =
+        useState<IUnifiedDocumentEntry>()
+
+    const openInspectNonPrimitiveModal = useCallback(
+        (entry: IUnifiedDocumentEntry) => {
+            setInspectNonPrimitiveEntry(entry)
+            setInspectNonPrimitiveModalOpen(true)
+        },
+        [],
+    )
 
     const onlyShowLeaves = useMemo(() => {
         return (
@@ -136,6 +150,21 @@ export const DataSourcePicker = forwardRef<
 
     return (
         <div>
+            <InspectNonPrimitiveModal
+                open={inspectNonPrimitiveModalOpen}
+                entry={inspectNonPrimitiveEntry}
+                onOpenChange={setInspectNonPrimitiveModalOpen}
+                searchFor={setSearch}
+                inspect={(entry) => setInspectNonPrimitiveEntry(entry)}
+                addToDesign={(entry) =>
+                    onEntryClick?.(
+                        entry,
+                        shortenedPaths.get(pathSegmentsToPointer(entry.path)) ??
+                            pathSegmentsToPointer(entry.path),
+                    )
+                }
+            />
+
             {!noData && (
                 <div className="flex items-center mb-2 gap-2">
                     <div className="relative grow">
@@ -233,6 +262,9 @@ export const DataSourcePicker = forwardRef<
                             pathSegmentsToPointer(withFullPointer.entry.path)
                         }
                         showShortened={!showFullPath}
+                        showInspectModal={() =>
+                            openInspectNonPrimitiveModal(withFullPointer.entry)
+                        }
                     />
                 ))}
             </div>

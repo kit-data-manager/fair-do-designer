@@ -15,10 +15,12 @@ export function ValueRenderer({
     values,
     unifiedDocumentEntry,
     timesObserved,
+    showInspectModal,
 }: {
     values: Map<JSONValuesPrimitive, number>
     unifiedDocumentEntry: IUnifiedDocumentEntry
     timesObserved: number
+    showInspectModal: () => void
 }) {
     const [showAll, setShowAll] = useState(false)
 
@@ -42,13 +44,16 @@ export function ValueRenderer({
         return (
             <div className="flex items-center p-1">
                 <div className={`opacity-0 pr-1`}>-</div>
-                {unifiedDocumentEntry.isArray() ? "Array" : "Object"}
+                <div className="text-primary dark:text-foreground/70 font-medium pr-2">
+                    {unifiedDocumentEntry.isArray() ? "Array" : "Object"}
+                </div>
                 <Button
                     variant="ghost"
-                    size="sm"
-                    className={`shrink-0 p-0 text-muted-foreground h-4 pl-2!`}
+                    size="mini-inline"
+                    className={`text-muted-foreground`}
+                    onClick={showInspectModal}
                 >
-                    <EyeIcon className="size-3.5 shrink-0 " />
+                    <EyeIcon className="size-4 shrink-0 " />
                 </Button>
             </div>
         )
@@ -72,9 +77,9 @@ export function ValueRenderer({
 
             <Button
                 variant="ghost"
-                size="sm"
+                size="mini-inline"
                 onClick={() => setShowAll(!showAll)}
-                className={`shrink-0 p-0 text-muted-foreground h-4 ${canShowMore ? "" : "hidden"} ${showAll ? "p-1 h-6" : ""}`}
+                className={`text-muted-foreground ${canShowMore ? "" : "hidden"} ${showAll ? "p-1 h-6" : ""}`}
             >
                 {showAll ? (
                     <XIcon className="size-4 shrink-0" />

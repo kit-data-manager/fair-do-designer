@@ -26,6 +26,7 @@ const buttonVariants = cva(
                 lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
                 icon: "size-9",
                 menubar: "h-7 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
+                "mini-inline": "h-5 w-7",
             },
         },
         defaultVariants: {

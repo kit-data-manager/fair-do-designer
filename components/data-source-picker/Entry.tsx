@@ -24,12 +24,14 @@ export function Entry({
     onEntryClick,
     shortened,
     showShortened = true,
+    showInspectModal,
 }: {
     entry: IUnifiedDocumentEntry
     totalDocuments: number
     onEntryClick?: (entry: IUnifiedDocumentEntry, label: string) => void
     shortened: string
     showShortened?: boolean
+    showInspectModal: () => void
 }) {
     // Optimization to only render entries that are visible on screen. Otherwise, the number
     // of entries becomes a performance bottleneck quickly, especially while searching
@@ -113,6 +115,7 @@ export function Entry({
                     values={entry.observedValues}
                     unifiedDocumentEntry={entry}
                     timesObserved={entry.timesObserved}
+                    showInspectModal={showInspectModal}
                 />
             ) : (
                 <div />
