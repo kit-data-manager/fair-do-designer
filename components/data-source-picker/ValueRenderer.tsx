@@ -5,7 +5,7 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { EllipsisIcon, XIcon } from "lucide-react"
+import { EllipsisIcon, EyeIcon, XIcon } from "lucide-react"
 import {
     IUnifiedDocumentEntry,
     JSONValuesPrimitive,
@@ -13,11 +13,11 @@ import {
 
 export function ValueRenderer({
     values,
-    documentChildren,
+    unifiedDocumentEntry,
     timesObserved,
 }: {
     values: Map<JSONValuesPrimitive, number>
-    documentChildren: IUnifiedDocumentEntry[]
+    unifiedDocumentEntry: IUnifiedDocumentEntry
     timesObserved: number
 }) {
     const [showAll, setShowAll] = useState(false)
@@ -38,16 +38,20 @@ export function ValueRenderer({
         }
     }, [arr, showAll])
 
-    if (sliced.length === 0 && documentChildren.length === 0) {
-        return <div className="p-1">Empty</div>
-    }
-
-    if (documentChildren.length > 0 && sliced.length > 0) {
-        return <div className="p-1">Mixed</div>
-    }
-
-    if (documentChildren.length > 0) {
-        return <div className="p-1">Object/Array</div>
+    if (unifiedDocumentEntry.children.length > 0) {
+        return (
+            <div className="flex items-center p-1">
+                <div className={`opacity-0 pr-1`}>-</div>
+                {unifiedDocumentEntry.isArray() ? "Array" : "Object"}
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    className={`shrink-0 p-0 text-muted-foreground h-4 pl-2!`}
+                >
+                    <EyeIcon className="size-3.5 shrink-0 " />
+                </Button>
+            </div>
+        )
     }
 
     return (
@@ -88,7 +92,7 @@ export function SingleValueRenderer({
     observedTimes,
     timesObserved,
 }: {
-    value: JSONValuesPrimitive
+    value: JSONValuesPrimitive | IUnifiedDocumentEntry
     showAll: boolean
     observedTimes: number
     timesObserved: number
@@ -112,11 +116,23 @@ export function SingleValueRenderer({
                         <span
                             className={`inline ${showAll ? "line-clamp-4" : "truncate"}`}
                         >
-                            {value + " "}
+                            {typeof value === "object" &&
+                                value !== null &&
+                                !value.isArray() && (
+                                    <span className="italic">Object </span>
+                                )}
+                            {typeof value === "object" &&
+                                value !== null &&
+                                value.isArray() && (
+                                    <span className="italic">Array </span>
+                                )}
+                            {typeof value !== "object" && value + " "}
                         </span>
                     </TooltipTrigger>
                     <TooltipContent className="max-w-[400px]">
-                        {value}
+                        {typeof value === "object"
+                            ? JSON.stringify(value)
+                            : value + ""}
                     </TooltipContent>
                 </Tooltip>
                 {showAll && (

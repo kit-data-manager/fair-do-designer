@@ -23,11 +23,13 @@ export function Entry({
     totalDocuments,
     onEntryClick,
     shortened,
+    showShortened = true,
 }: {
     entry: IUnifiedDocumentEntry
     totalDocuments: number
     onEntryClick?: (entry: IUnifiedDocumentEntry, label: string) => void
     shortened: string
+    showShortened?: boolean
 }) {
     // Optimization to only render entries that are visible on screen. Otherwise, the number
     // of entries becomes a performance bottleneck quickly, especially while searching
@@ -93,7 +95,11 @@ export function Entry({
                         </div>
                         <Tooltip delayDuration={700}>
                             <TooltipTrigger asChild>
-                                <div className="truncate">{shortened}</div>
+                                <div className="truncate">
+                                    {showShortened
+                                        ? shortened
+                                        : pathSegmentsToPointer(entry.path)}
+                                </div>
                             </TooltipTrigger>
                             <TooltipContent>
                                 {pathSegmentsToPointer(entry.path)}
@@ -105,7 +111,7 @@ export function Entry({
             {isInViewport ? (
                 <ValueRenderer
                     values={entry.observedValues}
-                    documentChildren={entry.children}
+                    unifiedDocumentEntry={entry}
                     timesObserved={entry.timesObserved}
                 />
             ) : (

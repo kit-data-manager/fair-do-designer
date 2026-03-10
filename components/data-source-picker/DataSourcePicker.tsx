@@ -7,11 +7,8 @@ import {
 } from "react"
 import { Entry } from "@/components/data-source-picker/Entry"
 import { Input } from "@/components/ui/input"
-import { SearchIcon } from "lucide-react"
-import {
-    PathSegment,
-    pathSegmentsToPointer,
-} from "@/lib/data-source-picker/json-path"
+import { BlocksIcon, SearchIcon, SettingsIcon } from "lucide-react"
+import { pathSegmentsToPointer } from "@/lib/data-source-picker/json-path"
 import { saveToLocalStorage } from "@/lib/serialization"
 import { useStore } from "zustand/react"
 import { dataSourcePickerStore } from "@/lib/stores/data-source-picker-store"
@@ -19,6 +16,19 @@ import {
     IUnifiedDocumentEntry,
     JSONValues,
 } from "@/lib/data-source-picker/types"
+import { Button } from "@/components/ui/button"
+import {
+    DropdownMenu,
+    DropdownMenuCheckboxItem,
+    DropdownMenuContent,
+    DropdownMenuSeparator,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { useDataSourcePickerSettings } from "@/lib/settings/data-source-picker-settings"
+import { shortenPathsUnique } from "@/lib/data-source-picker/shorten-path"
 
 export type DataSourcePickerRef = {
     addFile: (name: string, doc: JSONValues) => void
@@ -38,10 +48,19 @@ export const DataSourcePicker = forwardRef<
         totalDocumentCount,
     } = useStore(dataSourcePickerStore)
     const [search, setSearch] = useState("")
+    const {
+        showNonPrimitiveEntries,
+        setShowNonPrimitiveEntries,
+        setShowFullPath,
+        showFullPath,
+    } = useDataSourcePickerSettings()
 
     const onlyShowLeaves = useMemo(() => {
-        return search === ""
-    }, [search])
+        return (
+            (showNonPrimitiveEntries === "auto" && search === "") ||
+            showNonPrimitiveEntries === "never"
+        )
+    }, [search, showNonPrimitiveEntries])
 
     const addFile = useCallback(
         (name: string, doc: JSONValues) => {
@@ -118,14 +137,73 @@ export const DataSourcePicker = forwardRef<
     return (
         <div>
             {!noData && (
-                <div className="relative">
-                    <SearchIcon className="absolute size-4 left-2.5 top-2.5 text-muted-foreground" />
-                    <Input
-                        value={search}
-                        className="pl-8 mb-2"
-                        placeholder="Search for keys or values..."
-                        onChange={(e) => setSearch(e.target.value)}
-                    />
+                <div className="flex items-center mb-2 gap-2">
+                    <div className="relative grow">
+                        <SearchIcon className="absolute size-4 left-2.5 top-2.5 text-muted-foreground" />
+                        <Input
+                            value={search}
+                            className="pl-8"
+                            placeholder="Search for keys or values..."
+                            onChange={(e) => setSearch(e.target.value)}
+                        />
+                    </div>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button size={"icon"} variant="outline">
+                                <SettingsIcon />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <DropdownMenuCheckboxItem
+                                checked={showFullPath}
+                                onCheckedChange={(val) => setShowFullPath(val)}
+                            >
+                                Show full path
+                            </DropdownMenuCheckboxItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuSub>
+                                <DropdownMenuSubTrigger>
+                                    <BlocksIcon className="size-4 shrink-0 mr-2" />{" "}
+                                    Show non-primitive entries
+                                </DropdownMenuSubTrigger>
+                                <DropdownMenuSubContent>
+                                    <DropdownMenuCheckboxItem
+                                        checked={
+                                            showNonPrimitiveEntries === "auto"
+                                        }
+                                        onCheckedChange={(v) =>
+                                            v &&
+                                            setShowNonPrimitiveEntries("auto")
+                                        }
+                                    >
+                                        Auto
+                                    </DropdownMenuCheckboxItem>
+                                    <DropdownMenuCheckboxItem
+                                        checked={
+                                            showNonPrimitiveEntries === "always"
+                                        }
+                                        onCheckedChange={(v) =>
+                                            v &&
+                                            setShowNonPrimitiveEntries("always")
+                                        }
+                                    >
+                                        Always
+                                    </DropdownMenuCheckboxItem>
+                                    <DropdownMenuCheckboxItem
+                                        checked={
+                                            showNonPrimitiveEntries === "never"
+                                        }
+                                        onCheckedChange={(v) =>
+                                            v &&
+                                            setShowNonPrimitiveEntries("never")
+                                        }
+                                    >
+                                        Never
+                                    </DropdownMenuCheckboxItem>
+                                </DropdownMenuSubContent>
+                            </DropdownMenuSub>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
             )}
 
@@ -154,92 +232,10 @@ export const DataSourcePicker = forwardRef<
                             ) ??
                             pathSegmentsToPointer(withFullPointer.entry.path)
                         }
+                        showShortened={!showFullPath}
                     />
                 ))}
             </div>
         </div>
     )
 })
-
-/**
- * From an array of paths, returns the shortest unique partial pointers.
- * @param paths Array of paths to shorten. Each path is an array of path segments.
- * @returns Array of shortest unique partial pointers.
- */
-function shortenPathsUnique(paths: PathSegment[][]) {
-    const base = paths.map((p) => ({
-        path: p,
-        length: 1,
-        fullPointer: pathSegmentsToPointer(p),
-    }))
-    let nextIteration = base.slice()
-
-    while (nextIteration.length > 0) {
-        const { conflicted, mapping } = findConflicted(nextIteration)
-        const promoteToNextIteration = []
-
-        for (const candidate of nextIteration) {
-            const partialPointer = mapping.get(candidate.fullPointer)!
-            if (conflicted.has(partialPointer)) {
-                candidate.length += 1
-                promoteToNextIteration.push(candidate)
-            }
-        }
-
-        nextIteration = promoteToNextIteration.slice()
-    }
-
-    return base.map(getPartialPointer)
-}
-
-/**
- * Generates a partial pointer string from the provided part object. The partial pointer is constructed from the specified number of path segments, starting from the back of the path.
- *
- * @param {Object} part An object containing information to generate the partial pointer.
- * @param {PathSegment[]} part.path The array of path segments used to construct the pointer.
- * @param {number} part.length The number of segments from the start that will be included in the resulting partial pointer.
- * @return A partial pointer string constructed from the specified number of path segments, formatted for prettier output.
- */
-function getPartialPointer(part: { path: PathSegment[]; length: number }) {
-    return (
-        part.path
-            .slice()
-            // Rename root segment from "$" to "" to make prettier partial pointer
-            // e.g. "/title" instead of "$/title"
-            .map((v, i) => (i === 0 ? { ...v, value: "" } : (v as PathSegment)))
-            .reverse()
-            .slice(0, part.length)
-            .reverse()
-            .map((p) => p.value)
-            .join("/")
-    )
-}
-
-/**
- * From an array of paths, find all paths that have the same partial pointer. The `length` is the current length of the paths partial pointer (from the back)
- * @param parts Array of paths to find conflicts in. Each part has the path, the current length of the partial path, as well as the full pointer (this is a performance optimization, the full pointer can always be calculated from the path)
- */
-function findConflicted(
-    parts: { path: PathSegment[]; length: number; fullPointer: string }[],
-) {
-    // Partial pointers are added here the first time they are encountered
-    const firstPass = new Set<string>()
-    // Partial pointers are added here if they were encountered twice (conflict)
-    const secondPass = new Set<string>()
-    // Mapping from full pointer to partial pointer, to recover the full pointers from the list of conflicting partial pointers
-    // In case of a conflict, multiple unique full pointers map to the same partial pointer
-    const mapping = new Map<string, string>()
-
-    for (const part of parts) {
-        const partialPointer = getPartialPointer(part)
-        mapping.set(part.fullPointer, partialPointer)
-
-        if (firstPass.has(partialPointer)) {
-            secondPass.add(partialPointer)
-        } else {
-            firstPass.add(partialPointer)
-        }
-    }
-
-    return { conflicted: secondPass, mapping }
-}

@@ -38,4 +38,11 @@ export class UnifiedDocumentEntry implements IUnifiedDocumentEntry {
     isLeaf(): boolean {
         return this.children.length === 0
     }
+
+    isArray(): boolean {
+        return (
+            this.children.length > 0 &&
+            this.children.every((child) => child.arrayElement)
+        )
+    }
 }

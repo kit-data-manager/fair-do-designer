@@ -62,4 +62,9 @@ export interface IUnifiedDocumentEntry {
      * This further indicated that this entry has no {@link children} and only contains {@link observedValues}
      */
     isLeaf(): boolean
+
+    /**
+     * Indicates if this entry is an array. In this case, for all {@link children} `arrayElement == true` is implied.
+     */
+    isArray(): boolean
 }
