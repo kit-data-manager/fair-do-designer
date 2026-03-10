@@ -35,9 +35,11 @@ export function ValueRenderer({
 
     return (
         <div
-            className={`p-1 flex items-center  ${showAll ? "justify-between" : "gap-2 truncate"}`}
+            className={`p-1 flex items-center max-w-full ${showAll ? "justify-between break-words" : "gap-2 truncate"}`}
         >
-            <div className={showAll ? "" : "truncate"}>
+            <div
+                className={(showAll ? "" : "truncate") + " break-words min-w-0"}
+            >
                 {sliced.map(([value, observedTimes], i) => (
                     <SingleValueRenderer
                         value={value}
