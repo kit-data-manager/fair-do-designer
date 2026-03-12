@@ -34,25 +34,34 @@ export function OutputPane() {
 
     const codeGeneratorInstance = useCodeGenerator()
     const codeDownloader = useCodeDownloader()
-    const [jsStandaloneCodeGenerator, setJsStandaloneCodeGenerator] = useState(new JavascriptMappingGenerator("tmp"));
-    const unifier = useStore(dataSourcePickerStore, s => s.unifier)
+    const [jsStandaloneCodeGenerator, setJsStandaloneCodeGenerator] = useState(
+        new JavascriptMappingGenerator("tmp"),
+    )
+    const unifier = useStore(dataSourcePickerStore, (s) => s.unifier)
 
     useEffect(() => {
         const generator = async () => {
             const basepath = process.env.NEXT_PUBLIC_BASE_PATH ?? ""
             const prefix = `${window.location.origin}/${basepath}`
-            const executor_boilerplate = await fetch(`${prefix}/js/executor.js`).then((res) => res.text())
-            const error_boilerplate = await fetch(`${prefix}/js/error_handling.js`).then((res) => res.text())
+            const executor_boilerplate = await fetch(
+                `${prefix}/js/executor.js`,
+            ).then((res) => res.text())
+            const error_boilerplate = await fetch(
+                `${prefix}/js/error_handling.js`,
+            ).then((res) => res.text())
             const flags: Dict<any> = {
                 generate_trace_calls: true,
                 boilerplate: {
-                    "executor": executor_boilerplate,
+                    executor: executor_boilerplate,
                     "error-handling": error_boilerplate,
-                }
+                },
             }
-            return new JavascriptMappingGenerator("PidRecordMappingJavascriptStandalone", flags)
+            return new JavascriptMappingGenerator(
+                "PidRecordMappingJavascriptStandalone",
+                flags,
+            )
         }
-        generator().then(g => setJsStandaloneCodeGenerator(g))
+        generator().then((g) => setJsStandaloneCodeGenerator(g))
     }, [])
 
     const generateCode = useCallback(() => {
@@ -122,13 +131,14 @@ export function OutputPane() {
 
     if (!sandbox.workerMounted)
         sandbox.mount(
-            (process.env.NEXT_PUBLIC_BASE_PATH ?? "") + "/workers/js-sandbox.js",
+            (process.env.NEXT_PUBLIC_BASE_PATH ?? "") +
+                "/workers/js-sandbox.js",
         )
 
     const runLongCode = useCallback(async () => {
         console.time("JS sandbox execution")
         const docs = unifier.getDocuments()
-        const input_code: string = `const INPUT = [\n${docs.map(v => `${JSON.stringify(v.doc)}`).join(",\n")}\n];\n`
+        const input_code: string = `const INPUT = [\n${docs.map((v) => `${JSON.stringify(v.doc)}`).join(",\n")}\n];\n`
         let withNewData = jsStandaloneCodeGenerator.options
         if (!withNewData.boilerplate) {
             withNewData.boilerplate = {}
@@ -136,10 +146,10 @@ export function OutputPane() {
         withNewData.boilerplate.input = input_code
         jsStandaloneCodeGenerator.configure(withNewData)
         const fullCode = jsStandaloneCodeGenerator.workspaceToCode(workspace)
-        sandbox.execute("executeCode", fullCode).then((result => {
+        sandbox.execute("executeCode", fullCode).then((result) => {
             console.timeEnd("JS sandbox execution")
             console.log("Sandbox result:", result)
-        }))
+        })
     }, [sandbox, code, workspace, jsStandaloneCodeGenerator])
 
     return (

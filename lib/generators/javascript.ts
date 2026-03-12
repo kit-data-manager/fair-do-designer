@@ -75,8 +75,10 @@ export class JavascriptMappingGenerator
         this.addReservedWords("EXECUTOR")
 
         this.definitions_["executor"] = "const EXECUTOR = new Executor(INPUT)"
-        this.definitions_["import-jsonpointer"] = "import { JsonPointer } from 'jsonpointer.js';"
-        this.definitions_["import-jsonpath"] = "import { JSONPath } from 'jsonpath.js';"
+        this.definitions_["import-jsonpointer"] =
+            "import { JsonPointer } from 'jsonpointer.js';"
+        this.definitions_["import-jsonpath"] =
+            "import { JSONPath } from 'jsonpath.js';"
 
         if (this.options.generate_trace_calls && !this.hasTraceCalls) {
             Object.keys(this.forBlock).forEach((key) => {
@@ -162,7 +164,7 @@ export class JavascriptMappingGenerator
         const suffix: string = [
             "\n",
             "const result = EXECUTOR.execute()",
-            "globalThis.result = result"
+            "globalThis.result = result",
         ].join("\n")
         return code + suffix
     }

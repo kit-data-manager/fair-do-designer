@@ -44,7 +44,9 @@ function otherwise<T = any>(either: () => any, otherwiseFn: () => any): T {
 function stop_with_fail(message: string | null | undefined) {
     const finalMessage =
         !message || message === "" ? "No error message provided" : message
-    trace("error_block", () => {throw new Error("Design stopped with error: " + finalMessage)})
+    trace("error_block", () => {
+        throw new Error("Design stopped with error: " + finalMessage)
+    })
 }
 
 function trace(block_id: string, callback: () => any): any {

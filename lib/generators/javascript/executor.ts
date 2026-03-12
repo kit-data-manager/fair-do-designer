@@ -288,7 +288,7 @@ class Executor {
 
         this._apply_inputs_to_designs()
         console.log("Resulting amount of records:", this.RECORD_GRAPH.size)
-        
+
         this._apply_inference_rules_to_records()
 
         let result: Array<Record<string, any>> = []
