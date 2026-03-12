@@ -41,7 +41,7 @@ function otherwise<T = any>(either: () => any, otherwiseFn: () => any): T {
     return isOk ? eitherResult : otherwiseFn()
 }
 
-function stopWithFail(message: string | null | undefined) {
+function stop_with_fail(message: string | null | undefined) {
     const finalMessage =
         !message || message === "" ? "No error message provided" : message
     trace("error_block", () => {throw new Error("Design stopped with error: " + finalMessage)})
