@@ -135,7 +135,7 @@ export function OutputPane() {
                 "/workers/js-sandbox.js",
         )
 
-    const runLongCode = useCallback(async () => {
+    const calculateRecords = useCallback(async () => {
         console.time("JS sandbox execution")
         const docs = unifier.getDocuments()
         const input_code: string = `const INPUT = [\n${docs.map((v) => `${JSON.stringify(v.doc)}`).join(",\n")}\n];\n`
@@ -150,7 +150,7 @@ export function OutputPane() {
             console.timeEnd("JS sandbox execution")
             console.log("Sandbox result:", result)
         })
-    }, [sandbox, code, workspace, jsStandaloneCodeGenerator])
+    }, [sandbox, workspace, jsStandaloneCodeGenerator])
 
     return (
         <div className="flex flex-col grow max-w-full">
@@ -201,7 +201,7 @@ export function OutputPane() {
                         </SelectContent>
                     </Select>
                 </div>
-                <Button variant="outline" onClick={runLongCode}>
+                <Button variant="outline" onClick={calculateRecords}>
                     Run code
                 </Button>
             </div>
