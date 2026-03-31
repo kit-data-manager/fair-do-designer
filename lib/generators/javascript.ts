@@ -91,6 +91,7 @@ export class JavascriptMappingGenerator
                     generator /*: this*/,
                 ) {
                     let result = oldFunc.call(this, block, generator)
+                    let name = block.type
                     if (result == null) {
                         return `trace("${block.id}", () => null)`
                     } else if (typeof result === "string") {
@@ -199,4 +200,5 @@ const without_trace = [
     //"otherwise",
     //"backlink_declaration",
     "profile_hmc_reference_block",
+    "procedures_defreturn",
 ]
