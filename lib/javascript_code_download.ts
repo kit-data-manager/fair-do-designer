@@ -4,7 +4,7 @@ export class JavascriptCodeDownload {
     private staticFileCache: Record<string, string> = {}
 
     async downloadCodeZip(generatedCode: string) {
-        const filesToFetch = ["executor.js"]
+        const filesToFetch = ["executor.js", "jsonpointer.js", "jsonpath.js"]
         const promises = filesToFetch.map((name) =>
             name in this.staticFileCache
                 ? Promise.resolve(this.staticFileCache[name])
@@ -13,13 +13,29 @@ export class JavascriptCodeDownload {
                   ).then((res) => res.text()),
         )
 
-        const fetchedFile = await Promise.all(promises)
+        const license_name: string = "LICENSE"
+        const license_path: string =
+            (process.env.NEXT_PUBLIC_BASE_PATH ?? "") +
+            "/python/" +
+            license_name
+        const license_text =
+            license_name in this.staticFileCache
+                ? Promise.resolve(this.staticFileCache[license_name])
+                : fetch(license_path).then((res) => res.text())
+
+        const fetchedFile = await Promise.all(promises.concat([license_text]))
         const zippable: Record<string, Uint8Array> = {}
 
         for (const [index, file] of fetchedFile.entries()) {
+            if (index === fetchedFile.length - 1) {
+                zippable[license_name] = strToU8(file)
+                this.staticFileCache[license_name] = file
+                continue
+            }
             zippable[filesToFetch[index]] = strToU8(file)
             this.staticFileCache[filesToFetch[index]] = file
         }
+
         return new Promise<void>((resolve, reject) => {
             zip(
                 {
