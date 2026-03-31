@@ -33,7 +33,7 @@ def otherwise(either: Callable[[], Any], otherwise: Callable[[], Any]) -> Any:
     try:
         eitherResult = either()
     except Exception as e:
-        print("    USE OTHER: First value in otherwise block threq exception: ", e)
+        print("    USE OTHER: First value in otherwise block threw exception: ", e)
         return otherwise()
 
     if type(eitherResult) == str and eitherResult.strip().lower() in ("null", "", "()", "[]", "{}"):
