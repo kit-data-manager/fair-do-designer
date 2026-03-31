@@ -29,7 +29,7 @@ export class JavascriptCodeDownload {
     }
 
     async fetchBoilerplate(): Promise<{ boilerplate: Array<string> }> {
-        const filesToFetch = ["executor.js", "error_handling.js"]
+        const filesToFetch = ["executor.js"]
         const promises = filesToFetch.map((name) =>
             name in this.staticFileCache
                 ? Promise.resolve(this.staticFileCache[name])

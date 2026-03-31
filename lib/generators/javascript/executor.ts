@@ -5,6 +5,74 @@ type JsonType = string | Array<any> | Record<string, any>
 type Eval<T> = () => T
 type EvalPrimitive = Eval<Primitive>
 
+// ---Error-handling-------------------------------------------------
+const is_emptyish = (test_me: any) => {
+    const is_nullish = test_me === null || test_me === undefined
+    const is_empty_string = typeof test_me === "string" && test_me.trim() === ""
+    const is_emptyish_string =
+        typeof test_me === "string" &&
+        ["null", "()", "[]", "{}"].includes(test_me.trim().toLowerCase())
+    const is_empty_array: boolean =
+        Array.isArray(test_me) &&
+        (test_me.length === 0 || test_me.every(is_emptyish))
+    return is_nullish || is_empty_string || is_emptyish_string || is_empty_array
+}
+
+/**
+ * Returns `either` if it is somehow a valid value, otherwise executes and returns `otherwise`.
+ *
+ * @param either - A function that returns the value to check
+ * @param otherwiseFn - A function that returns the fallback value
+ * @returns `either` if it is not falsy/empty, otherwise the result of `otherwiseFn`
+ */
+function otherwise<T = any>(either: () => any, otherwiseFn: () => any): T {
+    let eitherResult: any
+
+    try {
+        eitherResult = either()
+    } catch (e) {
+        console.log(
+            "    USE OTHER: First value in otherwise block threw exception: ",
+            e,
+        )
+        return otherwiseFn()
+    }
+
+    return is_emptyish(eitherResult) ? eitherResult : otherwiseFn()
+}
+
+function stop_with_fail(message: string | null | undefined) {
+    const finalMessage =
+        !message || message === "" ? "No error message provided" : message
+    trace("error_block", () => {
+        throw new Error("Design stopped with error: " + finalMessage)
+    })
+}
+
+function trace(block_id: string, callback: () => any): any {
+    // Intention: Easy to parse format in case we want to know which block
+    // caused certain logs, even if not an error.
+    console.log("fdodesigner::trace-block-start=", block_id)
+    try {
+        const result = callback()
+        console.log("fdodesigner::trace-block-end=", block_id, result)
+        return result
+    } catch (e) {
+        // Build stacktrace so we can easily get back to the causing block.
+        throw new BlocklyError(block_id, e)
+    }
+}
+
+class BlocklyError extends Error {
+    block_id: string
+    original_error: any
+    constructor(block_id: string, original_error: any) {
+        super(`Error in block ${block_id}: ${original_error}`)
+        this.block_id = block_id
+        this.original_error = original_error
+    }
+}
+
 // ---Types-for-backlink-inference--------------------------------------- //
 class Reaction {
     receiver: string
@@ -53,6 +121,10 @@ class PidRecord {
     setPid(pid: string): this {
         this._pid = pid
         return this
+    }
+
+    getPid(): string {
+        return this._pid
     }
 
     setId(id: string): this {
@@ -167,7 +239,7 @@ class RecordDesign {
         }
 
         const record: PidRecord = new PidRecord()
-        // errors may occur here, but as IDs are critical, we do not catch them.
+        // Checking ID errors in terms of emptiness and uniqueness is in responsibility of the executer.
         record.setId(this._id())
         console.log("set id", this._id())
         record.setPid(this._pid())
@@ -266,6 +338,9 @@ class Executor {
     // Condition(forward_link_type, receiver_id) => Reaction(receiver_id, backward_link_type)
     private INFERENCE_MATCHES_DB: InferenceRules = new Map()
 
+    private EXISTING_IDS: string[] = []
+    private EXISTING_PIDS: string[] = []
+
     constructor(args: InputProvider) {
         console.log("Executor args", args)
         this.INPUT = args
@@ -312,11 +387,34 @@ class Executor {
         }
     }
 
+    /**
+     * Applies the input files to the designs and creates records.
+     * This will generate records and inference rules which will be stored in this class's state.
+     */
     private _apply_inputs_to_designs(): void {
-        /**
-         * Applies the input files to the designs and creates records.
-         * This will generate records and inference rules which will be stored in this class's state.
-         */
+        const assert_is_not_emptyish = (test_me: any, thing_name: string) => {
+            if (is_emptyish(test_me)) {
+                throw new Error(
+                    `${thing_name} is empty or invalid. Record designs must have a non-empty, unique IDs. But was "${test_me}".`,
+                )
+            }
+            return test_me
+        }
+        const assert_is_not_existing = (
+            id: string,
+            id_name: string,
+            existing: string[],
+        ) => {
+            if (existing.includes(id)) {
+                throw new Error(
+                    `${id_name} "${id}" already exists. Record designs must have unique IDs. Existing IDs are: ${existing.join(
+                        ", ",
+                    )}`,
+                )
+            }
+            return id
+        }
+
         for (const design of this.RECORD_DESIGNS) {
             for (const input_file of this.INPUT) {
                 try {
@@ -338,6 +436,25 @@ class Executor {
                         console.log(
                             `Created record with ID: "${sender.getId()}"`,
                         )
+                        // ID checks
+                        const id = sender.getId()
+                        assert_is_not_emptyish(id, "Record ID")
+                        assert_is_not_existing(
+                            id,
+                            "Record ID",
+                            this.EXISTING_IDS,
+                        )
+                        this.EXISTING_IDS.push(id)
+                        // PID checks
+                        const pid = sender.getPid()
+                        if (!is_emptyish(pid)) {
+                            assert_is_not_existing(
+                                pid,
+                                "Record PID",
+                                this.EXISTING_PIDS,
+                            )
+                            this.EXISTING_PIDS.push(pid)
+                        }
                         // Store the record in the graph
                         this.RECORD_GRAPH.set(sender.getId(), sender)
                         // merge rules into DB

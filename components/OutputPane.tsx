@@ -46,14 +46,10 @@ export function OutputPane() {
             const executor_boilerplate = await fetch(
                 `${prefix}/js/executor.js`,
             ).then((res) => res.text())
-            const error_boilerplate = await fetch(
-                `${prefix}/js/error_handling.js`,
-            ).then((res) => res.text())
             const flags: Dict<any> = {
                 generate_trace_calls: true,
                 boilerplate: {
                     executor: executor_boilerplate,
-                    "error-handling": error_boilerplate,
                 },
             }
             return new JavascriptMappingGenerator(
