@@ -18,8 +18,6 @@
 /out/
 /dist/
 /public/js/*
-!/public/js/jsonpath.js
-!/public/js/jsonpointer.js
 
 # production
 /build

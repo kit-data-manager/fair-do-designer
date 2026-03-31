@@ -3,8 +3,8 @@
   "version": "0.0.1-preview",
   "license": "Apache-2.0",
   "scripts": {
-    "prebuild": "bunx --bun tsc -p tsconfig.js-boilerplate.json",
-    "predev": "bunx --bun tsc -p tsconfig.js-boilerplate.json",
+    "prebuild": "bunx --bun tsc -p tsconfig.js-boilerplate.json; bash include-jsonaccess-libs-public.sh",
+    "predev": "bunx --bun tsc -p tsconfig.js-boilerplate.json; bash include-jsonaccess-libs-public.sh",
     "dev": "npm-run-all -p dev-boilerplate dev-webworker dev-next",
     "build": "npm-run-all -p build-webworker build-next",
     "dev-next": "bun --bun next dev --turbopack",
@@ -31,6 +31,7 @@
     "clsx": "^2.1.1",
     "fflate": "^0.8.2",
     "jsonpath-plus": "^10.3.0",
+    "jsonpointerx": "^1.2.5",
     "lucide-react": "^0.563.0",
     "memoizee": "^0.4.17",
     "next": "^16.0.7",
