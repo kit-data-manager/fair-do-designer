@@ -27,7 +27,7 @@ export type DataSourcePickerRef = {
 
 export const DataSourcePicker = forwardRef<
     DataSourcePickerRef,
-    { onEntryClick?: (entry: DocumentEntry) => void }
+    { onEntryClick?: (entry: DocumentEntry, label: string) => void }
 >(function DataSourcePicker({ onEntryClick }, ref) {
     const {
         unifier: jsonUnifier,

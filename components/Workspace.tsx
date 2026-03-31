@@ -17,9 +17,7 @@ import { useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
 import "@/lib/theme"
 import { DarkTheme } from "@/lib/theme"
-import { applyFillAttrAsStyle } from "@/lib/utils"
-import { InputJsonPointer } from "@/lib/blocks/input"
-import { PathSegment } from "@/lib/data-source-picker/json-path"
+import { addQueryBlockToWorkspace, applyFillAttrAsStyle } from "@/lib/utils"
 
 /**
  * This component encapsulates the {@link Blockly.Workspace} and takes care of initializing it and registering any
@@ -174,46 +172,18 @@ export function Workspace() {
         (event: DragEvent<HTMLDivElement>) => {
             if (!workspace) return
 
-            Blockly.Events.setGroup(true)
-
             try {
-                const block = workspace.newBlock("input_json_pointer")
                 const rawQuery = event.dataTransfer?.getData("application/json")
                 const label = event.dataTransfer?.getData("text/plain")
 
-                if (!rawQuery) {
-                    console.error(
-                        "Received drop event that did not include a valid application/json data point",
-                    )
-                    return
-                }
-                if (!label) {
-                    console.error(
-                        "Received drop event that did not include a valid text/plain data point",
-                    )
-                    return
-                }
-
-                const query = JSON.parse(rawQuery) as PathSegment[]
-
-                if (
-                    "updateQuery" in block &&
-                    typeof block.updateQuery === "function"
-                ) {
-                    ;(block as InputJsonPointer).updateQuery(query, label)
-                }
-
-                block.initSvg()
-                const offset = workspace.getOriginOffsetInPixels()
-                block.moveTo(
-                    new Blockly.utils.Coordinate(
-                        event.nativeEvent.offsetX - offset.x,
-                        event.nativeEvent.offsetY - offset.y,
-                    ),
+                addQueryBlockToWorkspace(
+                    workspace,
+                    JSON.parse(rawQuery),
+                    label,
+                    event,
                 )
-                block.render()
-            } finally {
-                Blockly.Events.setGroup(false)
+            } catch {
+                // Silently ignore drop failure. Users could drop anything in the workspace.
             }
         },
         [workspace],
