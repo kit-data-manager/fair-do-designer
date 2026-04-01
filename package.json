@@ -14,7 +14,8 @@
     "postbuild": "pagefind --site out --glob docs/**/*.{html} --output-path out/_pagefind",
     "dev-webworker": "webpack --config webpack.config.webworker.js --mode=development --watch",
     "build-webworker": "webpack --config webpack.config.webworker.js --mode=production",
-    "dev-boilerplate": "bunx --bun tsc --watch -p tsconfig.js-boilerplate.json"
+    "dev-boilerplate": "bunx --bun tsc --watch -p tsconfig.js-boilerplate.json",
+    "clean": "rm -rf dist out .next .turbo node_modules public/js/*"
   },
   "dependencies": {
     "@blockly/block-plus-minus": "^9.0.9",
