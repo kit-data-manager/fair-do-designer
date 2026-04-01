@@ -47,7 +47,7 @@ export function OutputPane() {
                 `${prefix}/js/executor.js`,
             ).then((res) => res.text())
             const flags: Dict<any> = {
-                generate_trace_calls: true,
+                generate_trace_calls: false,
                 boilerplate: {
                     executor: executor_boilerplate,
                 },
