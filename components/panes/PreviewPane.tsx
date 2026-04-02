@@ -4,7 +4,7 @@ import {
     RectangleHorizontal,
     TableIcon,
 } from "lucide-react"
-import { PIDRecord } from "@/lib/types"
+import { PIDRecord, pidRecordSchema } from "@/lib/types"
 import { PreviewRecordsView } from "@/components/preview/PreviewRecordsView"
 import {
     DropdownMenu,
@@ -17,10 +17,17 @@ import {
 import { Button } from "@/components/ui/button"
 import { useStore } from "zustand/react"
 import { dataSourcePickerStore } from "@/lib/stores/data-source-picker-store"
-import { useCallback, useMemo, useState } from "react"
-import { useCopyToClipboard } from "usehooks-ts"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useCopyToClipboard, useDebounceCallback } from "usehooks-ts"
 import { PreviewTableView } from "@/components/preview/PreviewTableView"
 import { ButtonGroup } from "@/components/ui/button-group"
+import { JavascriptMappingGenerator } from "@/lib/generators/javascript"
+import * as Blockly from "blockly"
+import { FunctionWorker } from "@/lib/function-worker"
+import { jsSandboxFunctions } from "@/lib/workers/js-sandbox/functions"
+import { workspaceStore } from "@/lib/stores/workspace"
+import { z } from "zod/mini"
+import { ErrorDisplay } from "@/components/ErrorDisplay"
 
 // Please generate some example PID records for me
 const exampleRecords: PIDRecord[] = [
@@ -111,6 +118,7 @@ const exampleRecords: PIDRecord[] = [
 export function PreviewPane() {
     const [viewType, setViewType] = useState<"records" | "table">("records")
     const unifier = useStore(dataSourcePickerStore, (s) => s.unifier)
+    const workspace = useStore(workspaceStore, (s) => s.workspace)
     const totalDocumentCount = useStore(
         dataSourcePickerStore,
         (s) => s.totalDocumentCount,
@@ -121,6 +129,8 @@ export function PreviewPane() {
             .slice(0, totalDocumentCount)
             .map((d) => d.name)
     }, [unifier, totalDocumentCount])
+    const [previewRecords, setPreviewRecords] = useState<PIDRecord[]>([])
+    const [previewError, setPreviewError] = useState<unknown>(undefined)
 
     const [selectedDocuments, setSelectedDocuments] = useState<string[]>([])
 
@@ -144,6 +154,112 @@ export function PreviewPane() {
 
     const [, copy] = useCopyToClipboard()
 
+    const [jsStandaloneCodeGenerator, setJsStandaloneCodeGenerator] =
+        useState<JavascriptMappingGenerator>()
+
+    useEffect(() => {
+        const generator = async () => {
+            const basepath = process.env.NEXT_PUBLIC_BASE_PATH ?? ""
+            const prefix = `${window.location.origin}/${basepath}`
+            const executor_boilerplate = await fetch(
+                `${prefix}/js/executor.js`,
+            ).then((res) => res.text())
+            const flags: Dict<any> = {
+                generate_trace_calls: false,
+                boilerplate: {
+                    executor: executor_boilerplate,
+                },
+            }
+            return new JavascriptMappingGenerator(
+                "PidRecordMappingJavascriptStandalone",
+                flags,
+            )
+        }
+        generator().then((g) => setJsStandaloneCodeGenerator(g))
+    }, [])
+
+    const [sandbox] = useState(
+        new FunctionWorker(jsSandboxFunctions, { localFallback: false }),
+    )
+
+    if (!sandbox.workerMounted)
+        sandbox.mount(
+            (process.env.NEXT_PUBLIC_BASE_PATH ?? "") +
+                "/workers/js-sandbox.js",
+        )
+
+    const calculateRecords = useCallback(async (): Promise<PIDRecord[]> => {
+        if (!jsStandaloneCodeGenerator) return []
+        console.time("JS sandbox execution")
+        const docs = unifier.getDocuments()
+        const input_code: string = `const INPUT = [\n${docs.map((v) => `${JSON.stringify(v.doc)}`).join(",\n")}\n];\n`
+        let withNewData = structuredClone(jsStandaloneCodeGenerator.options)
+        if (!withNewData.boilerplate) {
+            withNewData.boilerplate = {}
+        }
+        withNewData.boilerplate.input = input_code
+        jsStandaloneCodeGenerator.configure(withNewData)
+        const fullCode = jsStandaloneCodeGenerator.workspaceToCode(workspace)
+        const result = await sandbox.execute("executeCode", fullCode)
+        console.timeEnd("JS sandbox execution")
+        console.log("Sandbox result:", result)
+
+        if (result.value) {
+            const parsedValue = z.array(pidRecordSchema).safeParse(result.value)
+            if (parsedValue.success) {
+                return parsedValue.data
+            } else throw parsedValue.error
+        } else
+            throw (
+                result.error ??
+                new Error("Received empty response form record generator")
+            )
+    }, [unifier, jsStandaloneCodeGenerator, workspace, sandbox])
+
+    // Monotonic counter to prevent slow updates from overriding faster updates
+    const updateRecordsCounter = useRef(0)
+    const updateRecords = useCallback(async () => {
+        console.log("Updating records now...")
+        const counter = ++updateRecordsCounter.current
+        try {
+            const records = await calculateRecords()
+            if (counter === updateRecordsCounter.current) {
+                setPreviewError(undefined)
+                setPreviewRecords(records)
+            }
+        } catch (e) {
+            if (counter == updateRecordsCounter.current) {
+                setPreviewError(e)
+            }
+        }
+    }, [calculateRecords])
+
+    const debouncedUpdateRecords = useDebounceCallback(updateRecords, 500)
+
+    useEffect(() => {
+        if (!workspace) return
+
+        function changeListener(e: Blockly.Events.Abstract) {
+            if (!workspace) return
+
+            // Don't run the code when the workspace finishes loading; we're
+            // already running it once when the application starts.
+            // Don't run the code during drags; we might have invalid state.
+            if (
+                e.isUiEvent ||
+                e.type == Blockly.Events.FINISHED_LOADING ||
+                workspace.isDragging()
+            ) {
+                return
+            }
+            debouncedUpdateRecords()
+        }
+        // Whenever the workspace changes meaningfully, run the code again.
+        workspace.addChangeListener(changeListener)
+
+        return () => workspace.removeChangeListener(changeListener)
+    }, [debouncedUpdateRecords, workspace])
+
     const exportPreviewToClipboard = useCallback(() => {
         const data = {
             records: exampleRecords,
@@ -162,18 +278,19 @@ export function PreviewPane() {
         const attributeList = Array.from(attributes)
 
         // Helper to escape a CSV field (RFC 4180 compliant)
-        const escapeField = (value: string): string => {
+        const escapeField = (value: unknown): string => {
             // If field contains comma, double quote, or newline, wrap in quotes
             // and escape internal double quotes by doubling them
             if (
-                value.includes(",") ||
-                value.includes('"') ||
-                value.includes("\n") ||
-                value.includes("\r")
+                typeof value === "string" &&
+                (value.includes(",") ||
+                    value.includes('"') ||
+                    value.includes("\n") ||
+                    value.includes("\r"))
             ) {
                 return `"${value.replace(/"/g, '""')}"`
             }
-            return value
+            return value + ""
         }
 
         // Build header row: PID + all attribute keys
@@ -308,13 +425,18 @@ export function PreviewPane() {
                 </ButtonGroup>
             </div>
 
+            <ErrorDisplay
+                error={previewError}
+                title={"Failed to generate preview"}
+            />
+
             {viewType === "records" ? (
                 <div className="overflow-auto p-3">
-                    <PreviewRecordsView records={exampleRecords} />
+                    <PreviewRecordsView records={previewRecords} />
                 </div>
             ) : (
                 <div className="overflow-auto">
-                    <PreviewTableView records={exampleRecords} />
+                    <PreviewTableView records={previewRecords} />
                 </div>
             )}
         </div>
