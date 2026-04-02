@@ -18,14 +18,14 @@ export function PreviewRecordsView({ records }: { records: PIDRecord[] }) {
 
 export function PreviewRecordView({ record }: { record: PIDRecord }) {
     return (
-        <div className="rounded-md shadow-xs bg-profile text-profile-foreground">
-            <div className="bg-record text-record-foreground p-2 rounded-t-md truncate flex justify-between text-sm">
+        <div className="rounded-md shadow-xs text-profile-foreground">
+            <div className="bg-record/80 dark:bg-record/40 border-record border border-b-0 text-record-foreground p-2 rounded-t-md truncate flex justify-between text-sm">
                 <div className="font-medium">PID: {record.pid}</div>
                 <div className="flex gap-1 items-center">
                     <FileIcon className="size-3.5 shrink-0" /> example.json
                 </div>
             </div>
-            <div className="grid grid-cols-2">
+            <div className="grid grid-cols-2 dark:bg-profile/40 bg-profile/80 border-profile border rounded-b-md border-t-0">
                 {record.record.map((entry) => (
                     <PIDRecordEntry
                         key={entry.key}

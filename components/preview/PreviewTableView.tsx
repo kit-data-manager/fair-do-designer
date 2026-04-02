@@ -40,7 +40,9 @@ export function PreviewTableView({ records }: { records: PIDRecord[] }) {
         <Table>
             <TableHeader>
                 <TableRow>
-                    <TableHead>PID</TableHead>
+                    <TableHead className="bg-record/80 dark:bg-record/40 text-record-foreground">
+                        PID
+                    </TableHead>
                     {Array.from(attributes).map((attribute) => (
                         <PreviewTableHeaderCell
                             className={tdStyle}
@@ -102,7 +104,12 @@ export function PreviewTableHeaderCell({
     }
 
     return (
-        <TableHead className={className}>
+        <TableHead
+            className={cn(
+                className,
+                "bg-profile/80 dark:bg-profile/40 text-profile-foreground",
+            )}
+        >
             {error ? (
                 attributePID
             ) : !isLoading && data ? (
