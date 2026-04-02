@@ -29,92 +29,6 @@ import { workspaceStore } from "@/lib/stores/workspace"
 import { z } from "zod/mini"
 import { ErrorDisplay } from "@/components/ErrorDisplay"
 
-// Please generate some example PID records for me
-const exampleRecords: PIDRecord[] = [
-    {
-        pid: "12345",
-        record: [
-            {
-                key: "21.T11148/1c699a5d1b4ad3ba4956",
-                value: "application/json",
-            },
-            {
-                key: "21.T11148/b8457812905b83046284",
-                value: "https://location.com",
-            },
-            {
-                key: "21.T11148/aafd5fb4c7222e2d950a",
-                value: "10.02.2026",
-            },
-        ],
-    },
-    {
-        pid: "67",
-        record: [
-            {
-                key: "21.T11148/1c699a5d1b4ad3ba4956",
-                value: "text/plain",
-            },
-            {
-                key: "21.T11148/b8457812905b83046284",
-                value: "https://example.org",
-            },
-        ],
-    },
-    {
-        pid: "123451",
-        record: [
-            {
-                key: "21.T11148/1c699a5d1b4ad3ba4956",
-                value: "application/json",
-            },
-            {
-                key: "21.T11148/b8457812905b83046284",
-                value: "https://location.com",
-            },
-        ],
-    },
-    {
-        pid: "671",
-        record: [
-            {
-                key: "21.T11148/1c699a5d1b4ad3ba4956",
-                value: "text/plain",
-            },
-            {
-                key: "21.T11148/b8457812905b83046284",
-                value: "https://example.org",
-            },
-        ],
-    },
-    {
-        pid: "123452",
-        record: [
-            {
-                key: "21.T11148/1c699a5d1b4ad3ba4956",
-                value: "application/json",
-            },
-            {
-                key: "21.T11148/b8457812905b83046284",
-                value: "https://location.com",
-            },
-        ],
-    },
-    {
-        pid: "672",
-        record: [
-            {
-                key: "21.T11148/1c699a5d1b4ad3ba4956",
-                value: "text/plain",
-            },
-            {
-                key: "21.T11148/b8457812905b83046284",
-                value: "https://example.org",
-            },
-        ],
-    },
-]
-
 export function PreviewPane() {
     const [viewType, setViewType] = useState<"records" | "table">("records")
     const unifier = useStore(dataSourcePickerStore, (s) => s.unifier)
@@ -262,10 +176,10 @@ export function PreviewPane() {
 
     const exportPreviewToClipboard = useCallback(() => {
         const data = {
-            records: exampleRecords,
+            records: previewRecords,
         }
         copy(JSON.stringify(data)).then()
-    }, [copy])
+    }, [copy, previewRecords])
 
     const recordsToCsv = useCallback((records: PIDRecord[]): string => {
         // Collect all unique attribute keys
@@ -312,9 +226,9 @@ export function PreviewPane() {
     }, [])
 
     const exportPreviewToCsvClipboard = useCallback(() => {
-        const csv = recordsToCsv(exampleRecords)
+        const csv = recordsToCsv(previewRecords)
         copy(csv).then()
-    }, [copy, recordsToCsv])
+    }, [copy, previewRecords, recordsToCsv])
 
     const downloadFile = useCallback(
         (content: string, mimeType: string, fileName: string) => {
@@ -333,19 +247,19 @@ export function PreviewPane() {
 
     const exportPreviewToDownload = useCallback(() => {
         const data = {
-            records: exampleRecords,
+            records: previewRecords,
         }
         downloadFile(
             JSON.stringify(data),
             "application/json",
             "preview-export.json",
         )
-    }, [downloadFile])
+    }, [downloadFile, previewRecords])
 
     const exportPreviewToCsvDownload = useCallback(() => {
-        const csv = recordsToCsv(exampleRecords)
+        const csv = recordsToCsv(previewRecords)
         downloadFile(csv, "text/csv;charset=utf-8;", "preview-export.csv")
-    }, [downloadFile, recordsToCsv])
+    }, [downloadFile, previewRecords, recordsToCsv])
 
     return (
         <div className="min-h-0 w-full justify-stretch flex flex-col">
