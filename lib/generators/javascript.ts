@@ -31,6 +31,7 @@ export class JavascriptMappingGenerator
     implements Common.RecordMappingGenerator
 {
     options: Options = {}
+    // inner state indicating whether trace calls are already applied
     hasTraceCalls: boolean = false
 
     constructor(name: string, flags?: Dict<boolean>) {
@@ -63,7 +64,7 @@ export class JavascriptMappingGenerator
             this.options.boilerplate = {}
         }
         if (this.options.generate_trace_calls == null) {
-            this.options.generate_trace_calls = false
+            this.options.generate_trace_calls = false // default value
         }
         for (const [key, value] of Object.entries(this.options.boilerplate)) {
             if (!value) {
@@ -82,7 +83,12 @@ export class JavascriptMappingGenerator
 
         if (this.options.generate_trace_calls && !this.hasTraceCalls) {
             Object.keys(this.forBlock).forEach((key) => {
-                if (without_trace.includes(key)) {
+                let ignore_tracing =
+                    without_trace.has(key) ||
+                    prefixes_without_trace.some((prefix) =>
+                        key.startsWith(prefix),
+                    )
+                if (ignore_tracing) {
                     return
                 }
                 let oldFunc = this.forBlock[key]
@@ -182,7 +188,7 @@ function isEmptyJavascriptString(s: string): boolean {
     )
 }
 
-const without_trace = [
+const without_trace = new Set([
     // use `console.log("Key in forBlock: ", Object.keys(this.forBlock))` in the constructor
     // to get an up-to-date list of all available block types.
     // --------------------------------------------------------------------------------------
@@ -201,4 +207,13 @@ const without_trace = [
     //"backlink_declaration",
     "profile_hmc_reference_block",
     "procedures_defreturn",
+    "logic_boolean",
+    "math_number",
+])
+
+const prefixes_without_trace = [
+    "controls_",
+    "procedures_",
+    "profile_",
+    "lists_set",
 ]
