@@ -38,7 +38,7 @@ function otherwise<T = any>(either: () => any, otherwiseFn: () => any): T {
         return otherwiseFn()
     }
 
-    return is_emptyish(eitherResult) ? eitherResult : otherwiseFn()
+    return !is_emptyish(eitherResult) ? eitherResult : otherwiseFn()
 }
 
 function stop_with_fail(message: string | null | undefined) {

@@ -39,7 +39,7 @@ def otherwise(either: Callable[[], Any], otherwise: Callable[[], Any]) -> Any:
     if type(eitherResult) == str and eitherResult.strip().lower() in ("null", "", "()", "[]", "{}"):
         eitherResult = None
 
-    return eitherResult if is_emptyish(eitherResult) else otherwise()
+    return eitherResult if not is_emptyish(eitherResult) else otherwise()
 
 def stop_with_fail(message: str | None) -> None:
     if message == None or message == "":
