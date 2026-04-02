@@ -1,10 +1,14 @@
 import { PIDRecord } from "@/lib/types"
 import { Skeleton } from "@/components/ui/skeleton"
-import { camelToTitleCase } from "@/lib/utils"
 import { ErrorDisplay } from "@/components/ErrorDisplay"
 import { useResolvedAttributePID } from "@/lib/hooks"
 import { FileIcon } from "lucide-react"
 import { AttributePIDHelp } from "@/components/preview/AttributePIDHelp"
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 export function PreviewRecordsView({ records }: { records: PIDRecord[] }) {
     return (
@@ -20,17 +24,14 @@ export function PreviewRecordView({ record }: { record: PIDRecord }) {
     return (
         <div className="rounded-md shadow-xs text-profile-foreground">
             <div className="bg-record/80 dark:bg-record/40 border-record border border-b-0 text-record-foreground p-2 rounded-t-md truncate flex justify-between text-sm">
-                <div className="font-medium">PID: {record.pid}</div>
-                <div className="flex gap-1 items-center">
-                    <FileIcon className="size-3.5 shrink-0" /> example.json
-                </div>
+                <div className="font-medium truncate">PID: {record.pid}</div>
             </div>
             <div className="grid grid-cols-2 dark:bg-profile/40 bg-profile/80 border-profile border rounded-b-md border-t-0">
                 {record.record.map((entry) => (
                     <PIDRecordEntry
                         key={entry.key}
                         entryKey={entry.key}
-                        value={entry.value}
+                        value={entry.value + ""}
                     />
                 ))}
             </div>
@@ -59,9 +60,11 @@ export function PIDRecordEntry({
                         <Skeleton className="bg-profile-foreground/50 h-2 w-24" />
                     </div>
                 ) : keyPIDDataType ? (
-                    <div className="flex gap-1 items-center justify-end">
-                        {camelToTitleCase(keyPIDDataType.name)}
-                        <AttributePIDHelp data={keyPIDDataType} />
+                    <div className="flex gap-1 items-center justify-end truncate">
+                        <AttributePIDHelp
+                            data={keyPIDDataType}
+                            className="truncate"
+                        />
                     </div>
                 ) : (
                     <div>{entryKey}</div>
@@ -73,7 +76,14 @@ export function PIDRecordEntry({
                 />
             </div>
             <div className="border-t border-white/20 py-1 px-2 truncate h-full w-full text-sm">
-                <div>{value}</div>
+                <Tooltip delayDuration={300}>
+                    <TooltipTrigger asChild>
+                        <span className="truncate">{value}</span>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-100">
+                        {value}
+                    </TooltipContent>
+                </Tooltip>
             </div>
         </div>
     )

@@ -4,18 +4,30 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { HelpCircleIcon } from "lucide-react"
+import { camelToTitleCase } from "@/lib/utils"
 
-export function AttributePIDHelp({ data }: { data: PIDDataType }) {
+export function AttributePIDHelp({
+    data,
+    className,
+}: {
+    data: PIDDataType
+    className?: string
+}) {
     return (
         <Tooltip delayDuration={300}>
-            <TooltipTrigger>
-                <HelpCircleIcon className="size-3.5 shrink-0 opacity-70" />
+            <TooltipTrigger className={className}>
+                {camelToTitleCase(data.name)}
             </TooltipTrigger>
-            <TooltipContent className="max-w-[400px]">
-                <div>PID: {data.pid.toString()}</div>
+            <TooltipContent className="max-w-100">
                 <div>
-                    Description: {data.description ?? "No description provided"}
+                    <b>Name</b>: {camelToTitleCase(data.name)}
+                </div>
+                <div>
+                    <b>PID</b>: {data.pid.toString()}
+                </div>
+                <div>
+                    <b>Description</b>:{" "}
+                    {data.description ?? "No description provided"}
                 </div>
             </TooltipContent>
         </Tooltip>

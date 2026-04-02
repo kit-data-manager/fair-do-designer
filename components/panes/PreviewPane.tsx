@@ -46,25 +46,43 @@ export function PreviewPane() {
     const [previewRecords, setPreviewRecords] = useState<PIDRecord[]>([])
     const [previewError, setPreviewError] = useState<unknown>(undefined)
 
+    const [allDocumentsSelected, setAllDocumentsSelected] = useState(true)
     const [selectedDocuments, setSelectedDocuments] = useState<string[]>([])
 
     const toggleSelectDocument = useCallback(
         (doc: string) => {
+            let setAllDocumentsSelectedTo = false
             setSelectedDocuments((prev) => {
-                if (!prev.includes(doc))
-                    return [...prev.filter((d) => documents.includes(d)), doc]
-                else return [...prev.filter((d) => d !== doc)]
+                if (allDocumentsSelected) {
+                    setAllDocumentsSelectedTo = false
+                    return documents.filter((d) => d !== doc)
+                }
+                if (!prev.includes(doc)) {
+                    const res = [
+                        ...prev.filter((d) => documents.includes(d)),
+                        doc,
+                    ]
+                    if (res.length === documents.length) {
+                        setAllDocumentsSelectedTo = true
+                    }
+                    return res
+                } else {
+                    setAllDocumentsSelectedTo = false
+                    return [...prev.filter((d) => d !== doc)]
+                }
             })
+            setAllDocumentsSelected(setAllDocumentsSelectedTo)
         },
-        [documents],
+        [allDocumentsSelected, documents],
     )
 
     const toggleSelectAllDocuments = useCallback(() => {
-        setSelectedDocuments((prev) => {
-            if (prev.length === documents.length) return []
+        setSelectedDocuments(() => {
+            if (allDocumentsSelected) return []
             else return [...documents]
         })
-    }, [documents])
+        setAllDocumentsSelected(!allDocumentsSelected)
+    }, [allDocumentsSelected, documents])
 
     const [, copy] = useCopyToClipboard()
 
@@ -106,7 +124,14 @@ export function PreviewPane() {
         if (!jsStandaloneCodeGenerator) return []
         console.time("JS sandbox execution")
         const docs = unifier.getDocuments()
-        const input_code: string = `const INPUT = [\n${docs.map((v) => `${JSON.stringify(v.doc)}`).join(",\n")}\n];\n`
+        const input_code: string = `const INPUT = [\n${docs
+            .filter((d) =>
+                allDocumentsSelected
+                    ? true
+                    : selectedDocuments.includes(d.name),
+            )
+            .map((v) => `${JSON.stringify(v.doc)}`)
+            .join(",\n")}\n];\n`
         let withNewData = structuredClone(jsStandaloneCodeGenerator.options)
         if (!withNewData.boilerplate) {
             withNewData.boilerplate = {}
@@ -128,7 +153,14 @@ export function PreviewPane() {
                 result.error ??
                 new Error("Received empty response form record generator")
             )
-    }, [unifier, jsStandaloneCodeGenerator, workspace, sandbox])
+    }, [
+        jsStandaloneCodeGenerator,
+        unifier,
+        workspace,
+        sandbox,
+        allDocumentsSelected,
+        selectedDocuments,
+    ])
 
     // Monotonic counter to prevent slow updates from overriding faster updates
     const updateRecordsCounter = useRef(0)
@@ -170,6 +202,7 @@ export function PreviewPane() {
         }
         // Whenever the workspace changes meaningfully, run the code again.
         workspace.addChangeListener(changeListener)
+        debouncedUpdateRecords()
 
         return () => workspace.removeChangeListener(changeListener)
     }, [debouncedUpdateRecords, workspace])
@@ -268,15 +301,16 @@ export function PreviewPane() {
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline">
                             <DatabaseIcon /> Select Input (
-                            {selectedDocuments.length}/{documents.length})
+                            {allDocumentsSelected
+                                ? documents.length
+                                : selectedDocuments.length}
+                            /{documents.length})
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                         <DropdownMenuCheckboxItem
-                            onClick={toggleSelectAllDocuments}
-                            checked={
-                                selectedDocuments.length === documents.length
-                            }
+                            onClick={() => toggleSelectAllDocuments()}
+                            checked={allDocumentsSelected}
                             onSelect={(e) => e.preventDefault()}
                         >
                             All Documents
@@ -285,7 +319,10 @@ export function PreviewPane() {
                         {documents.map((d) => (
                             <DropdownMenuCheckboxItem
                                 key={d}
-                                checked={selectedDocuments.includes(d)}
+                                checked={
+                                    selectedDocuments.includes(d) ||
+                                    allDocumentsSelected
+                                }
                                 onClick={() => toggleSelectDocument(d)}
                                 onSelect={(e) => e.preventDefault()}
                             >
@@ -298,7 +335,7 @@ export function PreviewPane() {
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline">
-                            Export Preview{" "}
+                            Export Preview
                             <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
                         </Button>
                     </DropdownMenuTrigger>
@@ -342,14 +379,19 @@ export function PreviewPane() {
             <ErrorDisplay
                 error={previewError}
                 title={"Failed to generate preview"}
+                className="rounded-none"
             />
 
             {viewType === "records" ? (
-                <div className="overflow-auto p-3">
+                <div
+                    className={`overflow-auto p-3 ${previewError && "opacity-50"} transition-opacity`}
+                >
                     <PreviewRecordsView records={previewRecords} />
                 </div>
             ) : (
-                <div className="overflow-auto">
+                <div
+                    className={`overflow-auto ${previewError && "opacity-50"} transition-opacity`}
+                >
                     <PreviewTableView records={previewRecords} />
                 </div>
             )}

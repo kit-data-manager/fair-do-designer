@@ -12,12 +12,6 @@ import {
 } from "@/components/ui/table"
 import { camelToTitleCase, cn } from "@/lib/utils"
 import { AttributePIDHelp } from "@/components/preview/AttributePIDHelp"
-import { EyeOffIcon } from "lucide-react"
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
-} from "@/components/ui/tooltip"
 
 const tdStyle = "break-keep text-nowrap whitespace-nowrap"
 
@@ -50,21 +44,6 @@ export function PreviewTableView({ records }: { records: PIDRecord[] }) {
                             attributePID={attribute}
                         />
                     ))}
-                    <TableHead className="flex gap-1 items-center">
-                        Source Document
-                        <Tooltip>
-                            <TooltipTrigger>
-                                <EyeOffIcon className="size-3.5 shrink-0" />
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                This is shown for your information and{" "}
-                                <span className="font-semibold">
-                                    not included in the final record
-                                </span>
-                                .
-                            </TooltipContent>
-                        </Tooltip>
-                    </TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
@@ -82,7 +61,6 @@ export function PreviewTableView({ records }: { records: PIDRecord[] }) {
                                 }
                             </TableCell>
                         ))}
-                        <TableCell>example.json</TableCell>
                     </TableRow>
                 ))}
             </TableBody>
