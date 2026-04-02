@@ -11,7 +11,7 @@ const eslintConfig = [
             "react-hooks/set-state-in-effect": "warn",
         },
     },
-    globalIgnores(["out/*", ".next/*"]),
+    globalIgnores(["out/*", ".next/*", "public/js/*"]),
 ]
 
 export default eslintConfig

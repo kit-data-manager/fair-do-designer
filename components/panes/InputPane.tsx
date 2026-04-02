@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button"
 import { useCallback, useRef } from "react"
-import * as Blockly from "blockly"
 import { useStore } from "zustand/react"
 import { workspaceStore } from "@/lib/stores/workspace"
 import {
@@ -10,7 +9,7 @@ import {
     DataSourcePickerRef,
 } from "@/components/data-source-picker/DataSourcePicker"
 import { DocumentEntry } from "@/lib/data-source-picker/json-unifier"
-import { InputJsonPointer } from "@/lib/blocks/input"
+import { addQueryBlockToWorkspace } from "@/lib/utils"
 
 export function InputPane() {
     const uploadInputRef = useRef<HTMLInputElement>(null)
@@ -80,28 +79,10 @@ export function InputPane() {
     }, [])
 
     const onEntryClick = useCallback(
-        (event: DocumentEntry) => {
+        (entry: DocumentEntry, label: string) => {
             if (!workspace) return
 
-            const block = workspace.newBlock("input_jsonpath")
-
-            if (
-                "updateQuery" in block &&
-                typeof block.updateQuery === "function"
-            ) {
-                ;(block as InputJsonPointer).updateQuery(event.path)
-            }
-
-            block.initSvg()
-            const offset = workspace.getOriginOffsetInPixels()
-            block.moveTo(
-                new Blockly.utils.Coordinate(
-                    (workspace.getInjectionDiv().offsetWidth * 2) / 3 -
-                        offset.x,
-                    workspace.getInjectionDiv().offsetHeight / 3 - offset.y,
-                ),
-            )
-            block.render()
+            addQueryBlockToWorkspace(workspace, entry.path, label)
         },
         [workspace],
     )

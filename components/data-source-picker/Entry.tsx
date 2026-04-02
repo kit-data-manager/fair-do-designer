@@ -26,7 +26,7 @@ export function Entry({
 }: {
     entry: DocumentEntry
     totalDocuments: number
-    onEntryClick?: (entry: DocumentEntry) => void
+    onEntryClick?: (entry: DocumentEntry, label: string) => void
     shortened: string
 }) {
     // Optimization to only render entries that are visible on screen. Otherwise, the number
@@ -57,8 +57,8 @@ export function Entry({
     )
 
     const onSelfClick = useCallback(() => {
-        if (onEntryClick) onEntryClick(entry)
-    }, [entry, onEntryClick])
+        if (onEntryClick) onEntryClick(entry, shortened)
+    }, [entry, onEntryClick, shortened])
 
     return (
         <div className="contents [&:hover:nth-child(2n)_>_div]:bg-muted/70 [&:hover:nth-child(2n+1)_>_div]:bg-muted/70">

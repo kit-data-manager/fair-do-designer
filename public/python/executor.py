@@ -1,6 +1,7 @@
 import sys
 from typing import Dict, Set, List, Tuple, Callable, TypeVar, Any, Sequence, Mapping, Self, Optional
 import json
+from conditionals import is_emptyish
 
 from jsonpath import JSONPathError, JSONPathSyntaxError, JSONPointerError, RelativeJSONPointerSyntaxError
 
@@ -60,6 +61,9 @@ class PidRecord:
     def setPid(self, pid: str) -> Self:
         self._pid = pid
         return self
+    
+    def getPid(self) -> str:
+        return self._pid
 
     def setId(self, id: str) -> Self:
         self._id = id
@@ -140,7 +144,10 @@ class RecordDesign:
         self._backlinks.add((forward_link_type, backward_link_type))
         return self
     
-    def apply(self, json: JsonType) -> Optional[Tuple[PidRecord, InferenceRules]]:
+    def apply(
+            self,
+            json: JsonType
+            ) -> Optional[Tuple[PidRecord, InferenceRules]]:
         """
         Applies the given JSON to this design and returns a PidRecord.
         """
@@ -152,7 +159,7 @@ class RecordDesign:
             return None
         
         record: PidRecord = PidRecord()
-        # errors may occur here, but as IDs are critical, we do not catch them.
+        # errors regarding ID duplication and emptiness is in responsibility of the executer, not of the design
         record.setId(self._id())
         record.setPid(self._pid())
 
@@ -208,6 +215,8 @@ class Executor:
         #
         # Condition(forward_link_type, receiver_id) => Reaction(receiver_id, backward_link_type)
         self.INFERENCE_MATCHES_DB: InferenceRules = {}
+        self.EXISTING_IDS: Set[str] = set()
+        self.EXISTING_PIDS: Set[str] = set()
 
     def addDesign(self, design: RecordDesign) -> Self:
         """
@@ -288,6 +297,16 @@ class Executor:
         Applies the input files to the designs and creates records.
         This will generate records and inference rules which will be stored in this classes state.
         """
+        def assert_is_not_emptyish(value: Any, value_name: str) -> Any:
+            if is_emptyish(value):
+                raise ValueError(f"{value_name} is empty or invalid. Record designs must have a non-empty, unique IDs. But was '{value}'.")
+            return value
+        
+        def assert_uniqueness(value: Any, value_name: str, existing_values: Set[str]) -> Any:
+            if value in existing_values:
+                raise ValueError(f"{value_name} '{value}' is not unique. Record designs must have unique IDs. But this ID already exists in the graph.")
+            return value
+
         for design in self.RECORD_DESIGNS:
             while True:
                 input_file = self.INPUT.nextInputFile()
@@ -304,6 +323,17 @@ class Executor:
                     if (maybe_record != None):
                         sender, inference_rules = maybe_record
                         print(f'Created record with ID: "{sender.getId()}"')
+
+                        # ID checks
+                        id = sender.getId()
+                        assert_is_not_emptyish(id, "Record ID")
+                        assert_uniqueness(id, "Record ID", self.EXISTING_IDS)
+                        self.EXISTING_IDS.add(id)
+                        # PID checks
+                        pid = sender.getPid()
+                        if not is_emptyish(pid):
+                            assert_uniqueness(pid, "Record PID", self.EXISTING_PIDS)
+                            self.EXISTING_PIDS.add(pid)
                         # Store the record in the graph
                         self.RECORD_GRAPH[sender.getId()] = sender
                         # merge rules into DB
