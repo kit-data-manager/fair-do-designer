@@ -51,7 +51,10 @@ export default function Home() {
                             >
                                 <DatabaseIcon /> Input
                             </TabsTrigger>
-                            <TabsTrigger value={"preview"}>
+                            <TabsTrigger
+                                value={"preview"}
+                                variant="large-blocky"
+                            >
                                 <PlayIcon /> Preview
                             </TabsTrigger>
                             <TabsTrigger
