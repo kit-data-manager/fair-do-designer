@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useStore } from "zustand/react"
 import { workspaceStore } from "@/lib/stores/workspace"
 import * as Blockly from "blockly"
@@ -16,6 +16,10 @@ import {
 } from "./ui/select"
 import { alertStore } from "@/lib/stores/alert-store"
 import { useCodeDownloader, useCodeGenerator } from "@/lib/hooks"
+import { FunctionWorker } from "@/lib/function-worker"
+import { jsSandboxFunctions } from "@/lib/workers/js-sandbox/functions"
+import { JavascriptMappingGenerator } from "@/lib/generators/javascript"
+import { dataSourcePickerStore } from "@/lib/stores/data-source-picker-store"
 
 /**
  * Runs the code generator and shows the result
@@ -30,6 +34,31 @@ export function OutputPane() {
 
     const codeGeneratorInstance = useCodeGenerator()
     const codeDownloader = useCodeDownloader()
+    const [jsStandaloneCodeGenerator, setJsStandaloneCodeGenerator] = useState(
+        new JavascriptMappingGenerator("tmp"),
+    )
+    const unifier = useStore(dataSourcePickerStore, (s) => s.unifier)
+
+    useEffect(() => {
+        const generator = async () => {
+            const basepath = process.env.NEXT_PUBLIC_BASE_PATH ?? ""
+            const prefix = `${window.location.origin}/${basepath}`
+            const executor_boilerplate = await fetch(
+                `${prefix}/js/executor.js`,
+            ).then((res) => res.text())
+            const flags: Dict<any> = {
+                generate_trace_calls: false,
+                boilerplate: {
+                    executor: executor_boilerplate,
+                },
+            }
+            return new JavascriptMappingGenerator(
+                "PidRecordMappingJavascriptStandalone",
+                flags,
+            )
+        }
+        generator().then((g) => setJsStandaloneCodeGenerator(g))
+    }, [])
 
     const generateCode = useCallback(() => {
         if (!workspace) return
@@ -92,6 +121,33 @@ export function OutputPane() {
         }
     }, [alert, code, codeDownloader])
 
+    const [sandbox] = useState(
+        new FunctionWorker(jsSandboxFunctions, { localFallback: false }),
+    )
+
+    if (!sandbox.workerMounted)
+        sandbox.mount(
+            (process.env.NEXT_PUBLIC_BASE_PATH ?? "") +
+                "/workers/js-sandbox.js",
+        )
+
+    const calculateRecords = useCallback(async () => {
+        console.time("JS sandbox execution")
+        const docs = unifier.getDocuments()
+        const input_code: string = `const INPUT = [\n${docs.map((v) => `${JSON.stringify(v.doc)}`).join(",\n")}\n];\n`
+        let withNewData = jsStandaloneCodeGenerator.options
+        if (!withNewData.boilerplate) {
+            withNewData.boilerplate = {}
+        }
+        withNewData.boilerplate.input = input_code
+        jsStandaloneCodeGenerator.configure(withNewData)
+        const fullCode = jsStandaloneCodeGenerator.workspaceToCode(workspace)
+        sandbox.execute("executeCode", fullCode).then((result) => {
+            console.timeEnd("JS sandbox execution")
+            console.log("Sandbox result:", result)
+        })
+    }, [sandbox, workspace, jsStandaloneCodeGenerator])
+
     return (
         <div className="flex flex-col grow max-w-full">
             <div className="p-2 bg-muted w-full flex flex-wrap gap-2 shrink-0 items-center">
@@ -141,6 +197,9 @@ export function OutputPane() {
                         </SelectContent>
                     </Select>
                 </div>
+                <Button variant="outline" onClick={calculateRecords}>
+                    Run code
+                </Button>
             </div>
             <pre className="overflow-auto grow p-2">
                 <code>{code}</code>

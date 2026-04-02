@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "lib": ["webworker"],
+        "allowJs": true,
+        "skipLibCheck": true,
+        "strict": true,
+        "moduleResolution": "Bundler",
+        "esModuleInterop": true,
+        "resolveJsonModule": true,
+        "incremental": true,
+        "paths": {
+            "@/*": ["./*"]
+        },
+        "target": "ES2015",
+        "outDir": "public/schema-worker"
+    },
+    "include": [
+        "lib/workers/js-sandbox/*.ts",
+        "lib/workers/function-worker-workers.ts"
+    ],
+    "exclude": ["node_modules"]
+}

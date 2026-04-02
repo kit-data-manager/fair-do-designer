@@ -17,6 +17,7 @@
 /.next/
 /out/
 /dist/
+/public/js/*
 
 # production
 /build
@@ -43,3 +44,4 @@ next-env.d.ts
 
 .idea
 public/_pagefind
+public/workers
