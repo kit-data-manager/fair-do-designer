@@ -54,6 +54,8 @@ export const DataSourcePicker = forwardRef<
         setShowNonPrimitiveEntries,
         setShowFullPath,
         showFullPath,
+        showObjectEntries,
+        setShowObjectEntries,
     } = useDataSourcePickerSettings()
 
     const [inspectNonPrimitiveModalOpen, setInspectNonPrimitiveModalOpen] =
@@ -121,7 +123,12 @@ export const DataSourcePicker = forwardRef<
     const filtered = useMemo(() => {
         return withFullPointers
             .filter((withFullPointer) =>
-                onlyShowLeaves ? withFullPointer.entry.isLeaf() : true,
+                onlyShowLeaves
+                    ? withFullPointer.entry.isLeaf()
+                    : showObjectEntries
+                      ? true
+                      : withFullPointer.entry.isArray() ||
+                        withFullPointer.entry.isLeaf(),
             )
             .filter((withFullPointer) => withFullPointer.entry.key !== "$")
             .filter(
@@ -138,7 +145,13 @@ export const DataSourcePicker = forwardRef<
                     b.entry.timesObserved / totalDocumentCount -
                     a.entry.timesObserved / totalDocumentCount,
             )
-    }, [onlyShowLeaves, search, totalDocumentCount, withFullPointers])
+    }, [
+        onlyShowLeaves,
+        search,
+        showObjectEntries,
+        totalDocumentCount,
+        withFullPointers,
+    ])
 
     const searchNoResults = useMemo(() => {
         return flat.length > 0 && filtered.length === 0
@@ -192,21 +205,10 @@ export const DataSourcePicker = forwardRef<
                             <DropdownMenuSeparator />
                             <DropdownMenuSub>
                                 <DropdownMenuSubTrigger>
-                                    <BlocksIcon className="size-4 shrink-0 mr-2" />{" "}
+                                    <BlocksIcon className="size-4 shrink-0" />
                                     Show non-primitive entries
                                 </DropdownMenuSubTrigger>
                                 <DropdownMenuSubContent>
-                                    <DropdownMenuCheckboxItem
-                                        checked={
-                                            showNonPrimitiveEntries === "auto"
-                                        }
-                                        onCheckedChange={(v) =>
-                                            v &&
-                                            setShowNonPrimitiveEntries("auto")
-                                        }
-                                    >
-                                        Auto
-                                    </DropdownMenuCheckboxItem>
                                     <DropdownMenuCheckboxItem
                                         checked={
                                             showNonPrimitiveEntries === "always"
@@ -220,6 +222,17 @@ export const DataSourcePicker = forwardRef<
                                     </DropdownMenuCheckboxItem>
                                     <DropdownMenuCheckboxItem
                                         checked={
+                                            showNonPrimitiveEntries === "auto"
+                                        }
+                                        onCheckedChange={(v) =>
+                                            v &&
+                                            setShowNonPrimitiveEntries("auto")
+                                        }
+                                    >
+                                        Show on Search
+                                    </DropdownMenuCheckboxItem>
+                                    <DropdownMenuCheckboxItem
+                                        checked={
                                             showNonPrimitiveEntries === "never"
                                         }
                                         onCheckedChange={(v) =>
@@ -230,6 +243,12 @@ export const DataSourcePicker = forwardRef<
                                         Never
                                     </DropdownMenuCheckboxItem>
                                 </DropdownMenuSubContent>
+                                <DropdownMenuCheckboxItem
+                                    checked={showObjectEntries}
+                                    onCheckedChange={setShowObjectEntries}
+                                >
+                                    Show Object entries
+                                </DropdownMenuCheckboxItem>
                             </DropdownMenuSub>
                         </DropdownMenuContent>
                     </DropdownMenu>
