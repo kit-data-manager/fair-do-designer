@@ -12,7 +12,7 @@
   "dependencies": {
     "@blockly/block-plus-minus": "^9.0.2",
     "@blockly/field-dependent-dropdown": "^5.0.1",
-    "@kit-data-manager/pid-component": "./kit-data-manager-pid-component-0.3.0.tgz",
+    "@kit-data-manager/pid-component": "^0.3.0",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-dropdown-menu": "^2.1.16",
     "@radix-ui/react-menubar": "^1.1.16",
