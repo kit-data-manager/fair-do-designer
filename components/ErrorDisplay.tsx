@@ -1,5 +1,7 @@
 import { CircleAlert, TriangleAlert, XIcon } from "lucide-react"
 import { PropsWithChildren, useMemo } from "react"
+import { z } from "zod/mini"
+import { ZodError } from "zod"
 
 function cn(size?: "md" | "xl" | "sm") {
     if (!size || size == "md") {
@@ -21,6 +23,16 @@ function cnIcon(size?: "md" | "xl" | "sm") {
     }
 }
 
+export function isZodError(error: unknown): error is ZodError {
+    if (!(error instanceof Error)) return false
+
+    if (error instanceof ZodError) return true
+    if (error.constructor.name === "ZodError") return true
+    if ("issues" in error && error.issues instanceof Array) return true
+
+    return false
+}
+
 /**
  * Handler for any kind of error that is caught somewhere
  * Can handle any instance of Error
@@ -28,6 +40,7 @@ function cnIcon(size?: "md" | "xl" | "sm") {
  */
 export function handleError(e: unknown) {
     if (typeof e === "string") return e
+    if (isZodError(e)) return z.prettifyError(e)
     if (e !== null && e instanceof window.Error)
         return `${e.message} (type: ${e.name})`
     else return JSON.stringify(e)
