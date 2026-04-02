@@ -13,4 +13,4 @@ services:
     volumes:
       - .:/app
     working_dir: /app
-    command: sh -c "pipx run pre-commit install && bun install && bun run build && bun run dev"
+    command: sh -c "pipx run pre-commit install && bun install && bun run dev"

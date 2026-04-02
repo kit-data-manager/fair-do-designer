@@ -10,6 +10,7 @@ import {
 import { dataSourcePickerStore } from "@/lib/stores/data-source-picker-store"
 import { alertStore } from "@/lib/stores/alert-store"
 import { JSONValues } from "@/lib/data-source-picker/types"
+import { ValidationField } from "@/lib/fields/ValidationField"
 
 export interface InputJsonPointer extends Blockly.BlockSvg {
     path: PathSegment[]
@@ -50,6 +51,14 @@ export const input_json_pointer: InputJsonPointer = {
             .appendField("Read")
             .appendField("JSON", "DISPLAY_QUERY")
             .appendField(hiddenQueryField, "QUERY")
+            .appendField(
+                new ValidationField({
+                    customCheck: async () => {
+                        const queryResults = this.executeQuery()
+                        return queryResults.length > 0
+                    },
+                }),
+            )
         this.setTooltip(
             "Read value from Source Document. Right-click for more.",
         )
@@ -73,7 +82,11 @@ export const input_json_pointer: InputJsonPointer = {
                 if (!result || result.length === 0)
                     alertStore
                         .getState()
-                        .alert("Error", "The query returned no result", "error")
+                        .alert(
+                            "ErrorDisplay",
+                            "The query returned no result",
+                            "error",
+                        )
                 else {
                     alertStore.getState().alert(
                         "Results",
