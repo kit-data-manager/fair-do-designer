@@ -45,7 +45,14 @@ export class Unifier {
     }
 
     reset() {
-        this.root = starterDoc
+        this.root = new UnifiedDocumentEntry({
+            key: "$",
+            path: [{ type: "key", value: "$" }],
+            observedValues: new Map(),
+            children: [],
+            timesObserved: 0,
+            arrayElement: false,
+        })
         this.documents = {}
     }
 
