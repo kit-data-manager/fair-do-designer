@@ -1,6 +1,6 @@
 import { DocumentEntry } from "@/lib/data-source-picker/json-unifier"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, FingerprintIcon } from "lucide-react"
 import { ValueRenderer } from "@/components/data-source-picker/ValueRenderer"
 import {
     useCallback,
@@ -9,6 +9,7 @@ import {
     useEffect,
     useState,
     Fragment,
+    useMemo,
 } from "react"
 import { AvailabilityScale } from "@/components/data-source-picker/AvailabilityScale"
 import {
@@ -44,6 +45,15 @@ export function Entry({
             return () => observer.disconnect()
         }
     }, [])
+
+    // Whether all the observed values in the merged document entry are unique.
+    // This indicates that this value can be well-used for identifiers and the likes.
+    const isUnique = useMemo(() => {
+        return (
+            entry.observedValues.values().every((v) => v === 1) &&
+            entry.timesObserved === totalDocuments
+        )
+    }, [entry.observedValues, entry.timesObserved, totalDocuments])
 
     const onDragStart = useCallback(
         (e: DragEvent) => {
@@ -90,6 +100,19 @@ export function Entry({
                                 total={totalDocuments}
                                 current={entry.timesObserved}
                             />
+                            {isUnique && (
+                                <Tooltip delayDuration={700}>
+                                    <TooltipTrigger asChild>
+                                        <FingerprintIcon className="ml-1 size-4 shrink-0 text-primary" />
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-96">
+                                        The values of this entry are different
+                                        in each provided file. Therefore, this
+                                        value might be suitable as an
+                                        identifier.
+                                    </TooltipContent>
+                                </Tooltip>
+                            )}
                         </div>
                         <Tooltip delayDuration={700}>
                             <TooltipTrigger asChild>
