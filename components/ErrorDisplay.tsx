@@ -39,9 +39,11 @@ export function isZodError(error: unknown): error is ZodError {
  * @param e The error that will be turned into a string
  */
 export function handleError(e: unknown) {
-    if (typeof e === "string") return e
     if (isZodError(e)) return z.prettifyError(e)
-    if (e !== null && e instanceof window.Error)
+    if (
+        e instanceof window.Error ||
+        (e && typeof e === "object" && "message" in e && "name" in e)
+    )
         return `${e.message} (type: ${e.name})`
     else return JSON.stringify(e)
 }
@@ -87,8 +89,8 @@ export function ErrorDisplay(
             )}
             {"error" in props ? (
                 <div>
-                    <div className="">{props.title}</div>
-                    <div className={props.title ? "text-xs" : ""}>
+                    <div className="text-sm font-bold">{props.title}</div>
+                    <div className={props.title ? "text-sm" : ""}>
                         {props.prefix} {parsedText}
                     </div>
                 </div>
