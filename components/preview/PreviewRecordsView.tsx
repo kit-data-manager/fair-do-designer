@@ -2,7 +2,6 @@ import { PIDRecord } from "@/lib/types"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ErrorDisplay } from "@/components/ErrorDisplay"
 import { useResolvedAttributePID } from "@/lib/hooks"
-import { FileIcon } from "lucide-react"
 import { AttributePIDHelp } from "@/components/preview/AttributePIDHelp"
 import {
     Tooltip,
@@ -27,9 +26,9 @@ export function PreviewRecordView({ record }: { record: PIDRecord }) {
                 <div className="font-medium truncate">PID: {record.pid}</div>
             </div>
             <div className="grid grid-cols-2 dark:bg-profile/40 bg-profile/80 border-profile border rounded-b-md border-t-0">
-                {record.record.map((entry) => (
+                {record.record.map((entry, i) => (
                     <PIDRecordEntry
-                        key={entry.key}
+                        key={`${record.pid}:${entry.key}#globalIndex:${i}`}
                         entryKey={entry.key}
                         value={entry.value + ""}
                     />
