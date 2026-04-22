@@ -35,9 +35,11 @@ export function ValueRenderer({
 
     return (
         <div
-            className={`p-1 flex items-center  ${showAll ? "justify-between" : "gap-2 truncate"}`}
+            className={`p-1 flex items-center max-w-full ${showAll ? "justify-between break-words" : "gap-2 truncate"}`}
         >
-            <div className={showAll ? "" : "truncate"}>
+            <div
+                className={(showAll ? "" : "truncate") + " break-words min-w-0"}
+            >
                 {sliced.map(([value, observedTimes], i) => (
                     <SingleValueRenderer
                         value={value}
@@ -88,12 +90,12 @@ export function SingleValueRenderer({
                 -
             </div>
             <div
-                className={`text-primary dark:text-foreground/70 ${showAll ? "my-1 leading-tight" : "truncate"}`}
+                className={`text-primary dark:text-foreground/70 ${showAll ? "my-1 leading-tight" : "truncate"} min-w-0`}
             >
                 <Tooltip delayDuration={700}>
                     <TooltipTrigger asChild>
                         <span
-                            className={`inline ${showAll ? "line-clamp-4" : "truncate"}`}
+                            className={`${showAll ? "line-clamp-4" : "truncate"}`}
                         >
                             {value + " "}
                         </span>

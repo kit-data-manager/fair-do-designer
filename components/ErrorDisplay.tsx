@@ -1,20 +1,36 @@
 import { CircleAlert, TriangleAlert, XIcon } from "lucide-react"
 import { PropsWithChildren, useMemo } from "react"
+import { z } from "zod/mini"
+import { ZodError } from "zod"
 
-function cn(size?: "md" | "xl") {
+function cn(size?: "md" | "xl" | "sm") {
     if (!size || size == "md") {
         return "text-destructive-foreground bg-destructive rounded p-2 flex items-center text-sm"
-    } else {
+    } else if (size == "xl") {
         return "text-destructive-foreground bg-destructive rounded p-4 flex items-center text-xl"
+    } else {
+        return "text-destructive-foreground bg-destructive rounded p-1 flex items-center text-xs"
     }
 }
 
-function cnIcon(size?: "md" | "xl") {
+function cnIcon(size?: "md" | "xl" | "sm") {
     if (!size || size == "md") {
         return "size-4 mr-2 shrink-0"
-    } else {
+    } else if (size == "xl") {
         return "w-8 h-8 mr-4 shrink-0"
+    } else {
+        return "size-3 mr-1 shrink-0"
     }
+}
+
+export function isZodError(error: unknown): error is ZodError {
+    if (!(error instanceof Error)) return false
+
+    if (error instanceof ZodError) return true
+    if (error.constructor.name === "ZodError") return true
+    if ("issues" in error && error.issues instanceof Array) return true
+
+    return false
 }
 
 /**
@@ -23,13 +39,16 @@ function cnIcon(size?: "md" | "xl") {
  * @param e The error that will be turned into a string
  */
 export function handleError(e: unknown) {
-    if (typeof e === "string") return e
-    if (e !== null && e instanceof window.Error)
+    if (isZodError(e)) return z.prettifyError(e)
+    if (
+        e instanceof window.Error ||
+        (e && typeof e === "object" && "message" in e && "name" in e)
+    )
         return `${e.message} (type: ${e.name})`
     else return JSON.stringify(e)
 }
 
-export function Error(
+export function ErrorDisplay(
     props: (
         | {
               title?: string
@@ -38,7 +57,7 @@ export function Error(
           }
         | PropsWithChildren
     ) & {
-        size?: "md" | "xl"
+        size?: "md" | "xl" | "sm"
         className?: string
         warn?: boolean
         onClear?: () => void
@@ -70,8 +89,8 @@ export function Error(
             )}
             {"error" in props ? (
                 <div>
-                    <div className="">{props.title}</div>
-                    <div className={props.title ? "text-xs" : ""}>
+                    <div className="text-sm font-bold">{props.title}</div>
+                    <div className={props.title ? "text-sm" : ""}>
                         {props.prefix} {parsedText}
                     </div>
                 </div>

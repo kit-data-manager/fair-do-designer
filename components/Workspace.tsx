@@ -111,7 +111,8 @@ export function Workspace() {
             workspace.getAllBlocks().forEach((block) => {
                 if (
                     block.type === "profile_hmc" ||
-                    block.type === "attribute_key"
+                    block.type === "attribute_key" ||
+                    block.type === "input_json_pointer"
                 ) {
                     const fields = Array.from(block.getFields())
                     for (const field of fields) {

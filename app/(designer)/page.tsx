@@ -1,8 +1,8 @@
 "use client"
 
 import { Workspace } from "@/components/Workspace"
-import { OutputPane } from "@/components/OutputPane"
-import { InputPane } from "@/components/InputPane"
+import { OutputPane } from "@/components/panes/OutputPane"
+import { InputPane } from "@/components/panes/InputPane"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useState } from "react"
 import {
@@ -10,10 +10,11 @@ import {
     ResizablePanel,
     ResizablePanelGroup,
 } from "@/components/ui/resizable"
-import { CodeIcon, DatabaseIcon } from "lucide-react"
+import { BracesIcon, DatabaseIcon, PlayIcon } from "lucide-react"
 import { Header } from "@/components/Header"
 import { RemoteDesignImport } from "@/components/RemoteDesignImport"
 import { AlertManager } from "@/components/AlertManager"
+import { PreviewPane } from "@/components/panes/PreviewPane"
 
 export default function Home() {
     const [tab, setTab] = useState("input")
@@ -23,13 +24,21 @@ export default function Home() {
             <RemoteDesignImport />
             <AlertManager />
 
-            <ResizablePanelGroup direction={"horizontal"}>
-                <ResizablePanel defaultSize={70} className={"flex flex-col"}>
+            <ResizablePanelGroup orientation={"horizontal"}>
+                <ResizablePanel
+                    defaultSize={"70%"}
+                    minSize={400}
+                    className={"flex flex-col"}
+                >
                     <Header />
                     <Workspace />
                 </ResizablePanel>
-                <ResizableHandle hitAreaMargins={{ fine: 5, coarse: 10 }} />
-                <ResizablePanel defaultSize={30} className={"flex flex-col"}>
+                <ResizableHandle />
+                <ResizablePanel
+                    defaultSize={"30%"}
+                    minSize={400}
+                    className={"flex flex-col"}
+                >
                     <Tabs
                         className="max-h-full grow"
                         value={tab}
@@ -37,10 +46,13 @@ export default function Home() {
                     >
                         <TabsList>
                             <TabsTrigger value={"input"}>
-                                <DatabaseIcon /> Data Access
+                                <DatabaseIcon /> Input
+                            </TabsTrigger>
+                            <TabsTrigger value={"preview"}>
+                                <PlayIcon /> Preview
                             </TabsTrigger>
                             <TabsTrigger value={"output"}>
-                                <CodeIcon /> Generated Code
+                                <BracesIcon /> Code
                             </TabsTrigger>
                         </TabsList>
 
@@ -53,6 +65,17 @@ export default function Home() {
                             forceMount
                         >
                             <InputPane />
+                        </TabsContent>
+
+                        <TabsContent
+                            className={
+                                "min-h-0 max-h-full flex " +
+                                (tab === "preview" ? "" : "hidden")
+                            }
+                            value={"preview"}
+                            forceMount
+                        >
+                            <PreviewPane />
                         </TabsContent>
 
                         <TabsContent

@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { loadFromFile } from "@/lib/serialization"
-import { Error } from "@/components/error"
+import { ErrorDisplay } from "@/components/ErrorDisplay"
 import { ShieldAlert, TriangleAlert } from "lucide-react"
 
 export function RemoteDesignImport() {
@@ -102,7 +102,10 @@ function InnerRemoteDesignImport() {
                             from trusted sources.
                         </DialogDescription>
                     </DialogHeader>
-                    <Error title={"Design Import failed"} error={importError} />
+                    <ErrorDisplay
+                        title={"Design Import failed"}
+                        error={importError}
+                    />
                     <div className="flex justify-center p-2">
                         <ShieldAlert className="size-10 text-warn" />
                     </div>

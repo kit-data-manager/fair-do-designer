@@ -25,6 +25,7 @@
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -44,6 +45,10 @@
   --color-success: var(--success);
   --color-info: var(--info);
   --color-warn: var(--warn);
+  --color-record: var(--record);
+  --color-record-foreground: var(--primary-foreground);
+  --color-profile: var(--profile);
+  --color-profile-foreground: var(--primary-foreground);
 }
 
 body {
@@ -144,6 +149,7 @@ g > image.red-icon {
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(1 0 89.876);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
@@ -163,6 +169,8 @@ g > image.red-icon {
   --success: rgb(63, 197, 112);
   --info: rgb(58, 83, 196);
   --warn: rgb(237, 123, 9);
+  --record: #a55ba5;
+  --profile: #5b67a5;
 }
 
 /*---break---*/
@@ -182,7 +190,8 @@ g > image.red-icon {
   --muted-foreground: oklch(0.708 0 0);
   --accent: oklch(0.269 0 0);
   --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(1 0 89.876);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);

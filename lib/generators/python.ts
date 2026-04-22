@@ -6,8 +6,7 @@
 
 import { Order, PythonGenerator, pythonGenerator } from "blockly/python"
 import * as Blockly from "blockly/core"
-import * as HmcProfile from "../blocks/hmc_profile"
-import * as Util from "./util"
+import * as Common from "./common"
 
 /**
  * Specialized generator for our code.
@@ -15,15 +14,24 @@ import * as Util from "./util"
  * we should not override the existing methods but write new ones
  * (possibly reusing the existing functionality).
  */
-export class RecordMappingGenerator
+export class PythonMappingGenerator
     extends PythonGenerator
-    implements Util.RecordMappingGenerator
+    implements Common.RecordMappingGenerator
 {
+    configure(options: Dict<any>): void {
+        // No special configuration for now
+    }
+    makeJsonPointerCall(jsonPointer: string): string {
+        return `jsonpath.pointer.resolve(${jsonPointer}, executor.current_source_json)`
+    }
+    makeJsonpathCall(jsonPath: string): string {
+        return `jsonpath.findall(${jsonPath}, executor.current_source_json)`
+    }
     init(workspace: Blockly.Workspace) {
         super.init(workspace)
         this.addReservedWords("math,random,Number")
         Object.assign(this.forBlock, pythonGenerator.forBlock)
-        Object.assign(this.forBlock, forBlock)
+        Object.assign(this.forBlock, Common.forBlock)
         this.definitions_["import-main"] = "import executor"
         this.definitions_["import-from-main"] =
             "from executor import RecordDesign, Executor, log"
@@ -35,6 +43,24 @@ export class RecordMappingGenerator
         this.addReservedWords("current_source_json")
     }
 
+    getOrderAtomic(): number {
+        return Order.ATOMIC
+    }
+    getOrderCollection(): number {
+        return Order.COLLECTION
+    }
+    getOrderNone(): number {
+        return Order.NONE
+    }
+
+    makeLambda(body: string): string {
+        return `lambda: ${body}`
+    }
+
+    makeNewInstanceCall(className: string, args: string[]): string {
+        return `${className}(${args.join(", ")})`
+    }
+
     makeAddAttributeChainCall(key: string, value: string): string {
         if (value.startsWith("BackwardLinkFor(")) {
             return `.addAttribute(${key}, ${value})\n`
@@ -44,8 +70,8 @@ export class RecordMappingGenerator
     }
 
     makeSetIDChainCall(id: string): string {
-        if (!this.isEmptyPythonString(id)) {
-            return `.setId(lambda: ${id})\n`
+        if (!isEmptyPythonString(id)) {
+            return `.setId(lambda: str(${id}))\n`
         } else {
             return ""
         }
@@ -55,12 +81,8 @@ export class RecordMappingGenerator
         return this.prefixLines(`${text}\n`, "# ")
     }
 
-    isEmptyPythonString(s: string): boolean {
-        return s == null || false || s.length <= 0 || s == "''" || s == '""'
-    }
-
     prefixNonemptyLines(text: string, prefix: string): string {
-        if (this.isEmptyPythonString(text)) {
+        if (isEmptyPythonString(text)) {
             return text
         } else {
             return this.prefixLines(text, prefix)
@@ -74,236 +96,6 @@ export class RecordMappingGenerator
     }
 }
 
-/**
- * The generator will import all the definitions
- * assigned to this object.
- */
-const forBlock = Object.create(null)
-
-function genericRecord<T extends Util.FairDoCodeGenerator>(
-    block: Blockly.Block,
-    generator: T,
-    value_skip_condition: string,
-) {
-    const value_localid = generator.valueToCode(block, "local-id", Order.ATOMIC)
-    const statement_record = generator.statementToCode(block, "record")
-
-    let code = generator.makeLineComment(`${block.type}`)
-    code += `EXECUTOR.addDesign( RecordDesign()\n`
-    code += generator.prefixNonemptyLines(
-        generator.makeSetIDChainCall(`str(${value_localid})`),
-        generator.INDENT,
-    )
-
-    const hasCondition =
-        value_skip_condition && value_skip_condition.trim() != ""
-    if (hasCondition) {
-        code += generator.prefixNonemptyLines(
-            `.setSkipCondition(lambda: ${value_skip_condition})\n`,
-            generator.INDENT,
-        )
-    }
-
-    code += statement_record
-    code += ")\n"
-    return code
-}
-
-forBlock["pidrecord"] = function <T extends Util.FairDoCodeGenerator>(
-    block: Blockly.Block,
-    generator: T,
-) {
-    return genericRecord(block, generator, "")
-}
-
-forBlock["pidrecord_skipable"] = function <T extends Util.FairDoCodeGenerator>(
-    block: Blockly.Block,
-    generator: T,
-) {
-    const value_skip_condition = generator.valueToCode(
-        block,
-        "skip-condition",
-        Order.ATOMIC,
-    )
-    return genericRecord(block, generator, value_skip_condition)
-}
-
-forBlock["attribute_key"] = function <T extends Util.FairDoCodeGenerator>(
-    block: Blockly.Block,
-    generator: T,
-) {
-    const value_key = generator.valueToCode(block, "KEY", Order.ATOMIC)
-    const value_value = generator.valueToCode(block, "VALUE", Order.ATOMIC)
-
-    let code = ""
-    const isSomething = (thing: string | null | undefined) =>
-        thing && thing.length > 0 && thing !== "''"
-    if (isSomething(value_key) && isSomething(value_value)) {
-        code += generator.makeLineComment(`## ${block.type} ##`)
-        code += generator.makeAddAttributeChainCall(value_key, value_value)
-    }
-    return code
-}
-
-const jsonPointerCall = (path: string) =>
-    `jsonpath.pointer.resolve(${path}, executor.current_source_json)`
-
-const jsonpathCall = (path: string) =>
-    `jsonpath.findall(${path}, executor.current_source_json)`
-
-forBlock["input_json_pointer"] = function (
-    block: Blockly.Block,
-    generator: PythonGenerator,
-) {
-    const value_input = block.getFieldValue("QUERY")
-    const quoted = generator.quote_(value_input)
-    return [jsonPointerCall(quoted), Order.ATOMIC]
-}
-forBlock["input_jsonpath"] = forBlock["input_json_pointer"] // TODO remove
-
-forBlock["input_custom_json_path"] = function <
-    T extends Util.FairDoCodeGenerator,
->(block: Blockly.Block, generator: T) {
-    const value_block = generator.valueToCode(block, "QUERY", Order.ATOMIC)
-    return [jsonpathCall(value_block), Order.ATOMIC]
-}
-forBlock["input_custom_json"] = forBlock["input_custom_json_path"] // TODO remove
-
-forBlock["input_custom_json_pointer"] = function <
-    T extends Util.FairDoCodeGenerator,
->(block: Blockly.Block, generator: T) {
-    const value_block = generator.valueToCode(block, "QUERY", Order.ATOMIC)
-    return [jsonPointerCall(value_block), Order.ATOMIC]
-}
-
-// Type guard for HmcBlock interface
-function isHmcBlock(obj: unknown): obj is HmcProfile.HMCBlock {
-    return (
-        obj !== null &&
-        typeof obj === "object" &&
-        "profileAttributeKey" in obj &&
-        typeof obj.profileAttributeKey === "string" &&
-        "profile" in obj &&
-        typeof obj.profile === "object" &&
-        typeof obj.profile === "object" &&
-        obj.profile != undefined &&
-        "identifier" in obj.profile &&
-        typeof obj.profile.identifier === "string" &&
-        "inputList" in obj &&
-        Array.isArray(obj.inputList) &&
-        "extractPidFromProperty" in obj &&
-        typeof obj.extractPidFromProperty === "function"
-    )
-}
-
-forBlock["profile_hmc"] = function <T extends Util.FairDoCodeGenerator>(
-    block: Blockly.Block,
-    generator: T,
-) {
-    if (!isHmcBlock(block)) {
-        throw new Error("Expected block to conform to HmcBlock interface")
-    }
-
-    let code = generator.makeLineComment(`## ${block.type} ##`)
-    code += generator.makeLineComment(`attribute: Self-Reference`)
-    code += generator.makeAddAttributeChainCall(
-        `"${block.profileAttributeKey}"`,
-        "'" + block.profile.identifier + "'",
-    )
-
-    for (const input of block.inputList) {
-        const name = input.name
-        const pid = block.extractPidFromProperty(name)
-        const value = generator.valueToCode(block, name, Order.ATOMIC)
-        if (pid !== undefined && value && value != "") {
-            code += generator.makeLineComment(`attribute: ${input.name}`)
-            code += generator.makeAddAttributeChainCall(`"${pid}"`, value)
-        }
-    }
-    return code
-}
-
-forBlock["stop_design"] = function <T extends Util.FairDoCodeGenerator>(
-    block: Blockly.Block,
-    generator: T,
-) {
-    // TODO: change Order.ATOMIC to the correct operator precedence strength
-    let value_message = generator.valueToCode(block, "MESSAGE", Order.ATOMIC)
-    if (!value_message || value_message.trim() == "") {
-        value_message = '"No error message provided"'
-    }
-    const code = `stop_with_fail(${value_message})`
-    return [code, Order.ATOMIC]
-}
-
-forBlock["log_value"] = function <T extends Util.FairDoCodeGenerator>(
-    block: Blockly.Block,
-    generator: T,
-) {
-    const text_desc = block.getFieldValue("DESC")
-    // TODO: change Order.ATOMIC to the correct operator precedence strength
-    const value_invar = generator.valueToCode(block, "INVAR", Order.ATOMIC)
-
-    const code = `log(${value_invar}, "${text_desc}")\n`
-    // TODO: Change Order.NONE to the correct operator precedence strength
-    return [code, Order.NONE]
-}
-
-forBlock["otherwise"] = function <T extends Util.FairDoCodeGenerator>(
-    block: Blockly.Block,
-    generator: T,
-) {
-    // TODO: change Order.ATOMIC to the correct operator precedence strength
-    const value_value = generator.valueToCode(block, "VALUE", Order.ATOMIC)
-
-    // TODO: change Order.ATOMIC to the correct operator precedence strength
-    const value_other = generator.valueToCode(block, "OTHER", Order.ATOMIC)
-
-    const code = `otherwise(lambda: ${value_value}, lambda: ${value_other})\n`
-    // TODO: Change Order.NONE to the correct operator precedence strength
-    return [code, Order.NONE]
-}
-
-forBlock["backlink_declaration"] = function <
-    T extends Util.FairDoCodeGenerator,
->(block: Blockly.Block, generator: T) {
-    const value_attribute_key = generator.valueToCode(
-        block,
-        "ATTRIBUTE_KEY",
-        Order.ATOMIC,
-    )
-    const code = "BackwardLinkFor(" + value_attribute_key + ")"
-    return [code, Order.ATOMIC]
-}
-
-forBlock["profile_hmc_reference_block"] = function (block: Blockly.Block) {
-    const dropdown_attribute = block.getFieldValue("ATTRIBUTE")
-    const code = `"${dropdown_attribute}"`
-    return [code, Order.ATOMIC]
-}
-
-forBlock["lists_create_with"] = function <T extends Util.FairDoCodeGenerator>(
-    block: Blockly.Block,
-    generator: T,
-) {
-    const values: string[] = []
-    for (const input of block.inputList) {
-        const block = input.connection?.targetBlock()
-        if (block) {
-            // TODO: Do we have to consider the operator precedence here?
-            const result = generator.blockToCode(block)
-            if (typeof result === "string") {
-                values.push(result)
-            } else {
-                values.push(result[0])
-            }
-        }
-    }
-
-    return [
-        "[\n" +
-            generator.prefixLines(values.join(", "), generator.INDENT) +
-            "]",
-        Order.COLLECTION,
-    ]
+function isEmptyPythonString(s: string): boolean {
+    return s == null || false || s.length <= 0 || s == "''" || s == '""'
 }
