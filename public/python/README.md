@@ -12,6 +12,6 @@ To avoid modification of the pyproject.toml, the easiest (and intended) way to u
 
 - [Install the uv build tool](https://docs.astral.sh/uv/getting-started/installation/)
 - run `uv sync` to install the dependencies
-- run `uv run generated.py my-json01.json ../my/data/*.json` to call the generated code like a command line tool or adjust the code to your needs.
+- run `uv run generated.py [json-files]` to call the generated code like a command line tool or adjust the code to your needs. "json-files" is a list of input files the mapping should be applied to. Concrete examples: `uv run generated.py file01.json file02.json` or `uv run generated.py file01.json file*.json`
 
 Similar to other tools like poetry, uv creates a virtual environment for the project which can also be detected by most IDEs. If you need to use other build tools, you'll probably need to modify your pyproject.toml file a little.
