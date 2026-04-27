@@ -263,10 +263,10 @@ export function Header() {
                     </MenubarTrigger>
                     <MenubarContent>
                         <MenubarItem onClick={copyCodeSnippet}>
-                            Copy Generated Snippet
+                            Copy code preview
                         </MenubarItem>
                         <MenubarItem onClick={exportCode}>
-                            Export Code
+                            Download full code
                         </MenubarItem>
                     </MenubarContent>
                 </MenubarMenu>

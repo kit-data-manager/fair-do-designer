@@ -101,7 +101,7 @@ export function OutputPane() {
                             <CheckIcon /> Copied
                         </>
                     ) : (
-                        "Copy Snippet"
+                        "Copy code preview"
                     )}
                 </Button>
                 <Button
@@ -115,7 +115,7 @@ export function OutputPane() {
                             Preparing...
                         </>
                     ) : (
-                        "Download Generated Code"
+                        "Download full code"
                     )}
                 </Button>
                 <div className="flex items-center">
