@@ -6,7 +6,7 @@ type Eval<T> = () => T
 type EvalPrimitive = Eval<Primitive>
 
 // ---Error-handling-------------------------------------------------
-const is_emptyish = (test_me: any) => {
+const is_emptyish = (test_me: unknown): test_me is null | undefined => {
     const is_nullish = test_me === null || test_me === undefined
     const is_empty_string = typeof test_me === "string" && test_me.trim() === ""
     const is_emptyish_string =
@@ -137,7 +137,7 @@ class PidRecord {
     }
 
     addAttribute(a: string, b: Primitive | Primitive[] | null): this {
-        if (b === null) {
+        if (is_emptyish(b)) {
             return this
         }
         if (Array.isArray(b)) {
