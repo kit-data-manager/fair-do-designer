@@ -128,6 +128,9 @@ class PidRecord {
     }
 
     setId(id: string): this {
+        if (is_emptyish(id)) {
+            id = "empty-id-" + (Math.random() * Date.now()).toString(16)
+        }
         this._id = id
         return this
     }
