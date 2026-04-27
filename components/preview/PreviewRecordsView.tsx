@@ -23,7 +23,7 @@ export function PreviewRecordView({ record }: { record: PIDRecord }) {
     return (
         <div className="rounded-md shadow-xs text-profile-foreground">
             <div className="bg-record/80 dark:bg-record/40 border-record border border-b-0 text-record-foreground p-2 rounded-t-md truncate flex justify-between text-sm">
-                <div className="font-medium truncate">PID: {record.pid}</div>
+                <div className="font-medium truncate">ID: {record.pid}</div>
             </div>
             <div className="grid grid-cols-2 dark:bg-profile/40 bg-profile/80 border-profile border rounded-b-md border-t-0">
                 {record.record.map((entry, i) => (
