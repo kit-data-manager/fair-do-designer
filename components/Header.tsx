@@ -242,15 +242,15 @@ export function Header() {
                         />
                     </MenubarTrigger>
                     <MenubarContent>
-                        <MenubarItem onClick={triggerLoadFromDisk}>
-                            Load Design
-                        </MenubarItem>
-                        <MenubarItem onClick={saveToDisk}>
-                            Save Design
-                        </MenubarItem>
-                        <MenubarSeparator />
                         <MenubarItem onClick={clearWorkspace}>
                             New empty Design
+                        </MenubarItem>
+                        <MenubarSeparator />
+                        <MenubarItem onClick={triggerLoadFromDisk}>
+                            Load Design from file
+                        </MenubarItem>
+                        <MenubarItem onClick={saveToDisk}>
+                            Save Design to file
                         </MenubarItem>
                     </MenubarContent>
                 </MenubarMenu>
