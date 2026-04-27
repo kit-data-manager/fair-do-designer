@@ -1,12 +1,13 @@
 import { MetaRecord } from "nextra"
 
 const meta: MetaRecord = {
-    "standard-blocks": "Standard Blocks",
+    records: "Records",
     profile: "Profiles",
-    "automatic-backlinks": "Automatic Backlinks",
+    "standard-blocks": "Standard Blocks",
     "checks-and-errors": "Checks and Errors",
     variables: "Variables",
     functions: "Functions",
+    "automatic-backlinks": "Automatic Backlinks",
     "data-access": "Experts – Data Access",
 }
 
