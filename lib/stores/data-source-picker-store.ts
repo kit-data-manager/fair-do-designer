@@ -1,9 +1,10 @@
-import { DocumentEntry, Unifier } from "@/lib/data-source-picker/json-unifier"
+import { Unifier } from "@/lib/data-source-picker/json-unifier"
 import { create } from "zustand"
+import { IUnifiedDocumentEntry } from "@/lib/data-source-picker/types"
 
 interface DataSourcePickerStore {
     unifier: Unifier
-    flat: DocumentEntry[]
+    flat: IUnifiedDocumentEntry[]
     updateFlat: () => void
     totalDocumentCount: number
 }

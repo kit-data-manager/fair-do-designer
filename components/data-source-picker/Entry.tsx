@@ -1,4 +1,3 @@
-import { DocumentEntry } from "@/lib/data-source-picker/json-unifier"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import { ValueRenderer } from "@/components/data-source-picker/ValueRenderer"
@@ -17,17 +16,22 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { pathSegmentsToPointer } from "@/lib/data-source-picker/json-path"
+import { IUnifiedDocumentEntry } from "@/lib/data-source-picker/types"
 
 export function Entry({
     entry,
     totalDocuments,
     onEntryClick,
     shortened,
+    showShortened = true,
+    showInspectModal,
 }: {
-    entry: DocumentEntry
+    entry: IUnifiedDocumentEntry
     totalDocuments: number
-    onEntryClick?: (entry: DocumentEntry, label: string) => void
+    onEntryClick?: (entry: IUnifiedDocumentEntry, label: string) => void
     shortened: string
+    showShortened?: boolean
+    showInspectModal: () => void
 }) {
     // Optimization to only render entries that are visible on screen. Otherwise, the number
     // of entries becomes a performance bottleneck quickly, especially while searching
@@ -93,7 +97,11 @@ export function Entry({
                         </div>
                         <Tooltip delayDuration={700}>
                             <TooltipTrigger asChild>
-                                <div className="truncate">{shortened}</div>
+                                <div className="truncate">
+                                    {showShortened
+                                        ? shortened
+                                        : pathSegmentsToPointer(entry.path)}
+                                </div>
                             </TooltipTrigger>
                             <TooltipContent>
                                 {pathSegmentsToPointer(entry.path)}
@@ -105,7 +113,9 @@ export function Entry({
             {isInViewport ? (
                 <ValueRenderer
                     values={entry.observedValues}
+                    unifiedDocumentEntry={entry}
                     timesObserved={entry.timesObserved}
+                    showInspectModal={showInspectModal}
                 />
             ) : (
                 <div />

@@ -7,9 +7,10 @@
 import * as Blockly from "blockly/core"
 import { workspaceStore } from "@/lib/stores/workspace"
 import { runAllMigrations } from "@/lib/migrate/json_migrate"
-import { JSONValues, Unifier } from "@/lib/data-source-picker/json-unifier"
+import { Unifier } from "@/lib/data-source-picker/json-unifier"
 import { Workspace } from "blockly"
 import { dataSourcePickerStore } from "@/lib/stores/data-source-picker-store"
+import { JSONValues } from "@/lib/data-source-picker/types"
 
 const storageKey = "fairdoWorkspace"
 const version = 2

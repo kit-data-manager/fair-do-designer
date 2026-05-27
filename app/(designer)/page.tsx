@@ -40,18 +40,27 @@ export default function Home() {
                     className={"flex flex-col"}
                 >
                     <Tabs
-                        className="max-h-full grow"
+                        className="max-h-full grow gap-0"
                         value={tab}
                         onValueChange={setTab}
                     >
-                        <TabsList>
-                            <TabsTrigger value={"input"}>
+                        <TabsList variant={"large-blocky"}>
+                            <TabsTrigger
+                                value={"input"}
+                                variant={"large-blocky"}
+                            >
                                 <DatabaseIcon /> Input
                             </TabsTrigger>
-                            <TabsTrigger value={"preview"}>
+                            <TabsTrigger
+                                value={"preview"}
+                                variant="large-blocky"
+                            >
                                 <PlayIcon /> Preview
                             </TabsTrigger>
-                            <TabsTrigger value={"output"}>
+                            <TabsTrigger
+                                value={"output"}
+                                variant={"large-blocky"}
+                            >
                                 <BracesIcon /> Code
                             </TabsTrigger>
                         </TabsList>
