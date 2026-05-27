@@ -1,4 +1,3 @@
-import { JSONValuesSingle } from "@/lib/data-source-picker/json-unifier"
 import { useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
@@ -6,14 +5,22 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { EllipsisIcon, XIcon } from "lucide-react"
+import { EllipsisIcon, EyeIcon, XIcon } from "lucide-react"
+import {
+    IUnifiedDocumentEntry,
+    JSONValuesPrimitive,
+} from "@/lib/data-source-picker/types"
 
 export function ValueRenderer({
     values,
+    unifiedDocumentEntry,
     timesObserved,
+    showInspectModal,
 }: {
-    values: Map<JSONValuesSingle, number>
+    values: Map<JSONValuesPrimitive, number>
+    unifiedDocumentEntry: IUnifiedDocumentEntry
     timesObserved: number
+    showInspectModal: () => void
 }) {
     const [showAll, setShowAll] = useState(false)
 
@@ -32,6 +39,25 @@ export function ValueRenderer({
             return arr.slice(0, 1)
         }
     }, [arr, showAll])
+
+    if (unifiedDocumentEntry.children.length > 0) {
+        return (
+            <div className="flex items-center p-1">
+                <div className={`opacity-0 pr-1`}>-</div>
+                <div className="text-primary dark:text-foreground/70 font-medium pr-2">
+                    {unifiedDocumentEntry.isArray() ? "Array" : "Object"}
+                </div>
+                <Button
+                    variant="ghost"
+                    size="mini-inline"
+                    className={`text-muted-foreground`}
+                    onClick={showInspectModal}
+                >
+                    <EyeIcon className="size-4 shrink-0 " />
+                </Button>
+            </div>
+        )
+    }
 
     return (
         <div
@@ -53,9 +79,9 @@ export function ValueRenderer({
 
             <Button
                 variant="ghost"
-                size="sm"
+                size="mini-inline"
                 onClick={() => setShowAll(!showAll)}
-                className={`shrink-0 p-0 text-muted-foreground h-4 ${canShowMore ? "" : "hidden"} ${showAll ? "p-1 h-6" : ""}`}
+                className={`text-muted-foreground ${canShowMore ? "" : "hidden"} ${showAll ? "p-1 h-6" : ""}`}
             >
                 {showAll ? (
                     <XIcon className="size-4 shrink-0" />
@@ -73,7 +99,7 @@ export function SingleValueRenderer({
     observedTimes,
     timesObserved,
 }: {
-    value: JSONValuesSingle
+    value: JSONValuesPrimitive | IUnifiedDocumentEntry
     showAll: boolean
     observedTimes: number
     timesObserved: number
@@ -97,11 +123,23 @@ export function SingleValueRenderer({
                         <span
                             className={`${showAll ? "line-clamp-4" : "truncate"}`}
                         >
-                            {value + " "}
+                            {typeof value === "object" &&
+                                value !== null &&
+                                !value.isArray() && (
+                                    <span className="italic">Object </span>
+                                )}
+                            {typeof value === "object" &&
+                                value !== null &&
+                                value.isArray() && (
+                                    <span className="italic">Array </span>
+                                )}
+                            {typeof value !== "object" && value + " "}
                         </span>
                     </TooltipTrigger>
                     <TooltipContent className="max-w-[400px]">
-                        {value}
+                        {typeof value === "object"
+                            ? JSON.stringify(value)
+                            : value + ""}
                     </TooltipContent>
                 </Tooltip>
                 {showAll && (
