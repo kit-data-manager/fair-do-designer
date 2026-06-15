@@ -144,6 +144,7 @@ export const genericPidConsortiumLabProfile: ProfileBlockMixin &
             .setAlign(0)
 
         this.setTooltip(this.profile.name + ": " + this.profile.description)
+        relayoutAfterAsyncSetup(this)
     },
 
     getProperties() {
@@ -426,12 +427,12 @@ export const genericPidConsortiumLabProfile: ProfileBlockMixin &
             })
         } else {
             console.error(
-                "Failed to load extra state in hmc_profile",
+                "Failed to load extra state in generic dtr lab profile",
                 data,
                 parsed.error,
             )
         }
-    } satisfies Blockly.Block["loadExtraState"],
+    },
 }
 
 function extractProfileAttributeKey(block: ProfileBlock) {
@@ -440,4 +441,25 @@ function extractProfileAttributeKey(block: ProfileBlock) {
         .filter((p) => p.Name.toLowerCase().includes("profile"))
         .map((p) => p.Type)
         .at(0)
+}
+
+function relayoutAfterAsyncSetup(block: ProfileBlock) {
+    block.render()
+
+    if (block.workspace.isFlyout) {
+        const targetWorkspace = block.workspace.targetWorkspace
+        const flyout = targetWorkspace?.getToolbox()?.getFlyout()
+        if (!flyout) return
+
+        type FlyoutContents = ReturnType<typeof flyout.getContents>
+        const layoutFlyout = flyout as typeof flyout & {
+            layout_?: (contents: FlyoutContents) => void
+        }
+        layoutFlyout?.layout_?.(flyout.getContents())
+        flyout.reflow()
+        targetWorkspace?.recordDragTargets()
+        return
+    }
+
+    block.workspace.resizeContents()
 }

@@ -2,7 +2,7 @@ import { PID, PIDDataType } from "@kit-data-manager/pid-component"
 import { z } from "zod/mini"
 
 const locationType = new PID("10320", "loc")
-const typeMap = new Map<PID, unknown>()
+const typeMap = new Map<string, unknown>()
 const unresolvables = new Set<PID>()
 
 export class ProfileResolver extends PIDDataType {
@@ -13,7 +13,7 @@ export class ProfileResolver extends PIDDataType {
      */
     public static async resolveDataTypeJSON(pid: PID) {
         // Check if PID is already resolved
-        if (typeMap.has(pid)) return typeMap.get(pid)
+        if (typeMap.has(pid.toString())) return typeMap.get(pid.toString())
 
         // Check if PID is resolvable
         if (!pid.isResolvable()) {
@@ -138,7 +138,7 @@ export class ProfileResolver extends PIDDataType {
 
         // Create a new PIDDataType object from the temp object
         try {
-            typeMap.set(pid, tempDataType.ePICJSON)
+            typeMap.set(pid.toString(), tempDataType.ePICJSON)
             return tempDataType.ePICJSON
         } catch (e) {
             console.error(e)
