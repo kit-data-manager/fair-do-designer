@@ -4,6 +4,7 @@
 
 import * as Blockly from "blockly/core"
 import * as Util from "./util"
+import { ProfileBlock, ProfileBlockMixin } from "@/lib/blocks/generic_dtr_lab"
 
 export interface BlocklyGenerator {
     /**
@@ -285,6 +286,35 @@ forBlock["profile_hmc"] = function (
     code += generator.makeAddAttributeChainCall(
         `"${block.profileAttributeKey}"`,
         "'" + block.profile.identifier + "'",
+    )
+
+    for (const input of block.inputList) {
+        const name = input.name
+        const pid = block.extractPidFromProperty(name)
+        const value = generator.valueToCode(
+            block,
+            name,
+            generator.getOrderAtomic(),
+        )
+        if (pid !== undefined && value && value != "") {
+            code += generator.makeLineComment(`attribute: ${input.name}`)
+            code += generator.makeAddAttributeChainCall(`"${pid}"`, value)
+        }
+    }
+    return code
+}
+
+forBlock["profile_generic_pid_consortium_lab"] = function (
+    _block: Blockly.Block,
+    generator: FairDoCodeGenerator,
+) {
+    const block = _block as ProfileBlock
+
+    let code = generator.makeLineComment(`## ${block.type} ##`)
+    code += generator.makeLineComment(`attribute: Self-Reference`)
+    code += generator.makeAddAttributeChainCall(
+        `"${block.profileAttributeKey}"`,
+        "'" + block.profilePID + "'",
     )
 
     for (const input of block.inputList) {

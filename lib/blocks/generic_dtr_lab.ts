@@ -9,6 +9,8 @@ import {
     PidConsortiumLabProfileProperty,
     PidConsortiumLabProfileSchema,
 } from "@/lib/blocks/profiles/pidconsortium_lab_profile_schema"
+import { PID } from "@kit-data-manager/pid-component"
+import { ProfileResolver } from "@/lib/ProfileResolver"
 
 function recordMutation(block: Blockly.Block, mutation: () => void) {
     Blockly.Events.setGroup(true)
@@ -23,10 +25,12 @@ function recordMutation(block: Blockly.Block, mutation: () => void) {
 
 export type ProfileBlock = Blockly.BlockSvg & ProfileBlockMixin
 export interface ProfileBlockMixin {
-    profile: PidConsortiumLabProfile
+    profilePID: string
+    profile?: PidConsortiumLabProfile
     activeOptionalProperties: string[]
     profileAttributeKey: string | undefined
     // block methods
+    setup(this: ProfileBlock, withPid: string): Promise<void>
     addImplicitDummyField(
         this: ProfileBlock,
         propertyName: string,
@@ -54,14 +58,50 @@ export interface ProfileBlockMixin {
     getProperties(this: ProfileBlock): PidConsortiumLabProfileProperty[]
 }
 
-export const createProfileBlock: (profileJson: unknown) => ProfileBlockMixin = (
-    json,
-) => ({
-    profile: PidConsortiumLabProfileSchema.parse(json),
+export const genericPidConsortiumLabProfile: ProfileBlockMixin &
+    Partial<Blockly.BlockSvg> = {
+    profilePID: "",
     activeOptionalProperties: [],
     profileAttributeKey: undefined,
 
-    init: function init(this: ProfileBlock) {
+    init(this: ProfileBlock) {
+        this.setInputsInline(false)
+        this.setTooltip("Loading...")
+        this.setPreviousStatement(true, null)
+        this.setNextStatement(true, null)
+        this.setHelpUrl(addBasePath("/docs/blocks/profile"))
+        this.setColour(230)
+    },
+
+    async setup(withPid) {
+        this.profilePID = withPid
+
+        if (!this.profilePID) {
+            this.addImplicitDummyField("Invalid Profile Block (No PID)", "")
+            console.error("Invalid Profile Block (No PID): ", this)
+            return
+        }
+
+        if (!this.profile) {
+            const pid = PID.getPIDFromString(this.profilePID)
+            const json = await ProfileResolver.resolveDataTypeJSON(pid)
+            const parsed = PidConsortiumLabProfileSchema.safeParse(json)
+
+            if (parsed.success) {
+                this.profile = parsed.data
+            } else {
+                this.addImplicitDummyField(
+                    "Failed to resolve Profile",
+                    this.profilePID,
+                )
+                console.error(
+                    `Failed to resolve Profile with PID ${this.profilePID}`,
+                    z.formatError(parsed.error),
+                )
+                return
+            }
+        }
+
         this.profileAttributeKey = extractProfileAttributeKey(this)
 
         this.appendDummyInput("0").appendField(
@@ -103,16 +143,11 @@ export const createProfileBlock: (profileJson: unknown) => ProfileBlockMixin = (
             .appendField(optionalPropertiesSelector, "DROPDOWN")
             .setAlign(0)
 
-        this.setInputsInline(false)
         this.setTooltip(this.profile.name + ": " + this.profile.description)
-        this.setPreviousStatement(true, null)
-        this.setNextStatement(true, null)
-        this.setHelpUrl(addBasePath("/docs/blocks/profile"))
-        this.setColour(230)
     },
 
     getProperties() {
-        return this.profile.Schema?.Properties ?? []
+        return this.profile?.Schema?.Properties ?? []
     },
 
     extractPidFromProperty(propertyName: string): string | undefined {
@@ -234,7 +269,7 @@ export const createProfileBlock: (profileJson: unknown) => ProfileBlockMixin = (
             },
         )
 
-        const profileName = this.profile.name
+        const profileName = this.profile?.name ?? this.profilePID
         return {
             init: function () {
                 this.appendDummyInput("CONTENT")
@@ -342,6 +377,8 @@ export const createProfileBlock: (profileJson: unknown) => ProfileBlockMixin = (
     saveExtraState() {
         return JSON.stringify({
             activeOptionalProperties: this.activeOptionalProperties,
+            profilePID: this.profilePID,
+            profile: this.profile,
         })
     },
 
@@ -351,33 +388,42 @@ export const createProfileBlock: (profileJson: unknown) => ProfileBlockMixin = (
         const parsed = z
             .object({
                 activeOptionalProperties: z.array(z.string()),
+                profilePID: z.string(),
+                profile: PidConsortiumLabProfileSchema.optional(),
             })
             .safeParse(obj)
 
         if (parsed.success) {
-            const newProperties = parsed.data.activeOptionalProperties.filter(
-                (p) => !this.activeOptionalProperties.includes(p),
-            )
-            const removedProperties = this.activeOptionalProperties.filter(
-                (p) => !parsed.data.activeOptionalProperties.includes(p),
-            )
+            this.profilePID = parsed.data.profilePID
+            this.profile = parsed.data.profile
 
-            for (const opt of newProperties) {
-                const pos = parsed.data.activeOptionalProperties.findIndex(
-                    (v) => v === opt,
+            this.setup(this.profilePID).then(() => {
+                const newProperties =
+                    parsed.data.activeOptionalProperties.filter(
+                        (p) => !this.activeOptionalProperties.includes(p),
+                    )
+                const removedProperties = this.activeOptionalProperties.filter(
+                    (p) => !parsed.data.activeOptionalProperties.includes(p),
                 )
-                const followingProperty =
-                    parsed.data.activeOptionalProperties.length > pos + 1
-                        ? parsed.data.activeOptionalProperties[pos + 1]
-                        : undefined
-                this.addFieldForProperty(opt, followingProperty)
-            }
 
-            for (const opt of removedProperties) {
-                this.removeFieldForProperty(opt)
-            }
+                for (const opt of newProperties) {
+                    const pos = parsed.data.activeOptionalProperties.findIndex(
+                        (v) => v === opt,
+                    )
+                    const followingProperty =
+                        parsed.data.activeOptionalProperties.length > pos + 1
+                            ? parsed.data.activeOptionalProperties[pos + 1]
+                            : undefined
+                    this.addFieldForProperty(opt, followingProperty)
+                }
 
-            this.activeOptionalProperties = parsed.data.activeOptionalProperties
+                for (const opt of removedProperties) {
+                    this.removeFieldForProperty(opt)
+                }
+
+                this.activeOptionalProperties =
+                    parsed.data.activeOptionalProperties
+            })
         } else {
             console.error(
                 "Failed to load extra state in hmc_profile",
@@ -386,7 +432,7 @@ export const createProfileBlock: (profileJson: unknown) => ProfileBlockMixin = (
             )
         }
     } satisfies Blockly.Block["loadExtraState"],
-})
+}
 
 function extractProfileAttributeKey(block: ProfileBlock) {
     return block

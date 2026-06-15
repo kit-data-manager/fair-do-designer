@@ -18,6 +18,8 @@ import { useTheme } from "next-themes"
 import "@/lib/theme"
 import { DarkTheme } from "@/lib/theme"
 import { addQueryBlockToWorkspace, applyFillAttrAsStyle } from "@/lib/utils"
+import { InputJsonPointer } from "@/lib/blocks/input"
+import { ProfileBlock } from "@/lib/blocks/generic_dtr_lab"
 
 /**
  * This component encapsulates the {@link Blockly.Workspace} and takes care of initializing it and registering any
@@ -101,6 +103,25 @@ export function Workspace() {
             if (e.isUiEvent) return
             saveToLocalStorage()
         })
+
+        // TODO REMOVE
+        const block = workspace.newBlock(
+            "profile_generic_pid_consortium_lab",
+        ) as ProfileBlock
+
+        block.setup("21.T11969/f1eea855587d8b1f66da")
+        block.initSvg()
+
+        const offset = workspace.getOriginOffsetInPixels()
+        block.moveTo(
+            new Blockly.utils.Coordinate(
+                (workspace.getInjectionDiv().offsetWidth * 2) / 3 - offset.x,
+                workspace.getInjectionDiv().offsetHeight / 3 - offset.y,
+            ),
+        )
+
+        block.render()
+        // TODO REMOVE
 
         BacklinksToolbox.register(workspace)
 
