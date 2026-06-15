@@ -14,6 +14,7 @@ import {
     input_json_pointer,
 } from "./input"
 import "@blockly/block-plus-minus"
+import { dariah } from "@/lib/blocks/generic_dtr_lab"
 
 Blockly.Blocks["pidrecord"] = pidrecord
 Blockly.Blocks["pidrecord_skipable"] = pidrecord_skipable
@@ -25,6 +26,7 @@ Blockly.Blocks["input_custom_json_path"] = input_custom_json_path
 Blockly.Blocks["input_custom_json_pointer"] = input_custom_json_pointer
 
 Blockly.Blocks["profile_hmc"] = profile_hmc
+Blockly.Blocks["profile_dariah"] = dariah
 Blockly.Blocks["profile_hmc_reference_block"] =
     profile_hmc.createAttributeReferenceBlock()
 

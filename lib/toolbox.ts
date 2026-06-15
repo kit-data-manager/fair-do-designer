@@ -70,6 +70,10 @@ export const toolbox = {
                 },
                 {
                     kind: "block",
+                    type: "profile_dariah",
+                },
+                {
+                    kind: "block",
                     type: "attribute_key",
                 },
             ],
