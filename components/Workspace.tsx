@@ -18,7 +18,6 @@ import { useTheme } from "next-themes"
 import "@/lib/theme"
 import { DarkTheme } from "@/lib/theme"
 import { addQueryBlockToWorkspace, applyFillAttrAsStyle } from "@/lib/utils"
-import { InputJsonPointer } from "@/lib/blocks/input"
 import { ProfileBlock } from "@/lib/blocks/generic_dtr_lab"
 
 /**

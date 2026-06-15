@@ -4,7 +4,7 @@
 
 import * as Blockly from "blockly/core"
 import * as Util from "./util"
-import { ProfileBlock, ProfileBlockMixin } from "@/lib/blocks/generic_dtr_lab"
+import { ProfileBlock } from "@/lib/blocks/generic_dtr_lab"
 
 export interface BlocklyGenerator {
     /**
