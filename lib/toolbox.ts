@@ -70,6 +70,22 @@ export const toolbox = {
                 },
                 {
                     kind: "block",
+                    type: "profile_generic_pid_consortium_lab",
+                    extraState: {
+                        activeOptionalProperties: [],
+                        profilePID: "21.T11969/db605a11c81e79e1efc4",
+                    },
+                },
+                {
+                    kind: "block",
+                    type: "profile_generic_pid_consortium_lab",
+                    extraState: {
+                        activeOptionalProperties: [],
+                        profilePID: "21.T11969/f1eea855587d8b1f66da",
+                    },
+                },
+                {
+                    kind: "block",
                     type: "attribute_key",
                 },
             ],

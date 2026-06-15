@@ -112,7 +112,8 @@ export function Workspace() {
                 if (
                     block.type === "profile_hmc" ||
                     block.type === "attribute_key" ||
-                    block.type === "input_json_pointer"
+                    block.type === "input_json_pointer" ||
+                    block.type === "profile_generic_pid_consortium_lab"
                 ) {
                     const fields = Array.from(block.getFields())
                     for (const field of fields) {
