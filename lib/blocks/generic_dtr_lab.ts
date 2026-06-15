@@ -1,10 +1,14 @@
 import * as Blockly from "blockly"
 import { FieldImage } from "blockly"
 import { ValidationField } from "../fields/ValidationField"
-import * as LabProfile from "./profiles/new_DARIAH.json"
 import { camelToTitleCase } from "../utils"
 import { addBasePath } from "next/dist/client/add-base-path"
 import * as z from "zod/mini"
+import {
+    PidConsortiumLabProfile,
+    PidConsortiumLabProfileProperty,
+    PidConsortiumLabProfileSchema,
+} from "@/lib/blocks/profiles/pidconsortium_lab_profile_schema"
 
 function recordMutation(block: Blockly.Block, mutation: () => void) {
     Blockly.Events.setGroup(true)
@@ -17,58 +21,71 @@ function recordMutation(block: Blockly.Block, mutation: () => void) {
     Blockly.Events.setGroup(false)
 }
 
-export interface ProfileBlock extends Blockly.BlockSvg {
-    profile: typeof LabProfile
+export type ProfileBlock = Blockly.BlockSvg & ProfileBlockMixin
+export interface ProfileBlockMixin {
+    profile: PidConsortiumLabProfile
     activeOptionalProperties: string[]
     profileAttributeKey: string | undefined
     // block methods
-    addImplicitDummyField(propertyName: string, value: string): void
-    addFieldForProperty(propertyName: string, before?: string): void
-    removeFieldForProperty(propertyName: string): void
-    addListBlockToEmptyInput(input: Blockly.Input): void
+    addImplicitDummyField(
+        this: ProfileBlock,
+        propertyName: string,
+        value: string,
+    ): void
+    addFieldForProperty(
+        this: ProfileBlock,
+        propertyName: string,
+        before?: string,
+    ): void
+    removeFieldForProperty(this: ProfileBlock, propertyName: string): void
+    addListBlockToEmptyInput(this: ProfileBlock, input: Blockly.Input): void
     // data methods
-    extractPidFromProperty(propertyName: string): string | undefined
+    extractPidFromProperty(
+        this: ProfileBlock,
+        propertyName: string,
+    ): string | undefined
     // blocks created from profile data
-    createAttributeReferenceBlock(): Blockly.Block
+    createAttributeReferenceBlock(this: ProfileBlock): Blockly.Block
     // event handlers
-    onBlockCreate(event: Blockly.Events.BlockCreate): void
-    onBlockMove(event: Blockly.Events.BlockMove): void
-    onBlockChange(event: Blockly.Events.BlockChange): void
+    onBlockCreate(this: ProfileBlock, event: Blockly.Events.BlockCreate): void
+    onBlockMove(this: ProfileBlock, event: Blockly.Events.BlockMove): void
+    onBlockChange(this: ProfileBlock, event: Blockly.Events.BlockChange): void
+    // helpers
+    getProperties(this: ProfileBlock): PidConsortiumLabProfileProperty[]
 }
 
-/* @ts-expect-error Object can't be cast to class */
-export const dariah: ProfileBlock = {
-    profile: LabProfile,
+export const createProfileBlock: (profileJson: unknown) => ProfileBlockMixin = (
+    json,
+) => ({
+    profile: PidConsortiumLabProfileSchema.parse(json),
     activeOptionalProperties: [],
     profileAttributeKey: undefined,
 
-    init: function init() {
+    init: function init(this: ProfileBlock) {
         this.profileAttributeKey = extractProfileAttributeKey(this)
 
         this.appendDummyInput("0").appendField(
             camelToTitleCase(this.profile.name),
         )
 
-        for (const property of this.profile.Schema.Properties) {
-            if (property.Properties.Cardinality.startsWith("0")) continue // Skip optional properties by default
-            const isSelfReference =
-                property.Type === this.profileAttributeKey
+        for (const property of this.getProperties()) {
+            if (property.Properties?.Cardinality.startsWith("0")) continue // Skip optional properties by default
+            const isSelfReference = property.Type === this.profileAttributeKey
             if (!isSelfReference) {
                 this.addFieldForProperty(property.Name)
             } else {
                 this.addImplicitDummyField(
                     property.Name,
-                    this.profile.Identifier,
+                    this.profile.Identifier ?? this.profile.name,
                 )
             }
         }
 
         const optionalPropertiesSelector = new Blockly.FieldDropdown([
             ["-- Add Property --", "ADD"] as [string, string],
-            ...this.profile.Schema.Properties
-                .filter(
-                    (property) =>
-                        property.Properties.Cardinality.startsWith("0")
+            ...this.getProperties()
+                .filter((property) =>
+                    property.Properties?.Cardinality.startsWith("0"),
                 )
                 .map(
                     (property) =>
@@ -94,9 +111,12 @@ export const dariah: ProfileBlock = {
         this.setColour(230)
     },
 
+    getProperties() {
+        return this.profile.Schema?.Properties ?? []
+    },
+
     extractPidFromProperty(propertyName: string): string | undefined {
-        return this.profile.Schema.Properties.find((p) => p.Name === propertyName)
-            ?.Type
+        return this.getProperties().find((p) => p.Name === propertyName)?.Type
     },
 
     addImplicitDummyField(propertyName: string, value: string) {
@@ -115,14 +135,13 @@ export const dariah: ProfileBlock = {
     },
 
     addFieldForProperty(propertyName, before) {
-        const property = this.profile.Schema.Properties.find(
+        const property = this.getProperties().find(
             (p) => p.Name === propertyName,
         )
         if (!property) return
 
-
-        const isOptional = property.Properties.Cardinality.startsWith("0")
-        const isRepeatable = property.Properties.Cardinality.endsWith("n")
+        const isOptional = property.Properties?.Cardinality.startsWith("0")
+        const isRepeatable = property.Properties?.Cardinality.endsWith("n")
 
         const typeCheck = [
             "JSON",
@@ -182,12 +201,10 @@ export const dariah: ProfileBlock = {
     },
 
     addListBlockToEmptyInput(input: Blockly.Input) {
-        const property = this.profile.Schema.Properties.find(
-            (p) => p.Name === input.name,
-        )
+        const property = this.getProperties().find((p) => p.Name === input.name)
         if (!property) return
 
-        const isRepeatable: boolean = property.Properties.Cardinality.endsWith("n")
+        const isRepeatable = property.Properties?.Cardinality.endsWith("n")
         const hasConnection: boolean = input.connection != null
         const isConnected: boolean =
             hasConnection && input.connection?.targetConnection != null
@@ -211,7 +228,7 @@ export const dariah: ProfileBlock = {
     },
 
     createAttributeReferenceBlock() {
-        const nameIdPairs: Blockly.MenuGenerator = this.profile.Schema.Properties.map(
+        const nameIdPairs: Blockly.MenuGenerator = this.getProperties().map(
             (p) => {
                 return [p.Name, p.Type]
             },
@@ -310,7 +327,7 @@ export const dariah: ProfileBlock = {
         }
     },
 
-    onchange: function onchange(abstract) {
+    onchange: function onchange(this: ProfileBlock, abstract) {
         if (abstract instanceof Blockly.Events.BlockCreate) {
             this.onBlockCreate(abstract)
         }
@@ -320,7 +337,7 @@ export const dariah: ProfileBlock = {
         if (abstract instanceof Blockly.Events.BlockChange) {
             this.onBlockChange(abstract)
         }
-    },
+    } satisfies Blockly.Block["onchange"],
 
     saveExtraState() {
         return JSON.stringify({
@@ -328,7 +345,7 @@ export const dariah: ProfileBlock = {
         })
     },
 
-    loadExtraState(data) {
+    loadExtraState: function loadExtraState(this: ProfileBlock, data) {
         const obj = typeof data === "string" ? JSON.parse(data) : data
 
         const parsed = z
@@ -368,14 +385,13 @@ export const dariah: ProfileBlock = {
                 parsed.error,
             )
         }
-    },
-}
+    } satisfies Blockly.Block["loadExtraState"],
+})
 
 function extractProfileAttributeKey(block: ProfileBlock) {
-
-    return block.profile.Schema.Properties.filter((p) =>
-        p.Name.toLowerCase().includes("profile"),
-    )
+    return block
+        .getProperties()
+        .filter((p) => p.Name.toLowerCase().includes("profile"))
         .map((p) => p.Type)
         .at(0)
 }

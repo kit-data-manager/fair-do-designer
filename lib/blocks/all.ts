@@ -6,6 +6,8 @@ import { pidrecord, pidrecord_skipable } from "./pidrecord"
 import { profile_hmc } from "./hmc_profile"
 import { attribute, backlink_declaration } from "./attribute"
 import { stop_design, log_value, otherwise } from "./error_handling"
+import * as new_DARIAH from "./profiles/new_DARIAH.json"
+import * as B2Inst from "./profiles/B2Inst.json"
 
 import * as Blockly from "blockly/core"
 import {
@@ -14,7 +16,7 @@ import {
     input_json_pointer,
 } from "./input"
 import "@blockly/block-plus-minus"
-import { dariah } from "@/lib/blocks/generic_dtr_lab"
+import { createProfileBlock } from "@/lib/blocks/generic_dtr_lab"
 
 Blockly.Blocks["pidrecord"] = pidrecord
 Blockly.Blocks["pidrecord_skipable"] = pidrecord_skipable
@@ -26,7 +28,8 @@ Blockly.Blocks["input_custom_json_path"] = input_custom_json_path
 Blockly.Blocks["input_custom_json_pointer"] = input_custom_json_pointer
 
 Blockly.Blocks["profile_hmc"] = profile_hmc
-Blockly.Blocks["profile_dariah"] = dariah
+Blockly.Blocks["profile_dariah"] = createProfileBlock(new_DARIAH)
+Blockly.Blocks["profile_b2inst"] = createProfileBlock(B2Inst)
 Blockly.Blocks["profile_hmc_reference_block"] =
     profile_hmc.createAttributeReferenceBlock()
 

@@ -74,6 +74,10 @@ export const toolbox = {
                 },
                 {
                     kind: "block",
+                    type: "profile_b2inst",
+                },
+                {
+                    kind: "block",
                     type: "attribute_key",
                 },
             ],
